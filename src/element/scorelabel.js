@@ -3,36 +3,47 @@ phina.namespace(function() {
   phina.define("ps.ScoreLabel", {
     superClass: "phina.display.Label",
 
-    init: function() {
-      this.superInit({
+    init: function(options) {
+      this.superInit((options || {}).$safe({
         fill: "white",
         stroke: null,
-        fontSize: FONT_SIZE_M,
+        fontSize: FONT_SIZE_L,
         fontFamily: "mono",
         align: "right",
         baseline: "middle",
-      });
+      }));
 
-      this.score = 9999999999999;
+      this.value = Math.rand(0, 10000000000000);
     },
 
     formatText: function() {
       var v = "" + Math.floor(this._score);
-      if (12 < v.length) {
-        v = v.substring(0, v.length - 12) + "兆" + v.substring(v.length - 12);
-      }
-      if (8 < v.length) {
-        v = v.substring(0, v.length - 8) + "億" + v.substring(v.length - 8);
-      }
-      if (4 < v.length) {
-        v = v.substring(0, v.length - 4) + "万" + v.substring(v.length - 4);
-      }
+      Array.range(5, 0).forEach(function(i) {
+        var s = i * 3;
+        if (s < v.length) {
+          v = v.substring(0, v.length - s) + "," + v.substring(v.length - s);
+        }
+      });
 
       this.text = v;
     },
+    // formatText: function() {
+    //   var v = "" + Math.floor(this._score);
+    //   if (12 < v.length) {
+    //     v = v.substring(0, v.length - 12) + "兆" + v.substring(v.length - 12);
+    //   }
+    //   if (8 < v.length) {
+    //     v = v.substring(0, v.length - 8) + "億" + v.substring(v.length - 8);
+    //   }
+    //   if (4 < v.length) {
+    //     v = v.substring(0, v.length - 4) + "万" + v.substring(v.length - 4);
+    //   }
+
+    //   this.text = v;
+    // },
 
     _accessor: {
-      score: {
+      value: {
         get: function() {
           return this._score;
         },
