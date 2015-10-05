@@ -20,7 +20,7 @@ phina.namespace(function() {
       if (0 < count - this.children.length) {
         (count - this.children.length).times(function(i) {
           var newItem = phina.display.Sprite(t);
-          newItem.setPosition(self.children.length * -newItem.width * 1.1, 0)
+          newItem.setPosition(self.children.length * -newItem.width * 1.02, 0)
             .addChildTo(self);
         });
       }

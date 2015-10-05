@@ -37,6 +37,13 @@ phina.namespace(function() {
                 className: "ps.Player",
                 x: GAMEAREA_WIDTH * 0.5,
                 y: GAMEAREA_HEIGHT * 0.9,
+              },
+              
+              b: {
+                className: "phina.display.Sprite",
+                arguments: ["bomb"],
+                x: GAMEAREA_WIDTH * 0.5,
+                y: GAMEAREA_HEIGHT * 0.5,
               }
             }
           },

@@ -9,8 +9,11 @@ phina.namespace(function() {
             return {
               image: {
                 player: "asset/player.png",
+                bullet: "asset/bullets.png",
+                bomb: "asset/bomb.png",
+
                 zanki: "asset/zankiIcon.png",
-                bomb: "asset/bombIcon.png",
+                bombIcon: "asset/bombIcon.png",
               },
 
               font: {

@@ -67,8 +67,11 @@ phina.namespace(function() {
             return {
               image: {
                 player: "asset/player.png",
+                bullet: "asset/bullets.png",
+                bomb: "asset/bomb.png",
+
                 zanki: "asset/zankiIcon.png",
-                bomb: "asset/bombIcon.png",
+                bombIcon: "asset/bombIcon.png",
               },
 
               font: {
@@ -126,7 +129,7 @@ phina.namespace(function() {
     superClass: "ps.ItemDisplay",
 
     init: function(initialValue) {
-      this.superInit("bomb", initialValue);
+      this.superInit("bombIcon", initialValue);
     },
 
   });
@@ -185,7 +188,7 @@ phina.namespace(function() {
       if (0 < count - this.children.length) {
         (count - this.children.length).times(function(i) {
           var newItem = phina.display.Sprite(t);
-          newItem.setPosition(self.children.length * -newItem.width * 1.1, 0)
+          newItem.setPosition(self.children.length * -newItem.width * 1.02, 0)
             .addChildTo(self);
         });
       }
@@ -339,6 +342,19 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  phina.define("ps.Shot", {
+    superClass: "phina.display.Sprite",
+
+    init: function() {
+      this.superInit("bullet", 32, 32);
+      this.frameIndex = 0;
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
   phina.define("ps.TitleLogoLabel", {
     superClass: "phina.display.Label",
 
@@ -377,8 +393,8 @@ phina.namespace(function() {
     currentStage: 0,
 
     score: 0,
-    zanki: 0,
-    bomb: 0,
+    zanki: 10,
+    bomb: 10,
     psyche: 0,
     highScore: 0,
 
@@ -712,6 +728,13 @@ phina.namespace(function() {
                 className: "ps.Player",
                 x: GAMEAREA_WIDTH * 0.5,
                 y: GAMEAREA_HEIGHT * 0.9,
+              },
+              
+              b: {
+                className: "phina.display.Sprite",
+                arguments: ["bomb"],
+                x: GAMEAREA_WIDTH * 0.5,
+                y: GAMEAREA_HEIGHT * 0.5,
               }
             }
           },
