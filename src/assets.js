@@ -8,6 +8,7 @@ phina.namespace(function() {
           case "common":
             return {
               image: {
+                player: "asset/player.png",
                 zanki: "asset/zankiIcon.png",
                 bomb: "asset/bombIcon.png",
               },

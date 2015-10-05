@@ -14,7 +14,17 @@ phina.namespace(function() {
       this.domElement.style.imageRendering = "pixelated";
 
       this.replaceScene(ps.MainSequence());
-    }
+
+      this.gamepads = phina.input.GamepadManager();
+    },
+
+    update: function() {
+      this.mouse.update();
+      this.touch.update();
+      this.touchList.update();
+      this.keyboard.update();
+      this.gamepads.update();
+    },
 
   });
 

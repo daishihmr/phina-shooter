@@ -31,6 +31,14 @@ phina.namespace(function() {
             className: "ps.gamescene.MainLayer",
             x: SIDEBAR_WIDTH,
             y: 0,
+
+            children: {
+              player: {
+                className: "ps.Player",
+                x: GAMEAREA_WIDTH * 0.5,
+                y: GAMEAREA_HEIGHT * 0.9,
+              }
+            }
           },
         }
       });
@@ -41,6 +49,10 @@ phina.namespace(function() {
 
     update: function(app) {
       this.gameData.updateView(app.ticker.frame);
+    },
+
+    launchEnemy: function(enemy) {
+      // TODO
     },
 
   });

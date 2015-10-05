@@ -20,7 +20,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit();
       this._binder = {};
-
+      
       this.extendMode = "normal";
       this.extendScore = [100000000, 200000000];
     },

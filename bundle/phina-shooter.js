@@ -40,7 +40,17 @@ phina.namespace(function() {
       this.domElement.style.imageRendering = "pixelated";
 
       this.replaceScene(ps.MainSequence());
-    }
+
+      this.gamepads = phina.input.GamepadManager();
+    },
+
+    update: function() {
+      this.mouse.update();
+      this.touch.update();
+      this.touchList.update();
+      this.keyboard.update();
+      this.gamepads.update();
+    },
 
   });
 
@@ -56,6 +66,7 @@ phina.namespace(function() {
           case "common":
             return {
               image: {
+                player: "asset/player.png",
                 zanki: "asset/zankiIcon.png",
                 bomb: "asset/bombIcon.png",
               },
@@ -119,6 +130,18 @@ phina.namespace(function() {
     },
 
   });
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Enemy", {
+    superClass: "phina.display.Sprite",
+
+    init: function(params) {
+      this.superInit(params.texture, params.width, params.height);
+    }
+  });
+
 });
 
 phina.namespace(function() {
@@ -192,11 +215,66 @@ phina.namespace(function() {
   phina.define("ps.Player", {
     superClass: "phina.display.Sprite",
 
+    controllable: true,
+    muteki: false,
+
+    roll: 0,
+
+    speed: 3.6,
+
     init: function() {
-      this.superInit();
-    }
+      this.superInit("player", 32, 32);
+      this.frameIndex = 4;
+    },
+
+    update: function(app) {
+      if (!this.controllable) return;
+
+      var kb = app.keyboard;
+      var gp = app.gamepads.get(0);
+      var p = app.pointer;
+
+      moveVector.set(0, 0);
+
+      moveVector.add(kb.getKeyDirection().mul(this.speed));
+      if (gp) {
+        var stick = gp.getStickDirection();
+        if (0.4 < stick.length()) {
+          moveVector.add(stick.normalize().mul(this.speed));
+        }
+      }
+      if (p.getPointing()) {
+        moveVector.add(p.deltaPosition.mul(2));
+      }
+
+      if (moveVector.x) {
+        this.roll += moveVector.x * 0.1;
+      } else {
+        this.roll *= 0.8;
+        if (Math.abs(this.roll) < 0.1) {
+          this.roll = 0;
+        }
+      }
+      if (this.roll !== 0) {
+        var sign = this.roll / Math.abs(this.roll);
+        var r = ~~(Math.abs(this.roll)) * sign;
+        this.frameIndex = Math.clamp(4 + r, 0, 8);
+      }
+
+      this.position.add(moveVector);
+      this.position.x = Math.clamp(this.position.x, 4, GAMEAREA_WIDTH - 4);
+      this.position.y = Math.clamp(this.position.y, 4, GAMEAREA_HEIGHT - 4);
+    },
+
+    launch: function() {
+      // TODO
+      this.x = GAMEAREA_WIDTH * 0.5;
+      this.y = GAMEAREA_HEIGHT * 0.9;
+    },
 
   });
+
+  var moveVector = phina.geom.Vector2(0, 0);
 
 });
 
@@ -304,12 +382,23 @@ phina.namespace(function() {
     psyche: 0,
     highScore: 0,
 
+    /**
+     * "normal" or "every"
+     */
+    extendMode: null,
+    extendScore: null,
+
     init: function() {
       this.superInit();
       this._binder = {};
+      
+      this.extendMode = "normal";
+      this.extendScore = [100000000, 200000000];
     },
 
-    update: function() {
+    updateView: function(frame) {
+      if (frame % 5 !== 0) return;
+
       var self = this;
       self._binder.forIn(function(name, view) {
         if (self[name] !== undefined) {
@@ -318,8 +407,45 @@ phina.namespace(function() {
       });
     },
 
-    bind: function(name, view) {
-      this._binder[name] = view;
+    miss: function() {
+      this.zanki -= 1;
+      this.psyche = 0;
+    },
+
+    useBomb: function() {
+      this.bomb -= 1;
+      this.psyche *= 0.7;
+    },
+
+    addPsyche: function(v) {
+      this.psyche += v;
+    },
+
+    addScore: function(v) {
+      var self = this;
+      var before = this.score;
+      var after = this.score + v;
+
+      if (this.extendMode === "normal") {
+        this.extendScore.forEach(function(es) {
+          if (before < es && es <= after) {
+            self.zanki += 1;
+            self.flare("extend");
+          }
+        });
+      } else if (this.extendMode === "every") {
+        var es = this.extendScore[0];
+        if (Math.floor(before / es) < Math.floor(after / es)) {
+          this.zanki += 1;
+          this.flare("extend");
+        }
+      }
+
+      this.score = after;
+    },
+
+    bind: function(propertyName, view) {
+      this._binder[propertyName] = view;
     }
 
   });
@@ -413,6 +539,8 @@ phina.namespace(function() {
       this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
     },
 
+    bindGameData: function(gameData) {},
+
     update: function(app) {
       this.skipDraw = app.ticker.frame % 5 !== 0
     },
@@ -480,7 +608,13 @@ phina.namespace(function() {
           },
         }
       });
-    }
+    },
+
+    bindGameData: function(gameData) {
+      gameData.bind("score", this.score);
+      gameData.bind("psyche", this.psyche);
+      gameData.bind("highScore", this.highScore);
+    },
 
   });
 
@@ -528,7 +662,12 @@ phina.namespace(function() {
           },
         }
       });
-    }
+    },
+
+    bindGameData: function(gameData) {
+      gameData.bind("zanki", this.zanki);
+      gameData.bind("bomb", this.bomb);
+    },
 
   });
 
@@ -539,6 +678,9 @@ phina.namespace(function() {
   phina.define("ps.GameScene", {
     superClass: "phina.display.CanvasScene",
 
+    stageId: null,
+    gameData: null,
+
     init: function(params) {
       this.superInit({
         width: SCREEN_WIDTH,
@@ -548,6 +690,7 @@ phina.namespace(function() {
 
       this.fromJSON({
         stageId: params.stageId,
+        gameData: params.gameData,
         children: {
           leftSideBar: {
             className: "ps.gamescene.LeftSideBar",
@@ -563,12 +706,29 @@ phina.namespace(function() {
             className: "ps.gamescene.MainLayer",
             x: SIDEBAR_WIDTH,
             y: 0,
+
+            children: {
+              player: {
+                className: "ps.Player",
+                x: GAMEAREA_WIDTH * 0.5,
+                y: GAMEAREA_HEIGHT * 0.9,
+              }
+            }
           },
         }
       });
+
+      this.leftSideBar.bindGameData(this.gameData);
+      this.rightSideBar.bindGameData(this.gameData);
     },
 
-    update: function() {}
+    update: function(app) {
+      this.gameData.updateView(app.ticker.frame);
+    },
+
+    launchEnemy: function(enemy) {
+      // TODO
+    },
 
   });
 });
@@ -626,6 +786,26 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  phina.define("ps.ResultScene", {
+    superClass: "phina.display.CanvasScene",
+
+    init: function(params) {
+      this.superInit({
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
+        backgroundColor: "black",
+      });
+
+      this.fromJSON({
+        gameData: params.gameData,
+      });
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
   phina.define("ps.TitleScene", {
     superClass: "phina.display.CanvasScene",
 
@@ -664,8 +844,11 @@ phina.namespace(function() {
    */
   phina.define("ps.ArcadeModeSequence", {
     superClass: "phina.game.ManagerScene",
-
+    
     init: function() {
+      
+      var gameData = ps.GameData();
+      
       this.superInit({
         scenes: [
 
@@ -691,7 +874,17 @@ phina.namespace(function() {
                 label: stageName,
                 className: "ps.GameScene",
                 arguments: {
-                  stageId: stageId
+                  stageId: stageId,
+                  gameData: gameData,
+                },
+                nextLabel: stageName + "result",
+              },
+
+              {
+                label: stageName + "result",
+                className: "ps.ResultScene",
+                arguments: {
+                  gameData: gameData,
                 },
                 nextLabel: next,
               },
@@ -759,6 +952,157 @@ phina.namespace(function() {
     }
   });
 
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Stage", {
+    superClass: "phina.util.EventDispatcher",
+
+    waitFor: -1,
+    sequencer: null,
+
+    init: function() {
+      this.superInit();
+
+      this.sequencer = ps.StageSequancer();
+    },
+
+    update: function(app) {
+      var frame = app.ticker.frame;
+      while (this.waitFor <= frame) {
+        var task = this.sequencer.next();
+        if (task) {
+          task.execute(app, app.currentScene, this);
+        }
+      }
+    }
+  });
+
+  phina.define("ps.StageSequancer", {
+
+    init: function() {
+      this.seq = [];
+    },
+
+    addTask: function(task) {
+      this.seq.push(task);
+      return this;
+    },
+
+    next: function() {
+      return this.seq.shift();
+    },
+
+    wait: function(frame) {
+      return this.addTask(ps.StageTask(frame));
+    },
+
+    playBgm: function(bgmData) {
+      return this.addTask(ps.PlayBgmTask(bgmData));
+    },
+
+    stopBgm: function() {
+      return this.addTask(ps.StopBgmTask());
+    },
+
+    warning: function() {
+      return this.addTask(ps.WarningTask());
+    },
+
+    launchEnemy: function(enemyClassName, params) {
+      return this.addTask(ps.LaunchEnemyTask(enemyClassName, params));
+    },
+
+    launchBoss: function(bossClassName) {
+      return this.addTask(ps.LaunchBossTask(bossClassName));
+    },
+  });
+
+  phina.define("ps.StageTask", {
+    init: function() {},
+    execute: function(app, gameScene, stage) {}
+  });
+
+  phina.define("ps.WaitTask", {
+    superClass: "ps.StageTask",
+
+    frame: 0,
+
+    init: function(frame) {
+      this.frame = frame;
+    },
+
+    execute: function(app, gameScene, stage) {
+      stage.waitFor = app.ticker.frame + this.frame;
+    }
+  });
+
+  phina.define("ps.PlayBgmTask", {
+    superClass: "ps.StageTask",
+
+    bgmData: null,
+
+    init: function(bgmData) {
+      this.superInit();
+      this.bgmData = bgmData;
+    }
+  });
+
+  phina.define("ps.StopBgmTask", {
+    superClass: "ps.StageTask",
+
+    init: function() {
+      this.superInit();
+    }
+  });
+
+  phina.define("ps.WarningTask", {
+    superClass: "ps.StageTask",
+
+    init: function() {
+      this.superInit();
+    }
+  });
+
+  phina.define("ps.LaunchEnemyTask", {
+    superClass: "ps.StageTask",
+
+    enemyClassName: null,
+    params: null,
+
+    init: function(enemyClassName, params) {
+      this.superInit();
+      this.enemyClassName = enemyClassName;
+      this.params = params;
+    }
+  });
+
+  phina.define("ps.LaunchBossTask", {
+    superClass: "ps.StageTask",
+
+    bossClassName: null,
+
+    init: function(bossClassName, params) {
+      this.superInit();
+      this.bossClassName = bossClassName;
+      this.params = params;
+    }
+  });
+
+});
+
+phina.namespace(function() {
+  
+  phina.define("ps.Stage1", {
+    superClass: "ps.Stage",
+    
+    init: function() {
+      this.superInit();
+    }
+
+  });
+  
 });
 
 //# sourceMappingURL=phina-shooter.js.map
