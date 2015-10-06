@@ -4,6 +4,7 @@ phina.namespace(function() {
     superClass: "phina.display.Layer",
 
     renderChildBySelf: true,
+    skip: false,
 
     init: function(params) {
       this.superInit({
@@ -11,13 +12,17 @@ phina.namespace(function() {
         height: GAMEAREA_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = null;
+      this.backgroundColor = params.backgroundColor;
 
       this.stroke = params.stroke;
       this.fill = params.fill;
       this.lineWidth = 1;
 
       this.camera = ps.bg.Camera().addChildTo(this);
+    },
+    
+    update: function(app) {
+      this.skip = app.ticker.frame % 3 !== 0;
     },
 
     render: function() {
@@ -27,7 +32,7 @@ phina.namespace(function() {
       var w = canvas.canvas.width;
       var h = canvas.canvas.height;
 
-      canvas.clear();
+      canvas.clearColor(this.backgroundColor);
 
       if (self.stroke) {
         canvas.strokeStyle = self.stroke;
@@ -45,7 +50,7 @@ phina.namespace(function() {
           var positions = [];
           for (var s = 0, slen = src.length; s < slen; s++) {
             var pos = src[s];
-            if (pos === null) {
+            if (pos[3] < 0) {
               positions = [];
               break;
             } else {
@@ -54,9 +59,15 @@ phina.namespace(function() {
             }
           }
 
-          if (2 <= positions.length) {
+          if (4 <= positions.length) {
             canvas.beginPath();
             canvas.lines.apply(canvas, positions);
+            canvas.closePath();
+            if (self.stroke) canvas.stroke();
+            if (self.fill) canvas.fill();
+          } else if (positions.length === 2) {
+            canvas.beginPath();
+            canvas.rect(positions[0], positions[1], 1, 1);
             canvas.closePath();
             if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
@@ -66,7 +77,9 @@ phina.namespace(function() {
     },
 
     draw: function(canvas) {
-      this.render();
+      if (!this.skip) {
+        this.render();
+      }
 
       var image = this.canvas.domElement;
       canvas.context.drawImage(image,
@@ -200,9 +213,9 @@ phina.namespace(function() {
         return vec4.clone(vertex);
       });
 
-      this.rotation = quat.create();
+      // this.rotation = quat.create();
       this.translation = vec3.create();
-      this.scale = vec3.set(vec3.create(), 1, 1, 1);
+      // this.scale = vec3.set(vec3.create(), 1, 1, 1);
 
       this.mMatrix = mat4.create();
       this.mvpMatrix = mat4.create();
@@ -219,16 +232,16 @@ phina.namespace(function() {
     },
 
     render: function(camera) {
+      var vertices = this.vertices;
       var calcPosition = this.calcPosition;
       var mvp = mat4.mul(this.mvpMatrix, camera.vpMatrix, this.mMatrix);
-      return this.vertices.map(function(vertex, i) {
-        var pos = vec4.transformMat4(calcPosition[i], vertex, mvp);
-        if (pos[3] < 0) {
-          return null;
-        } else {
-          return pos;
-        }
-      });
+
+      for (var i = 0, len = vertices.length; i < len; i++) {
+        var vertex = vertices[i];
+        vec4.transformMat4(calcPosition[i], vertex, mvp);
+      }
+
+      return calcPosition;
     },
 
     setTranslation: function(x, y, z) {

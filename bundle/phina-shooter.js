@@ -17,6 +17,7 @@ var FONT_SIZE_M = ~~(0.02 * SCREEN_WIDTH);
 var FONT_SIZE_S = ~~(0.01 * SCREEN_WIDTH);
 
 phina.main(function() {
+  ps.Color.initialize();
 
   var app = ps.Application();
   app.run();
@@ -125,12 +126,301 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var B0 = bullet({
+    type: 4
+  });
+  var B1 = bullet({
+    type: 5
+  });
+  var B2 = bullet({
+    type: 6
+  });
+  var B3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 10
+  });
+  var B5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
+
+  ps.danmaku = {};
+
+  // ザコ
+  var basic = function(dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
+          fire(DM, spd(1), direction(dir)),
+          repeat("$burst", [
+            fire(B2, spdSeq(0.15), direction(0, "sequence")),
+          ]),
+          interval(90),
+        ]),
+      ]),
+    });
+  };
+  ps.danmaku.basic = basic(0);
+  ps.danmaku.basicR1 = basic(-5);
+  ps.danmaku.basicL1 = basic(+5);
+  ps.danmaku.basicR2 = basic(-15);
+  ps.danmaku.basicL2 = basic(+15);
+
+  // ザコ3way
+  var basic3 = function(dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
+          fire(DM, spd(1), direction(dir - 7)),
+          repeat("$burst", [
+            fire(B2, spdSeq(0.05), direction(0, "sequence")),
+            fire(B2, spdSeq(0), direction(7, "sequence")),
+            fire(B2, spdSeq(0), direction(7, "sequence")),
+            fire(DM, spdSeq(0), direction(-14, "sequence")),
+          ]),
+          interval(90),
+        ]),
+      ]),
+    });
+  };
+  ps.danmaku.basic3 = basic3(0);
+  ps.danmaku.basic3R1 = basic3(-5);
+  ps.danmaku.basic3L1 = basic3(+5);
+  ps.danmaku.basic3R2 = basic3(-15);
+  ps.danmaku.basic3L2 = basic3(+15);
+
+  // Stage1 ------------------------------
+
+  // 黒川
+  ps.danmaku.kurokawa1 = new bulletml.Root({
+    top: action([
+      interval(20),
+      repeat(Infinity, [
+        repeat(3, [
+          fire(DM, spd(1.2)),
+          repeat(3, [
+            fire(B0, spdSeq(0), direction(0, "sequence")),
+            wait(6),
+          ]),
+          interval(12),
+        ]),
+        interval(50),
+      ]),
+    ]),
+  });
+
+  // 秋元
+  ps.danmaku.akimoto1 = new bulletml.Root({
+    top0: action([
+      repeat(Infinity, [
+        interval(20),
+        fire(B1, spd(1.0), direction(-30)),
+        repeat(8, [
+          fire(B1, spdSeq(0), direction(60 / 8, "sequence")),
+        ]),
+        interval(80),
+      ]),
+    ]),
+    top1: action([
+      repeat(Infinity, [
+        interval(50),
+        fire(B1, spd(1.2), direction(-10)),
+        repeat(6, [
+          fire(B1, spdSeq(0), direction(20 / 6, "sequence")),
+        ]),
+        interval(50),
+      ]),
+    ]),
+  });
+
+  // 黄瀬
+  ps.danmaku.kise1 = new bulletml.Root({
+    top: action([
+      interval(20),
+      repeat(Infinity, [
+        fire(DM, spd(1.4)),
+        repeat(12, [
+          fire(B4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+        ]),
+        interval(90),
+      ]),
+    ]),
+  });
+
+  // Stage2 ------------------------------
+  // Stage3 ------------------------------
+  // Stage4 ------------------------------
+  // Stage5 ------------------------------
+
+});
+
+phina.namespace(function() {
+  // Color Palette by Paletton.com
+  // Palette URL: http://paletton.com/#uid=50f1n0kmGpNdfBfixtwqklHuEgU
+
+  phina.define("ps.Color", {
+    init: function() {},
+    _static: {
+      pri: [],
+      sec0: [],
+      sec1: [],
+
+      initialize: function(scene) {
+        ps.Color.pri = [];
+        ps.Color.sec0 = [];
+        ps.Color.sec1 = [];
+        ps.Color.pria = [];
+        ps.Color.sec0a = [];
+        ps.Color.sec1a = [];
+
+        var p0 = 21;
+        var r = 140;
+        var s0 = (p0 - r + 360) % 360;
+        var s1 = (p0 + r + 360) % 360;
+
+        var size = 15;
+        var sMin = 48;
+        var sMax = 90;
+        var sLev = (sMax - sMin) / (size - 1);
+        var hMin = 5;
+        var hMax = 94;
+        var hLev = (hMax - hMin) / (size - 1);
+        Array.range(0, size).forEach(function(i) {
+          var s = Math.floor(sMin + sLev * i);
+          var h = Math.floor(hMin + hLev * i);
+          ps.Color.pri[i] = "hsl({0},{1}%,{2}%)"    .format(p0, s, h);
+          ps.Color.sec0[i] = "hsl({0},{1}%,{2}%)"   .format(s0, s, h);
+          ps.Color.sec1[i] = "hsl({0},{1}%,{2}%)"   .format(s1, s, h);
+          ps.Color.pria[i] = "hsla({0},{1}%,{2}%,"  .format(p0, s, h) + "{0})";
+          ps.Color.sec0a[i] = "hsla({0},{1}%,{2}%," .format(s0, s, h) + "{0})";
+          ps.Color.sec1a[i] = "hsla({0},{1}%,{2}%," .format(s1, s, h) + "{0})";
+        });
+
+        if (scene) ps.Color.test().addChildTo(scene);
+      },
+
+      test: function() {
+        var r = phina.display.CanvasElement();
+        ps.Color.pri.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 20)
+            .addChildTo(r);
+        });
+
+        ps.Color.sec0.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 0)
+            .addChildTo(r);
+        });
+
+        ps.Color.sec1.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 40)
+            .addChildTo(r);
+        });
+
+        return r;
+      }
+    },
+  });
+
+});
+
+phina.namespace(function() {
+
   phina.define("ps.BombDisplay", {
     superClass: "ps.ItemDisplay",
 
     init: function(initialValue) {
       this.superInit("bombIcon", initialValue);
     },
+
+  });
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Bullet", {
+    superClass: "phina.display.Sprite",
+
+    runner: null,
+    dummy: false,
+
+    init: function() {
+      this.superInit("bullet", 32, 32);
+      this.age = 0;
+      this.scale.x = 0.75;
+      this.scale.y = 0.75;
+    },
+
+    update: function(app) {
+      if (this.runner) {
+        var bx = this.position.x;
+        var by = this.position.y;
+        this.runner.update();
+        this.position.x = this.runner.x;
+        this.position.y = this.runner.y;
+        
+        this.rotation = Math.atan2(this.runner.y - by, this.runner.x - bx) * 180 / Math.PI;
+        this.scale.y = 0.75 + Math.sin(this.age * 0.8) * 0.12;
+      }
+      
+      this.age += 1;
+    }
 
   });
 });
@@ -153,6 +443,7 @@ phina.namespace(function() {
     superClass: "phina.display.Layer",
 
     renderChildBySelf: true,
+    skip: false,
 
     init: function(params) {
       this.superInit({
@@ -160,13 +451,17 @@ phina.namespace(function() {
         height: GAMEAREA_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = null;
+      this.backgroundColor = params.backgroundColor;
 
       this.stroke = params.stroke;
       this.fill = params.fill;
       this.lineWidth = 1;
 
       this.camera = ps.bg.Camera().addChildTo(this);
+    },
+    
+    update: function(app) {
+      this.skip = app.ticker.frame % 3 !== 0;
     },
 
     render: function() {
@@ -176,7 +471,7 @@ phina.namespace(function() {
       var w = canvas.canvas.width;
       var h = canvas.canvas.height;
 
-      canvas.clear();
+      canvas.clearColor(this.backgroundColor);
 
       if (self.stroke) {
         canvas.strokeStyle = self.stroke;
@@ -194,7 +489,7 @@ phina.namespace(function() {
           var positions = [];
           for (var s = 0, slen = src.length; s < slen; s++) {
             var pos = src[s];
-            if (pos === null) {
+            if (pos[3] < 0) {
               positions = [];
               break;
             } else {
@@ -203,9 +498,15 @@ phina.namespace(function() {
             }
           }
 
-          if (2 <= positions.length) {
+          if (4 <= positions.length) {
             canvas.beginPath();
             canvas.lines.apply(canvas, positions);
+            canvas.closePath();
+            if (self.stroke) canvas.stroke();
+            if (self.fill) canvas.fill();
+          } else if (positions.length === 2) {
+            canvas.beginPath();
+            canvas.rect(positions[0], positions[1], 1, 1);
             canvas.closePath();
             if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
@@ -215,7 +516,9 @@ phina.namespace(function() {
     },
 
     draw: function(canvas) {
-      this.render();
+      if (!this.skip) {
+        this.render();
+      }
 
       var image = this.canvas.domElement;
       canvas.context.drawImage(image,
@@ -349,9 +652,9 @@ phina.namespace(function() {
         return vec4.clone(vertex);
       });
 
-      this.rotation = quat.create();
+      // this.rotation = quat.create();
       this.translation = vec3.create();
-      this.scale = vec3.set(vec3.create(), 1, 1, 1);
+      // this.scale = vec3.set(vec3.create(), 1, 1, 1);
 
       this.mMatrix = mat4.create();
       this.mvpMatrix = mat4.create();
@@ -368,16 +671,16 @@ phina.namespace(function() {
     },
 
     render: function(camera) {
+      var vertices = this.vertices;
       var calcPosition = this.calcPosition;
       var mvp = mat4.mul(this.mvpMatrix, camera.vpMatrix, this.mMatrix);
-      return this.vertices.map(function(vertex, i) {
-        var pos = vec4.transformMat4(calcPosition[i], vertex, mvp);
-        if (pos[3] < 0) {
-          return null;
-        } else {
-          return pos;
-        }
-      });
+
+      for (var i = 0, len = vertices.length; i < len; i++) {
+        var vertex = vertices[i];
+        vec4.transformMat4(calcPosition[i], vertex, mvp);
+      }
+
+      return calcPosition;
     },
 
     setTranslation: function(x, y, z) {
@@ -422,7 +725,7 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.gamescene.MainLayer", {
+  phina.define("ps.BulletLayer", {
     superClass: "phina.display.Layer",
 
     init: function() {
@@ -431,7 +734,119 @@ phina.namespace(function() {
         height: GAMEAREA_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = "hsl(240, 100%, 5%)";
+      this.backgroundColor = null;
+    },
+
+    spawn: function(runner, spec) {
+      var bullet = ps.Bullet().addChildTo(this);
+      bullet.runner = runner;
+      bullet.frameIndex = spec.type || 0;
+      if (spec.dummy) {
+        bullet.visible = false;
+      }
+    },
+
+    update: function() {
+      var bs = this.children.slice(0);
+      for (var i = 0, len = bs.length; i < len; i++) {
+        var b = bs[i];
+        if (b.x < 0 || GAMEAREA_WIDTH < b.x || b.y < 0 || GAMEAREA_HEIGHT < b.y) {
+          b.remove();
+        }
+      }
+    },
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.gamescene.MainLayer", {
+    superClass: "phina.display.Layer",
+
+    init: function(params) {
+      this.superInit({
+        width: GAMEAREA_WIDTH,
+        height: GAMEAREA_HEIGHT,
+      });
+      this.setOrigin(0, 0);
+      this.backgroundColor = null;
+
+      this.fromJSON({
+        children: {
+          backgroundLayer: {
+            className: params.stage.backgroundClassName,
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+          
+          scoreItemLayer: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+
+          shotLayer: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "lighter";
+            // },
+          },
+
+          player: {
+            className: "ps.Player",
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.9,
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+
+          itemLayer: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+
+          enemyLayer: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+
+          effectLayer: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+              // canvas.context.globalCompositeOperation = "lighter";
+            // },
+          },
+
+          bulletLayer: {
+            className: "ps.BulletLayer",
+            // draw: function(canvas) {
+            //   canvas.context.globalCompositeOperation = "lighter";
+            // },
+          },
+
+          dummy: {
+            className: "phina.app.Element",
+            // draw: function(canvas) {
+            //   canvas.context.globalCompositeOperation = "source-over";
+            // },
+          },
+
+          b: {
+            className: "phina.display.Sprite",
+            arguments: ["bomb"],
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.2,
+          }
+        }
+      });
     }
 
   });
@@ -450,7 +865,7 @@ phina.namespace(function() {
         height: SIDEBAR_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = "hsl(0, 100%, 7%)";
+      this.backgroundColor = ps.Color.sec1[0];
       this.gridX = phina.util.Grid(SIDEBAR_WIDTH, 16);
       this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
     },
@@ -596,8 +1011,8 @@ phina.namespace(function() {
 
     init: function(options) {
       this.superInit(options.$safe({
-        fill: "white",
-        stroke: null,
+        fill: ps.Color.sec0[14],
+        stroke: ps.Color.sec0[6],
         fontSize: FONT_SIZE_M,
         fontFamily: "main",
         align: "left",
@@ -790,7 +1205,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit("bullet", 32, 32);
       this.frameIndex = 0;
-    }
+    },
   });
 
 });
@@ -806,8 +1221,8 @@ phina.namespace(function() {
         align: "center",
         fontFamily: "title",
         fontSize: FONT_SIZE_L,
-        fill: "hsl(50, 80%, 80%)",
-        stroke: "hsl(0, 100%, 50%)",
+        stroke: ps.Color.pri[6],
+        fill: ps.Color.pri[13],
       }));
     }
 
@@ -825,6 +1240,34 @@ phina.namespace(function() {
     },
 
   });
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.BulletConfig", {
+
+    speedRate: 2,
+    target: null,
+    bulletLayer: null,
+
+    init: function(target, bulletLayer) {
+      this.target = target;
+      this.bulletLayer = bulletLayer;
+      
+      this.put("densityRank", 0.0);
+      this.put("speedRank", 0.0);
+      this.put("burst", 0);
+    },
+
+    createNewBullet: function(runner, spec) {
+      this.bulletLayer.spawn(runner, spec);
+    },
+    
+    put: function(name, value) {
+      bulletml.Walker.globalScope["$" + name] = value;
+    },
+  });
+
 });
 
 phina.namespace(function() {
@@ -969,6 +1412,7 @@ phina.namespace(function() {
 
     stageId: null,
     gameData: null,
+    bulletConfig: null,
 
     init: function(params) {
       this.superInit({
@@ -977,33 +1421,17 @@ phina.namespace(function() {
         backgroundColor: "hsl(30, 60%, 60%)",
       });
 
+      this.stage = ps.Stage.create(params.stageId);
+
       this.fromJSON({
-        stageId: params.stageId,
-        gameData: params.gameData,
         children: {
           mainLayer: {
             className: "ps.gamescene.MainLayer",
+            arguments: {
+              stage: this.stage,
+            },
             x: SIDEBAR_WIDTH,
             y: 0,
-
-            children: {
-              backgroundLayer: {
-                className: "ps.Background1",
-              },
-
-              player: {
-                className: "ps.Player",
-                x: GAMEAREA_WIDTH * 0.5,
-                y: GAMEAREA_HEIGHT * 0.9,
-              },
-              
-              b: {
-                className: "phina.display.Sprite",
-                arguments: ["bomb"],
-                x: GAMEAREA_WIDTH * 0.5,
-                y: GAMEAREA_HEIGHT * 0.5,
-              }
-            }
           },
           leftSideBar: {
             className: "ps.gamescene.LeftSideBar",
@@ -1018,12 +1446,19 @@ phina.namespace(function() {
         }
       });
 
+      this.gameData = params.gameData;
       this.leftSideBar.bindGameData(this.gameData);
       this.rightSideBar.bindGameData(this.gameData);
+      this.bulletConfig = ps.BulletConfig(this.mainLayer.player, this.mainLayer.bulletLayer);
+      
+      runner = ps.danmaku.akimoto1.createRunner(this.bulletConfig);
+      runner.x = GAMEAREA_WIDTH * 0.5;
+      runner.y = GAMEAREA_HEIGHT * 0.2;
     },
 
     update: function(app) {
       this.gameData.updateView(app.ticker.frame);
+      runner.update();
     },
 
     launchEnemy: function(enemy) {
@@ -1031,6 +1466,8 @@ phina.namespace(function() {
     },
 
   });
+
+  var runner;
 });
 
 phina.namespace(function() {
@@ -1261,25 +1698,53 @@ phina.namespace(function() {
 
     init: function() {
       this.superInit({
-        // fill: "hsla(40, 80%, 80%, 0.4)",
-        fill: null,
-        stroke: "hsl(20, 80%, 20%)",
+        backgroundColor: ps.Color.sec0[1],
+        fill: ps.Color.sec0a[6].format(0.2),
+        stroke: ps.Color.sec0[3],
       });
 
       this.camera.x = -1;
-      this.camera.y = 20;
-      this.camera.z = 5;
-      this.camera.tweener.to({
-        x: 1,
-        y: 10,
-      }, 3000, "easeOutQuad");
+      this.camera.y = 35;
+      this.camera.z = 4;
+      var f = 0;
+      this.camera.on("enterframe", function(e) {
+        this.x = Math.sin(f * 0.003);
+        this.y = 20 + Math.cos(f * 0.001) * 10;
+        f += 1;
+      });
 
       var self = this;
 
-      var dx = 0.04 / 5;
+      var dx = 0.01;
       var dz = 0.04;
-      var rangeX = 1.8 * 5;
-      var rangeZ = 2.6 * 5;
+
+      var rangeX2 = 1.205 * 5;
+      var rangeZ2 = 1.205 * 5;
+      var vertices2 = [
+        [0, 0, 0],
+      ];
+
+      Array.range(-5, 5).forEach(function(z) {
+        Array.range(-5, 5).forEach(function(x) {
+          ps.bg.Polygon({
+              vertices: vertices2,
+            })
+            .setTranslation(x * 1.205, 0, z * 1.205)
+            .addChildTo(self)
+            .on("enterframe", function() {
+              this.x += dx;
+              this.z += dz;
+
+              if (this.x < -rangeX2) this.x += rangeX2 * 2;
+              if (rangeX2 < this.x) this.x += -rangeX2 * 2;
+              if (this.z < -rangeZ2) this.z += rangeZ2 * 2;
+              if (rangeZ2 < this.z) this.z += -rangeZ2 * 2;
+            });
+        });
+      });
+
+      var rangeX = 3.0 * 5.6;
+      var rangeZ = 3.0 * 5.0;
 
       var vertices = [
         [-0.5, 0, -0.5],
@@ -1290,11 +1755,11 @@ phina.namespace(function() {
 
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
-          Array.range(0, 8).forEach(function(y) {
+          Array.range(0, Math.randint(4, 9)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 1.8, y * 0.3, z * 2.6)
+              .setTranslation(x * 3.0, y * 0.25, z * 3.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;
@@ -1333,6 +1798,15 @@ phina.namespace(function() {
         var task = this.sequencer.next();
         if (task) {
           task.execute(app, app.currentScene, this);
+        }
+      }
+    },
+
+    _static: {
+      create: function(stageId) {
+        switch (stageId) {
+          case 0:
+            return ps.Stage1();
         }
       }
     }
@@ -1452,16 +1926,18 @@ phina.namespace(function() {
 });
 
 phina.namespace(function() {
-  
+
   phina.define("ps.Stage1", {
     superClass: "ps.Stage",
-    
+
+    backgroundClassName: "ps.Background1",
+
     init: function() {
       this.superInit();
     }
 
   });
-  
+
 });
 
 //# sourceMappingURL=phina-shooter.js.map

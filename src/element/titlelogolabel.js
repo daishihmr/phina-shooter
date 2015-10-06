@@ -9,8 +9,8 @@ phina.namespace(function() {
         align: "center",
         fontFamily: "title",
         fontSize: FONT_SIZE_L,
-        fill: "hsl(50, 80%, 80%)",
-        stroke: "hsl(0, 100%, 50%)",
+        stroke: ps.Color.pri[6],
+        fill: ps.Color.pri[13],
       }));
     }
 

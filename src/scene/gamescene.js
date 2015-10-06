@@ -5,6 +5,7 @@ phina.namespace(function() {
 
     stageId: null,
     gameData: null,
+    bulletConfig: null,
 
     init: function(params) {
       this.superInit({
@@ -13,33 +14,17 @@ phina.namespace(function() {
         backgroundColor: "hsl(30, 60%, 60%)",
       });
 
+      this.stage = ps.Stage.create(params.stageId);
+
       this.fromJSON({
-        stageId: params.stageId,
-        gameData: params.gameData,
         children: {
           mainLayer: {
             className: "ps.gamescene.MainLayer",
+            arguments: {
+              stage: this.stage,
+            },
             x: SIDEBAR_WIDTH,
             y: 0,
-
-            children: {
-              backgroundLayer: {
-                className: "ps.Background1",
-              },
-
-              player: {
-                className: "ps.Player",
-                x: GAMEAREA_WIDTH * 0.5,
-                y: GAMEAREA_HEIGHT * 0.9,
-              },
-              
-              b: {
-                className: "phina.display.Sprite",
-                arguments: ["bomb"],
-                x: GAMEAREA_WIDTH * 0.5,
-                y: GAMEAREA_HEIGHT * 0.5,
-              }
-            }
           },
           leftSideBar: {
             className: "ps.gamescene.LeftSideBar",
@@ -54,12 +39,19 @@ phina.namespace(function() {
         }
       });
 
+      this.gameData = params.gameData;
       this.leftSideBar.bindGameData(this.gameData);
       this.rightSideBar.bindGameData(this.gameData);
+      this.bulletConfig = ps.BulletConfig(this.mainLayer.player, this.mainLayer.bulletLayer);
+      
+      runner = ps.danmaku.akimoto1.createRunner(this.bulletConfig);
+      runner.x = GAMEAREA_WIDTH * 0.5;
+      runner.y = GAMEAREA_HEIGHT * 0.2;
     },
 
     update: function(app) {
       this.gameData.updateView(app.ticker.frame);
+      runner.update();
     },
 
     launchEnemy: function(enemy) {
@@ -67,4 +59,6 @@ phina.namespace(function() {
     },
 
   });
+
+  var runner;
 });

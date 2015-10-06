@@ -20,6 +20,15 @@ phina.namespace(function() {
           task.execute(app, app.currentScene, this);
         }
       }
+    },
+
+    _static: {
+      create: function(stageId) {
+        switch (stageId) {
+          case 0:
+            return ps.Stage1();
+        }
+      }
     }
   });
 

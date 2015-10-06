@@ -5,8 +5,8 @@ phina.namespace(function() {
 
     init: function(options) {
       this.superInit(options.$safe({
-        fill: "white",
-        stroke: null,
+        fill: ps.Color.sec0[14],
+        stroke: ps.Color.sec0[6],
         fontSize: FONT_SIZE_M,
         fontFamily: "main",
         align: "left",

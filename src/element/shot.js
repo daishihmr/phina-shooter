@@ -6,7 +6,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit("bullet", 32, 32);
       this.frameIndex = 0;
-    }
+    },
   });
 
 });
