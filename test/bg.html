@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="${description}" />
+  <script src="https://cdn.rawgit.com/phi-jp/phina.js/develop/build/phina.js"></script>
+  <script src="https://cdn.rawgit.com/toji/gl-matrix/master/dist/gl-matrix.js"></script>
+  <script>
+  W = 320;
+  H = 480;
+  phina.main(function() {
+    var app = phina.display.CanvasApp({
+      query: "#app",
+      width: W,
+      height: H,
+    });
+    app.run();
+    app.enableStats();
+
+    var c = phina.display.CanvasElement().addChildTo(app.currentScene);
+
+    var camera = ps.Camera().addChildTo(c);
+    (5).times(function(k) {
+      (5).times(function(j) {
+        (20).times(function(i) {
+          var rect = ps.Polygon({
+            vertices: [
+              vec4.set(vec4.create(), -1, 0, -1, 1),
+              vec4.set(vec4.create(), -1, 0, +1, 1),
+              vec4.set(vec4.create(), +1, 0, +1, 1),
+              vec4.set(vec4.create(), +1, 0, -1, 1),
+            ],
+            stroke: "hsla(350, 80%, 30%, 0.8)",
+            fill: "hsla(350, 80%, 80%, 0.6)",
+          }).addChildTo(c);
+          vec4.set(rect.translation, j * 3.1, i * 0.3, k * -4);
+          rect.on("enterframe", function() {
+            this.translation[2] += 0.2;
+            if (60 < this.translation[2]) {
+              this.translation[2] = -60;
+            }
+          });
+        });
+      });
+    });
+
+    c.draw = function(canvas) {
+      var w = canvas.width;
+      var h = canvas.height;
+
+      for (var i = 0, len = this.children.length; i < len; i++) {
+        var child = this.children[i];
+        if (child instanceof ps.Polygon) {
+          var positions = child.render(camera).map(function(pos) {
+            if (pos === null) {
+              return [null];
+            } else {
+              return [pos[0] * w + w * 0.5, -pos[1] * h + h * 0.5];
+            }
+          }).flatten();
+
+          if (positions.some(function(it) {
+              return it === null
+            })) {
+            continue;
+          }
+
+          var canvas = app.canvas;
+          canvas.beginPath();
+          canvas.lines.apply(canvas, positions);
+          canvas.closePath();
+          if (child.stroke) {
+            canvas.strokeStyle = child.stroke;
+            canvas.stroke();
+          }
+          if (child.fill) {
+            canvas.fillStyle = child.fill;
+            canvas.fill();
+          }
+        }
+      }
+    };
+  });
+
+  phina.define("ps.Camera", {
+    superClass: "phina.app.Element",
+
+    init: function() {
+      this.superInit();
+
+      this.position = vec3.set(vec3.create(), 5, 3, 50);
+      this.target = vec3.set(vec3.create(), 0, 0, 0);
+      this.up = vec3.set(vec3.create(), 0, 1, 0);
+
+      this.vMatrix = mat4.create();
+      this.pMatrix = mat4.perspective(mat4.create(), 45, W / H, 0.1, 10000);
+
+      this.vpMatrix = mat4.create();
+    },
+
+    update: function() {
+      mat4.lookAt(this.vMatrix, this.position, this.target, this.up);
+      mat4.mul(this.vpMatrix, this.pMatrix, this.vMatrix);
+    }
+  });
+
+  phina.define("ps.Polygon", {
+    superClass: "phina.app.Element",
+
+    init: function(params) {
+      this.superInit();
+
+      this.vertices = params.vertices.map(function(vertex) {
+        return vec4.set(vec4.create(), vertex[0], vertex[1], vertex[2]);
+      });
+      this.rotation = quat.create();
+      this.translation = vec3.create();
+      this.scale = vec3.set(vec3.create(), 1, 1, 1);
+
+      this.mMatrix = mat4.create();
+
+      this.fill = params.fill;
+      this.stroke = params.stroke;
+    },
+
+    update: function() {
+      // mat4.fromRotationTranslationScale(this.mMatrix, this.rotation, this.translation, this.scale);
+      mat4.fromTranslation(this.mMatrix, this.translation);
+    },
+
+    render: function(camera) {
+      var mvp = mat4.mul(mat4.create(), camera.vpMatrix, this.mMatrix);
+      return this.vertices.map(function(v) {
+        var pos = vec4.create();
+        vec4.transformMat4(pos, v, mvp);
+        if (pos[3] < 0) {
+          return null;
+        } else {
+          return [pos[0] / pos[3], pos[1] / pos[3]];
+        }
+      });
+    }
+  });
+  </script>
+</head>
+
+<body>
+  <canvas id="app"></canvas>
+</body>
+
+</html>

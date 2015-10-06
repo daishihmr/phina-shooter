@@ -6,8 +6,8 @@ phina.namespace(function() {
     currentStage: 0,
 
     score: 0,
-    zanki: 10,
-    bomb: 10,
+    zanki: 2,
+    bomb: 3,
     psyche: 0,
     highScore: 0,
 

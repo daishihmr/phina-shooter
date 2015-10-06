@@ -10,29 +10,23 @@ phina.namespace(function() {
       this.superInit({
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT,
-        backgroundColor: "black",
+        backgroundColor: "hsl(30, 60%, 60%)",
       });
 
       this.fromJSON({
         stageId: params.stageId,
         gameData: params.gameData,
         children: {
-          leftSideBar: {
-            className: "ps.gamescene.LeftSideBar",
-            x: 0,
-            y: 0,
-          },
-          rightSideBar: {
-            className: "ps.gamescene.RightSideBar",
-            x: SCREEN_WIDTH - SIDEBAR_WIDTH,
-            y: 0,
-          },
           mainLayer: {
             className: "ps.gamescene.MainLayer",
             x: SIDEBAR_WIDTH,
             y: 0,
 
             children: {
+              backgroundLayer: {
+                className: "ps.Background1",
+              },
+
               player: {
                 className: "ps.Player",
                 x: GAMEAREA_WIDTH * 0.5,
@@ -46,6 +40,16 @@ phina.namespace(function() {
                 y: GAMEAREA_HEIGHT * 0.5,
               }
             }
+          },
+          leftSideBar: {
+            className: "ps.gamescene.LeftSideBar",
+            x: 0,
+            y: 0,
+          },
+          rightSideBar: {
+            className: "ps.gamescene.RightSideBar",
+            x: SCREEN_WIDTH - SIDEBAR_WIDTH,
+            y: 0,
           },
         }
       });

@@ -7728,8 +7728,8 @@ phina.namespace(function() {
     /** 表示フラグ */
     visible: true,
 
-    /** 子供を CanvasRenderer で描画するか */
-    childrenVisible: true,
+    /** 子供を 自分のCanvasRenderer で描画するか */
+    renderChildBySelf: false,
 
     init: function(options) {
       options = (options || {});
@@ -8601,8 +8601,8 @@ phina.namespace(function() {
   phina.define('phina.display.Layer', {
     superClass: 'phina.display.CanvasElement',
 
-    /** 子供を CanvasRenderer で描画するか */
-    childrenVisible: false,
+    /** 子供を 自分のCanvasRenderer で描画するか */
+    renderChildBySelf: false,
 
     init: function(params) {
       this.superInit(params);
@@ -8645,8 +8645,8 @@ phina.namespace(function() {
     light: null,
     renderer: null,
 
-    /** 子供を CanvasRenderer で描画するか */
-    childrenVisible: false,
+    /** 子供を 自分のCanvasRenderer で描画するか */
+    renderChildBySelf: false,
 
     init: function(params) {
       this.superInit();
@@ -8736,7 +8736,7 @@ phina.namespace(function() {
         if (obj.draw) obj.draw(this.canvas);
 
         // 子供たちも実行
-        if (obj.childrenVisible && obj.children.length > 0) {
+        if (obj.renderChildBySelf === false && obj.children.length > 0) {
             var tempChildren = obj.children.slice();
             for (var i=0,len=tempChildren.length; i<len; ++i) {
                 this.renderObject(tempChildren[i]);
@@ -8749,7 +8749,7 @@ phina.namespace(function() {
         if (obj.draw) obj.draw(this.canvas);
 
         // 子供たちも実行
-        if (obj.childrenVisible && obj.children.length > 0) {
+        if (obj.renderChildBySelf === false && obj.children.length > 0) {
           var tempChildren = obj.children.slice();
           for (var i=0,len=tempChildren.length; i<len; ++i) {
             this.renderObject(tempChildren[i]);
@@ -9603,6 +9603,8 @@ phina.namespace(function() {
 
       params = (params || {}).$safe(phina.game.ResultScene.defaults);
 
+      var message = params.message.format(params);
+
       this.backgroundColor = params.backgroundColor;
 
       this.fromJSON({
@@ -9633,7 +9635,7 @@ phina.namespace(function() {
           messageLabel: {
             className: 'phina.display.Label',
             arguments: {
-              text: params.message,
+              text: message,
               fill: params.fontColor,
               stroke: null,
               fontSize: 32,
@@ -9682,7 +9684,7 @@ phina.namespace(function() {
 
       this.shareButton.onclick = function() {
         var url = phina.social.Twitter.createURL({
-          text: params.message,
+          text: message,
           hashtags: params.hashtags,
         });
         window.open(url, 'share window', 'width=480, height=320');
@@ -9693,7 +9695,7 @@ phina.namespace(function() {
       defaults: {
         score: 16,
 
-        message: 'this is phina.js project.\n',
+        message: 'this is phina.js project.\nscore: {score}\n',
         hashtags: 'phina_js,game,javascript',
         url: phina.global.location && phina.global.location.href,
 
@@ -10088,11 +10090,11 @@ phina.namespace(function() {
       defaults: {
         // type: 'tweet',
         text: 'Hello, world!',
-        screen_name: 'phi_jp',
+        // screen_name: 'phi_jp',
         hashtags: 'javascript,phina',
         // url: 'http://github.com/phi-jp/phina.js',
         url: phina.global.location && phina.global.location.href,
-        via: 'phi_jp',
+        // via: 'phi_jp',
       },
 
       createURL: function(options) {

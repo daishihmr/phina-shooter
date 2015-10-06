@@ -149,6 +149,448 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  phina.define("ps.BackgroundLayer", {
+    superClass: "phina.display.Layer",
+
+    renderChildBySelf: true,
+
+    init: function(params) {
+      this.superInit({
+        width: GAMEAREA_WIDTH,
+        height: GAMEAREA_HEIGHT,
+      });
+      this.setOrigin(0, 0);
+      this.backgroundColor = null;
+
+      this.stroke = params.stroke;
+      this.fill = params.fill;
+      this.lineWidth = 1;
+
+      this.camera = ps.bg.Camera().addChildTo(this);
+    },
+
+    render: function() {
+      var self = this;
+      var cam = this.camera;
+      var canvas = this.canvas;
+      var w = canvas.canvas.width;
+      var h = canvas.canvas.height;
+
+      canvas.clear();
+
+      if (self.stroke) {
+        canvas.strokeStyle = self.stroke;
+        canvas.context.lineWidth = self.lineWidth;
+      }
+      if (self.fill) {
+        canvas.fillStyle = self.fill;
+        canvas.fill();
+      }
+
+      for (var i = 0, len = this.children.length; i < len; i++) {
+        var child = this.children[i];
+        if (child instanceof ps.bg.Polygon) {
+          var src = child.render(cam);
+          var positions = [];
+          for (var s = 0, slen = src.length; s < slen; s++) {
+            var pos = src[s];
+            if (pos === null) {
+              positions = [];
+              break;
+            } else {
+              positions.push(((pos[0] / pos[3]) + 0.5) * w);
+              positions.push((-(pos[1] / pos[3]) + 0.5) * h);
+            }
+          }
+
+          if (2 <= positions.length) {
+            canvas.beginPath();
+            canvas.lines.apply(canvas, positions);
+            canvas.closePath();
+            if (self.stroke) canvas.stroke();
+            if (self.fill) canvas.fill();
+          }
+        }
+      }
+    },
+
+    draw: function(canvas) {
+      this.render();
+
+      var image = this.canvas.domElement;
+      canvas.context.drawImage(image,
+        0, 0, image.width, image.height, -this.width * this.originX, -this.height * this.originY, this.width, this.height
+      );
+    },
+  });
+
+  phina.define("ps.bg.Camera", {
+    superClass: "phina.app.Element",
+
+    init: function() {
+      this.superInit();
+
+      this.position = vec3.set(vec3.create(), 5, 3, 50);
+      this.target = vec3.set(vec3.create(), 0, 0, 0);
+      this.up = vec3.set(vec3.create(), 0, 1, 0);
+
+      this.vMatrix = mat4.create();
+      this.pMatrix = mat4.perspective(mat4.create(), 70, GAMEAREA_WIDTH / GAMEAREA_HEIGHT, 0.1, 10000);
+
+      this.vpMatrix = mat4.create();
+
+      this.needsUpdate = true;
+    },
+
+    update: function() {
+      if (this.needsUpdate) {
+        mat4.lookAt(this.vMatrix, this.position, this.target, this.up);
+        mat4.mul(this.vpMatrix, this.pMatrix, this.vMatrix);
+        this.needsUpdate = false;
+      }
+    },
+
+    _accessor: {
+      x: {
+        get: function() {
+          return this.position[0];
+        },
+        set: function(v) {
+          this.position[0] = v;
+          this.needsUpdate = true;
+        }
+      },
+      y: {
+        get: function() {
+          return this.position[1];
+        },
+        set: function(v) {
+          this.position[1] = v;
+          this.needsUpdate = true;
+        }
+      },
+      z: {
+        get: function() {
+          return this.position[2];
+        },
+        set: function(v) {
+          this.position[2] = v;
+          this.needsUpdate = true;
+        }
+      },
+      targetX: {
+        get: function() {
+          return this.target[0];
+        },
+        set: function(v) {
+          this.target[0] = v;
+          this.needsUpdate = true;
+        }
+      },
+      targetY: {
+        get: function() {
+          return this.target[1];
+        },
+        set: function(v) {
+          this.target[1] = v;
+          this.needsUpdate = true;
+        }
+      },
+      targetZ: {
+        get: function() {
+          return this.target[2];
+        },
+        set: function(v) {
+          this.target[2] = v;
+          this.needsUpdate = true;
+        }
+      },
+      upX: {
+        get: function() {
+          return this.up[0];
+        },
+        set: function(v) {
+          this.up[0] = v;
+          this.needsUpdate = true;
+        }
+      },
+      upY: {
+        get: function() {
+          return this.up[1];
+        },
+        set: function(v) {
+          this.up[1] = v;
+          this.needsUpdate = true;
+        }
+      },
+      upZ: {
+        get: function() {
+          return this.up[2];
+        },
+        set: function(v) {
+          this.up[2] = v;
+          this.needsUpdate = true;
+        }
+      },
+    }
+  });
+
+  phina.define("ps.bg.Polygon", {
+    superClass: "phina.app.Element",
+
+    init: function(params) {
+      this.superInit();
+
+      this.vertices = params.vertices.map(function(vertex) {
+        return vec4.set(vec4.create(), vertex[0], vertex[1], vertex[2], 1);
+      });
+
+      this.calcPosition = this.vertices.map(function(vertex) {
+        return vec4.clone(vertex);
+      });
+
+      this.rotation = quat.create();
+      this.translation = vec3.create();
+      this.scale = vec3.set(vec3.create(), 1, 1, 1);
+
+      this.mMatrix = mat4.create();
+      this.mvpMatrix = mat4.create();
+
+      this.needsUpdate = true;
+    },
+
+    update: function() {
+      if (this.needsUpdate) {
+        // mat4.fromRotationTranslationScale(this.mMatrix, this.rotation, this.translation, this.scale);
+        mat4.fromTranslation(this.mMatrix, this.translation);
+        this.needsUpdate = false;
+      }
+    },
+
+    render: function(camera) {
+      var calcPosition = this.calcPosition;
+      var mvp = mat4.mul(this.mvpMatrix, camera.vpMatrix, this.mMatrix);
+      return this.vertices.map(function(vertex, i) {
+        var pos = vec4.transformMat4(calcPosition[i], vertex, mvp);
+        if (pos[3] < 0) {
+          return null;
+        } else {
+          return pos;
+        }
+      });
+    },
+
+    setTranslation: function(x, y, z) {
+      this.translation[0] = x;
+      this.translation[1] = y;
+      this.translation[2] = z;
+      return this;
+    },
+
+    _accessor: {
+      x: {
+        get: function() {
+          return this.translation[0];
+        },
+        set: function(v) {
+          this.translation[0] = v;
+          this.needsUpdate = true;
+        }
+      },
+      y: {
+        get: function() {
+          return this.translation[1];
+        },
+        set: function(v) {
+          this.translation[1] = v;
+          this.needsUpdate = true;
+        }
+      },
+      z: {
+        get: function() {
+          return this.translation[2];
+        },
+        set: function(v) {
+          this.translation[2] = v;
+          this.needsUpdate = true;
+        }
+      },
+    },
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.gamescene.MainLayer", {
+    superClass: "phina.display.Layer",
+
+    init: function() {
+      this.superInit({
+        width: GAMEAREA_WIDTH,
+        height: GAMEAREA_HEIGHT,
+      });
+      this.setOrigin(0, 0);
+      this.backgroundColor = "hsl(240, 100%, 5%)";
+    }
+
+  });
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.gamescene.SideBarLayer", {
+    superClass: "phina.display.Layer",
+
+    skipDraw: false,
+
+    init: function() {
+      this.superInit({
+        width: SIDEBAR_WIDTH,
+        height: SIDEBAR_HEIGHT,
+      });
+      this.setOrigin(0, 0);
+      this.backgroundColor = "hsl(0, 100%, 7%)";
+      this.gridX = phina.util.Grid(SIDEBAR_WIDTH, 16);
+      this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
+    },
+
+    bindGameData: function(gameData) {},
+
+    update: function(app) {
+      this.skipDraw = app.ticker.frame % 5 !== 0
+    },
+
+    draw: function(canvas) {
+      if (this.skipDraw) {
+        var image = this.canvas.domElement;
+        canvas.context.drawImage(image,
+          0, 0, image.width, image.height, -this.width * this.originX, -this.height * this.originY, this.width, this.height
+        );
+      } else {
+        phina.display.Layer.prototype.draw.call(this, canvas);
+      }
+    }
+
+  });
+
+  phina.define("ps.gamescene.LeftSideBar", {
+    superClass: "ps.gamescene.SideBarLayer",
+
+    init: function() {
+      this.superInit();
+      this.fromJSON({
+        children: {
+          scoreLabel: {
+            className: "ps.HudLabel",
+            arguments: {
+              text: "SCORE",
+            },
+            x: this.gridX.span(1),
+            y: this.gridY.span(1),
+          },
+          score: {
+            className: "ps.ScoreLabel",
+            x: this.gridX.span(15),
+            y: this.gridY.span(2),
+          },
+
+          psycheLabel: {
+            className: "ps.HudLabel",
+            arguments: {
+              text: "PSYCHE",
+            },
+            x: this.gridX.span(1),
+            y: this.gridY.span(3),
+          },
+          psyche: {
+            className: "ps.ScoreLabel",
+            x: this.gridX.span(15),
+            y: this.gridY.span(4),
+          },
+
+          highScoreLabel: {
+            className: "ps.HudLabel",
+            arguments: {
+              text: "HIGH SCORE",
+            },
+            x: this.gridX.span(1),
+            y: this.gridY.span(15),
+          },
+          highScore: {
+            className: "ps.ScoreLabel",
+            x: this.gridX.span(15),
+            y: this.gridY.span(16),
+          },
+        }
+      });
+    },
+
+    bindGameData: function(gameData) {
+      gameData.bind("score", this.score);
+      gameData.bind("psyche", this.psyche);
+      gameData.bind("highScore", this.highScore);
+    },
+
+  });
+
+  phina.define("ps.gamescene.RightSideBar", {
+    superClass: "ps.gamescene.SideBarLayer",
+
+    init: function() {
+      this.superInit();
+      this.fromJSON({
+        children: {
+          zankiLabel: {
+            className: "ps.HudLabel",
+            arguments: {
+              text: "ZANKI",
+            },
+            x: this.gridX.span(1),
+            y: this.gridY.span(1),
+          },
+          zanki: {
+            className: "ps.ZankiDisplay",
+            arguments: 3 - 1,
+            x: this.gridX.span(15),
+            y: this.gridY.span(2),
+          },
+
+          bombLabel: {
+            className: "ps.HudLabel",
+            arguments: {
+              text: "BOMBER",
+            },
+            x: this.gridX.span(1),
+            y: this.gridY.span(3),
+          },
+          bomb: {
+            className: "ps.BombDisplay",
+            arguments: 3,
+            x: this.gridX.span(15),
+            y: this.gridY.span(4),
+          },
+
+          gameTitleLabel: {
+            className: "ps.TitleLogoLabel",
+            x: this.gridX.center(),
+            y: this.gridY.span(16),
+          },
+        }
+      });
+    },
+
+    bindGameData: function(gameData) {
+      gameData.bind("zanki", this.zanki);
+      gameData.bind("bomb", this.bomb);
+    },
+
+  });
+
+});
+
+phina.namespace(function() {
+
   phina.define("ps.HudLabel", {
     superClass: "phina.display.Label",
 
@@ -393,8 +835,8 @@ phina.namespace(function() {
     currentStage: 0,
 
     score: 0,
-    zanki: 10,
-    bomb: 10,
+    zanki: 2,
+    bomb: 3,
     psyche: 0,
     highScore: 0,
 
@@ -522,175 +964,6 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.gamescene.MainLayer", {
-    superClass: "phina.display.Layer",
-
-    init: function() {
-      this.superInit({
-        width: GAMEAREA_WIDTH,
-        height: GAMEAREA_HEIGHT,
-      });
-      this.setOrigin(0, 0);
-      this.backgroundColor = "hsl(240, 100%, 5%)";
-    }
-
-  });
-});
-
-phina.namespace(function() {
-
-  phina.define("ps.gamescene.SideBarLayer", {
-    superClass: "phina.display.Layer",
-
-    skipDraw: false,
-
-    init: function() {
-      this.superInit({
-        width: SIDEBAR_WIDTH,
-        height: SIDEBAR_HEIGHT,
-      });
-      this.setOrigin(0, 0);
-      this.backgroundColor = "hsl(0, 100%, 7%)";
-      this.gridX = phina.util.Grid(SIDEBAR_WIDTH, 16);
-      this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
-    },
-
-    bindGameData: function(gameData) {},
-
-    update: function(app) {
-      this.skipDraw = app.ticker.frame % 5 !== 0
-    },
-
-    draw: function(canvas) {
-      if (this.skipDraw) {
-        var image = this.canvas.domElement;
-        canvas.context.drawImage(image,
-          0, 0, image.width, image.height, -this.width * this.originX, -this.height * this.originY, this.width, this.height
-        );
-      } else {
-        phina.display.Layer.prototype.draw.call(this, canvas);
-      }
-    }
-
-  });
-
-  phina.define("ps.gamescene.LeftSideBar", {
-    superClass: "ps.gamescene.SideBarLayer",
-
-    init: function() {
-      this.superInit();
-      this.fromJSON({
-        children: {
-          scoreLabel: {
-            className: "ps.HudLabel",
-            arguments: {
-              text: "SCORE",
-            },
-            x: this.gridX.span(1),
-            y: this.gridY.span(1),
-          },
-          score: {
-            className: "ps.ScoreLabel",
-            x: this.gridX.span(15),
-            y: this.gridY.span(2),
-          },
-
-          psycheLabel: {
-            className: "ps.HudLabel",
-            arguments: {
-              text: "PSYCHE",
-            },
-            x: this.gridX.span(1),
-            y: this.gridY.span(3),
-          },
-          psyche: {
-            className: "ps.ScoreLabel",
-            x: this.gridX.span(15),
-            y: this.gridY.span(4),
-          },
-
-          highScoreLabel: {
-            className: "ps.HudLabel",
-            arguments: {
-              text: "HIGH SCORE",
-            },
-            x: this.gridX.span(1),
-            y: this.gridY.span(15),
-          },
-          highScore: {
-            className: "ps.ScoreLabel",
-            x: this.gridX.span(15),
-            y: this.gridY.span(16),
-          },
-        }
-      });
-    },
-
-    bindGameData: function(gameData) {
-      gameData.bind("score", this.score);
-      gameData.bind("psyche", this.psyche);
-      gameData.bind("highScore", this.highScore);
-    },
-
-  });
-
-  phina.define("ps.gamescene.RightSideBar", {
-    superClass: "ps.gamescene.SideBarLayer",
-
-    init: function() {
-      this.superInit();
-      this.fromJSON({
-        children: {
-          zankiLabel: {
-            className: "ps.HudLabel",
-            arguments: {
-              text: "ZANKI",
-            },
-            x: this.gridX.span(1),
-            y: this.gridY.span(1),
-          },
-          zanki: {
-            className: "ps.ZankiDisplay",
-            arguments: 3 - 1,
-            x: this.gridX.span(15),
-            y: this.gridY.span(2),
-          },
-
-          bombLabel: {
-            className: "ps.HudLabel",
-            arguments: {
-              text: "BOMBER",
-            },
-            x: this.gridX.span(1),
-            y: this.gridY.span(3),
-          },
-          bomb: {
-            className: "ps.BombDisplay",
-            arguments: 3,
-            x: this.gridX.span(15),
-            y: this.gridY.span(4),
-          },
-
-          gameTitleLabel: {
-            className: "ps.TitleLogoLabel",
-            x: this.gridX.center(),
-            y: this.gridY.span(16),
-          },
-        }
-      });
-    },
-
-    bindGameData: function(gameData) {
-      gameData.bind("zanki", this.zanki);
-      gameData.bind("bomb", this.bomb);
-    },
-
-  });
-
-});
-
-phina.namespace(function() {
-
   phina.define("ps.GameScene", {
     superClass: "phina.display.CanvasScene",
 
@@ -701,29 +974,23 @@ phina.namespace(function() {
       this.superInit({
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT,
-        backgroundColor: "black",
+        backgroundColor: "hsl(30, 60%, 60%)",
       });
 
       this.fromJSON({
         stageId: params.stageId,
         gameData: params.gameData,
         children: {
-          leftSideBar: {
-            className: "ps.gamescene.LeftSideBar",
-            x: 0,
-            y: 0,
-          },
-          rightSideBar: {
-            className: "ps.gamescene.RightSideBar",
-            x: SCREEN_WIDTH - SIDEBAR_WIDTH,
-            y: 0,
-          },
           mainLayer: {
             className: "ps.gamescene.MainLayer",
             x: SIDEBAR_WIDTH,
             y: 0,
 
             children: {
+              backgroundLayer: {
+                className: "ps.Background1",
+              },
+
               player: {
                 className: "ps.Player",
                 x: GAMEAREA_WIDTH * 0.5,
@@ -737,6 +1004,16 @@ phina.namespace(function() {
                 y: GAMEAREA_HEIGHT * 0.5,
               }
             }
+          },
+          leftSideBar: {
+            className: "ps.gamescene.LeftSideBar",
+            x: 0,
+            y: 0,
+          },
+          rightSideBar: {
+            className: "ps.gamescene.RightSideBar",
+            x: SCREEN_WIDTH - SIDEBAR_WIDTH,
+            y: 0,
           },
         }
       });
@@ -971,6 +1248,65 @@ phina.namespace(function() {
         ],
 
         startLabel: "load",
+      });
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Background1", {
+    superClass: "ps.BackgroundLayer",
+
+    init: function() {
+      this.superInit({
+        // fill: "hsla(40, 80%, 80%, 0.4)",
+        fill: null,
+        stroke: "hsl(20, 80%, 20%)",
+      });
+
+      this.camera.x = -1;
+      this.camera.y = 20;
+      this.camera.z = 5;
+      this.camera.tweener.to({
+        x: 1,
+        y: 10,
+      }, 3000, "easeOutQuad");
+
+      var self = this;
+
+      var dx = 0.04 / 5;
+      var dz = 0.04;
+      var rangeX = 1.8 * 5;
+      var rangeZ = 2.6 * 5;
+
+      var vertices = [
+        [-0.5, 0, -0.5],
+        [-0.5, 0, +0.5],
+        [+0.5, 0, +0.5],
+        [+0.5, 0, -0.5],
+      ];
+
+      Array.range(-5, 5).forEach(function(z) {
+        Array.range(-5, 5).forEach(function(x) {
+          Array.range(0, 8).forEach(function(y) {
+            ps.bg.Polygon({
+                vertices: vertices,
+              })
+              .setTranslation(x * 1.8, y * 0.3, z * 2.6)
+              .addChildTo(self)
+              .on("enterframe", function() {
+                this.x += dx;
+                this.z += dz;
+
+                if (this.x < -rangeX) this.x += rangeX * 2;
+                if (rangeX < this.x) this.x += -rangeX * 2;
+                if (this.z < -rangeZ) this.z += rangeZ * 2;
+                if (rangeZ < this.z) this.z += -rangeZ * 2;
+              });
+          });
+        });
       });
     }
   });
