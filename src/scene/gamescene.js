@@ -14,6 +14,10 @@ phina.namespace(function() {
         backgroundColor: "hsl(30, 60%, 60%)",
       });
 
+      ps.TextureEdit.outline("bullet", "red");
+      ps.TextureEdit.outline("player");
+      ps.TextureEdit.outline("bomb", "lightgreen");
+
       this.stage = ps.Stage.create(params.stageId);
 
       this.fromJSON({
@@ -50,8 +54,12 @@ phina.namespace(function() {
     },
 
     update: function(app) {
-      this.gameData.updateView(app.ticker.frame);
+      var frame = app.ticker.frame;
+      
+      this.gameData.updateView(frame);
       runner.update();
+      
+      ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.15) * 0.5;
     },
 
     launchEnemy: function(enemy) {

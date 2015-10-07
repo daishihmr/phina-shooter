@@ -1,32 +1,39 @@
 phina.namespace(function() {
 
   phina.define("ps.Bullet", {
-    superClass: "phina.display.Sprite",
+    superClass: "ps.OutlinedSprite",
 
     runner: null,
     dummy: false,
 
     init: function() {
-      this.superInit("bullet", 32, 32);
+      this.superInit("bullet", 24, 24);
       this.age = 0;
-      this.scale.x = 0.75;
-      this.scale.y = 0.75;
     },
 
     update: function(app) {
-      if (this.runner) {
-        var bx = this.position.x;
-        var by = this.position.y;
-        this.runner.update();
-        this.position.x = this.runner.x;
-        this.position.y = this.runner.y;
+      var runner = this.runner;
+      if (runner) {
+        var pos = this.position;
         
-        this.rotation = Math.atan2(this.runner.y - by, this.runner.x - bx) * 180 / Math.PI;
-        this.scale.y = 0.75 + Math.sin(this.age * 0.8) * 0.12;
+        var bx = pos.x;
+        var by = pos.y;
+        runner.update();
+        var dx = runner.x - bx;
+        var dy = runner.y - by;
+
+        pos.x += dx * ps.Bullet.globalSpeedRate;
+        pos.y += dy * ps.Bullet.globalSpeedRate;
+
+        this.rotation = Math.atan2(pos.y - by, pos.x - bx) * 180 / Math.PI;
+
+        this.age += 1;
       }
-      
-      this.age += 1;
-    }
+    },
+
+    _static: {
+      globalSpeedRate: 1.0,
+    },
 
   });
 });

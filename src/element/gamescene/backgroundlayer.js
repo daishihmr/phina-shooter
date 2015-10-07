@@ -20,7 +20,7 @@ phina.namespace(function() {
 
       this.camera = ps.bg.Camera().addChildTo(this);
     },
-    
+
     update: function(app) {
       this.skip = app.ticker.frame % 3 !== 0;
     },
@@ -77,9 +77,8 @@ phina.namespace(function() {
     },
 
     draw: function(canvas) {
-      if (!this.skip) {
-        this.render();
-      }
+      if (!this.skip) this.render();
+
 
       var image = this.canvas.domElement;
       canvas.context.drawImage(image,

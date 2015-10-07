@@ -7,17 +7,17 @@ phina.namespace(function() {
       this.superInit({
         backgroundColor: ps.Color.sec0[1],
         fill: ps.Color.sec0a[6].format(0.2),
-        stroke: ps.Color.sec0[3],
+        stroke: ps.Color.sec0[4],
       });
 
       this.camera.x = -1;
       this.camera.y = 35;
       this.camera.z = 4;
-      var f = 0;
+      var frame = 0;
       this.camera.on("enterframe", function(e) {
-        this.x = Math.sin(f * 0.003);
-        this.y = 20 + Math.cos(f * 0.001) * 10;
-        f += 1;
+        this.y = 18 + Math.cos(frame * 0.001) * 14;
+        this.z = 4 + Math.sin(frame * 0.001) * 2;
+        frame += 1;
       });
 
       var self = this;
@@ -25,18 +25,17 @@ phina.namespace(function() {
       var dx = 0.01;
       var dz = 0.04;
 
-      var rangeX2 = 1.205 * 5;
-      var rangeZ2 = 1.205 * 5;
+      var rangeX2 = 1.6 * 5;
+      var rangeZ2 = 1.6 * 5;
       var vertices2 = [
         [0, 0, 0],
       ];
-
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
           ps.bg.Polygon({
               vertices: vertices2,
             })
-            .setTranslation(x * 1.205, 0, z * 1.205)
+            .setTranslation(x * 1.6, 0, z * 1.6)
             .addChildTo(self)
             .on("enterframe", function() {
               this.x += dx;
@@ -50,23 +49,21 @@ phina.namespace(function() {
         });
       });
 
-      var rangeX = 3.0 * 5.6;
-      var rangeZ = 3.0 * 5.0;
-
+      var rangeX = 3.0 * 5.0;
+      var rangeZ = 4.0 * 5.6;
       var vertices = [
         [-0.5, 0, -0.5],
         [-0.5, 0, +0.5],
         [+0.5, 0, +0.5],
         [+0.5, 0, -0.5],
       ];
-
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
           Array.range(0, Math.randint(4, 9)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.25, z * 3.0)
+              .setTranslation(x * 3.0, y * 0.25, z * 4.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;

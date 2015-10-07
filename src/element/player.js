@@ -1,7 +1,7 @@
 phina.namespace(function() {
 
   phina.define("ps.Player", {
-    superClass: "phina.display.Sprite",
+    superClass: "ps.OutlinedSprite",
 
     controllable: true,
     muteki: false,
@@ -36,7 +36,7 @@ phina.namespace(function() {
       }
 
       if (moveVector.x) {
-        this.roll += moveVector.x * 0.1;
+        this.roll = Math.clamp(this.roll + moveVector.x * 0.1, -4, 4);
       } else {
         this.roll *= 0.8;
         if (Math.abs(this.roll) < 0.1) {

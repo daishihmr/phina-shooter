@@ -2,7 +2,7 @@ phina.namespace(function() {
 
   phina.define("ps.BulletConfig", {
 
-    speedRate: 2,
+    speedRate: 3,
     target: null,
     bulletLayer: null,
 

@@ -34,21 +34,39 @@ phina.namespace(function() {
   };
 
   var B0 = bullet({
-    type: 4
+    type: 0
   });
   var B1 = bullet({
-    type: 5
+    type: 1
   });
   var B2 = bullet({
-    type: 6
+    type: 2
   });
   var B3 = bullet({
+    type: 3
+  });
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
     type: 7
   });
   var B4 = bullet({
-    type: 10
+    type: 8
   });
   var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
     type: 11
   });
   var DM = bullet({
@@ -65,7 +83,7 @@ phina.namespace(function() {
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir)),
           repeat("$burst", [
-            fire(B2, spdSeq(0.15), direction(0, "sequence")),
+            fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
           interval(90),
         ]),
@@ -86,9 +104,9 @@ phina.namespace(function() {
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir - 7)),
           repeat("$burst", [
-            fire(B2, spdSeq(0.05), direction(0, "sequence")),
-            fire(B2, spdSeq(0), direction(7, "sequence")),
-            fire(B2, spdSeq(0), direction(7, "sequence")),
+            fire(R2, spdSeq(0.05), direction(0, "sequence")),
+            fire(R2, spdSeq(0), direction(7, "sequence")),
+            fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(DM, spdSeq(0), direction(-14, "sequence")),
           ]),
           interval(90),
@@ -112,7 +130,7 @@ phina.namespace(function() {
         repeat(3, [
           fire(DM, spd(1.2)),
           repeat(3, [
-            fire(B0, spdSeq(0), direction(0, "sequence")),
+            fire(R0, spdSeq(0), direction(0, "sequence")),
             wait(6),
           ]),
           interval(12),
@@ -127,9 +145,9 @@ phina.namespace(function() {
     top0: action([
       repeat(Infinity, [
         interval(20),
-        fire(B1, spd(1.0), direction(-30)),
+        fire(R2, spd(1.0), direction(-30)),
         repeat(8, [
-          fire(B1, spdSeq(0), direction(60 / 8, "sequence")),
+          fire(R2, spdSeq(0), direction(60 / 8, "sequence")),
         ]),
         interval(80),
       ]),
@@ -137,9 +155,9 @@ phina.namespace(function() {
     top1: action([
       repeat(Infinity, [
         interval(50),
-        fire(B1, spd(1.2), direction(-10)),
+        fire(R1, spd(1.2), direction(-10)),
         repeat(6, [
-          fire(B1, spdSeq(0), direction(20 / 6, "sequence")),
+          fire(R1, spdSeq(0), direction(20 / 6, "sequence")),
         ]),
         interval(50),
       ]),
@@ -153,7 +171,7 @@ phina.namespace(function() {
       repeat(Infinity, [
         fire(DM, spd(1.4)),
         repeat(12, [
-          fire(B4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
         ]),
         interval(90),
       ]),

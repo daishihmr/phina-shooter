@@ -160,21 +160,39 @@ phina.namespace(function() {
   };
 
   var B0 = bullet({
-    type: 4
+    type: 0
   });
   var B1 = bullet({
-    type: 5
+    type: 1
   });
   var B2 = bullet({
-    type: 6
+    type: 2
   });
   var B3 = bullet({
+    type: 3
+  });
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
     type: 7
   });
   var B4 = bullet({
-    type: 10
+    type: 8
   });
   var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
     type: 11
   });
   var DM = bullet({
@@ -191,7 +209,7 @@ phina.namespace(function() {
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir)),
           repeat("$burst", [
-            fire(B2, spdSeq(0.15), direction(0, "sequence")),
+            fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
           interval(90),
         ]),
@@ -212,9 +230,9 @@ phina.namespace(function() {
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir - 7)),
           repeat("$burst", [
-            fire(B2, spdSeq(0.05), direction(0, "sequence")),
-            fire(B2, spdSeq(0), direction(7, "sequence")),
-            fire(B2, spdSeq(0), direction(7, "sequence")),
+            fire(R2, spdSeq(0.05), direction(0, "sequence")),
+            fire(R2, spdSeq(0), direction(7, "sequence")),
+            fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(DM, spdSeq(0), direction(-14, "sequence")),
           ]),
           interval(90),
@@ -238,7 +256,7 @@ phina.namespace(function() {
         repeat(3, [
           fire(DM, spd(1.2)),
           repeat(3, [
-            fire(B0, spdSeq(0), direction(0, "sequence")),
+            fire(R0, spdSeq(0), direction(0, "sequence")),
             wait(6),
           ]),
           interval(12),
@@ -253,9 +271,9 @@ phina.namespace(function() {
     top0: action([
       repeat(Infinity, [
         interval(20),
-        fire(B1, spd(1.0), direction(-30)),
+        fire(R2, spd(1.0), direction(-30)),
         repeat(8, [
-          fire(B1, spdSeq(0), direction(60 / 8, "sequence")),
+          fire(R2, spdSeq(0), direction(60 / 8, "sequence")),
         ]),
         interval(80),
       ]),
@@ -263,9 +281,9 @@ phina.namespace(function() {
     top1: action([
       repeat(Infinity, [
         interval(50),
-        fire(B1, spd(1.2), direction(-10)),
+        fire(R1, spd(1.2), direction(-10)),
         repeat(6, [
-          fire(B1, spdSeq(0), direction(20 / 6, "sequence")),
+          fire(R1, spdSeq(0), direction(20 / 6, "sequence")),
         ]),
         interval(50),
       ]),
@@ -279,7 +297,7 @@ phina.namespace(function() {
       repeat(Infinity, [
         fire(DM, spd(1.4)),
         repeat(12, [
-          fire(B4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
         ]),
         interval(90),
       ]),
@@ -395,32 +413,39 @@ phina.namespace(function() {
 phina.namespace(function() {
 
   phina.define("ps.Bullet", {
-    superClass: "phina.display.Sprite",
+    superClass: "ps.OutlinedSprite",
 
     runner: null,
     dummy: false,
 
     init: function() {
-      this.superInit("bullet", 32, 32);
+      this.superInit("bullet", 24, 24);
       this.age = 0;
-      this.scale.x = 0.75;
-      this.scale.y = 0.75;
     },
 
     update: function(app) {
-      if (this.runner) {
-        var bx = this.position.x;
-        var by = this.position.y;
-        this.runner.update();
-        this.position.x = this.runner.x;
-        this.position.y = this.runner.y;
+      var runner = this.runner;
+      if (runner) {
+        var pos = this.position;
         
-        this.rotation = Math.atan2(this.runner.y - by, this.runner.x - bx) * 180 / Math.PI;
-        this.scale.y = 0.75 + Math.sin(this.age * 0.8) * 0.12;
+        var bx = pos.x;
+        var by = pos.y;
+        runner.update();
+        var dx = runner.x - bx;
+        var dy = runner.y - by;
+
+        pos.x += dx * ps.Bullet.globalSpeedRate;
+        pos.y += dy * ps.Bullet.globalSpeedRate;
+
+        this.rotation = Math.atan2(pos.y - by, pos.x - bx) * 180 / Math.PI;
+
+        this.age += 1;
       }
-      
-      this.age += 1;
-    }
+    },
+
+    _static: {
+      globalSpeedRate: 1.0,
+    },
 
   });
 });
@@ -459,7 +484,7 @@ phina.namespace(function() {
 
       this.camera = ps.bg.Camera().addChildTo(this);
     },
-    
+
     update: function(app) {
       this.skip = app.ticker.frame % 3 !== 0;
     },
@@ -516,9 +541,8 @@ phina.namespace(function() {
     },
 
     draw: function(canvas) {
-      if (!this.skip) {
-        this.render();
-      }
+      if (!this.skip) this.render();
+
 
       var image = this.canvas.domElement;
       canvas.context.drawImage(image,
@@ -726,7 +750,9 @@ phina.namespace(function() {
 phina.namespace(function() {
 
   phina.define("ps.BulletLayer", {
-    superClass: "phina.display.Layer",
+    superClass: "phina.display.CanvasElement",
+    
+    bullets: null,
 
     init: function() {
       this.superInit({
@@ -735,10 +761,14 @@ phina.namespace(function() {
       });
       this.setOrigin(0, 0);
       this.backgroundColor = null;
+      
+      this.bullets = [];
     },
 
     spawn: function(runner, spec) {
       var bullet = ps.Bullet().addChildTo(this);
+      bullet.position.x = runner.x;
+      bullet.position.y = runner.y;
       bullet.runner = runner;
       bullet.frameIndex = spec.type || 0;
       if (spec.dummy) {
@@ -755,6 +785,18 @@ phina.namespace(function() {
         }
       }
     },
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.EffectLayer", {
+    superClass: "phina.display.CanvasElement",
+
+    init: function() {
+      this.superInit();
+    }
   });
 
 });
@@ -840,7 +882,7 @@ phina.namespace(function() {
           },
 
           b: {
-            className: "phina.display.Sprite",
+            className: "ps.OutlinedSprite",
             arguments: ["bomb"],
             x: GAMEAREA_WIDTH * 0.5,
             y: GAMEAREA_HEIGHT * 0.2,
@@ -1072,8 +1114,35 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.Player", {
+  phina.define("ps.OutlinedSprite", {
     superClass: "phina.display.Sprite",
+
+    init: function(texture, width, height) {
+      this.superInit(texture, width, height);
+
+      var self = this;
+
+      this.outline = phina.display.Sprite(texture + "Outline", width, height).addChildTo(this);
+      this.outline.update = function(app) {
+        this.frameIndex = self.frameIndex;
+        this.alpha = ps.OutlinedSprite.staticAlpha;
+      };
+      this.outline.draw = function(canvas) {
+        phina.display.Sprite.prototype.draw.call(this, canvas);
+      }
+    },
+    
+    _static: {
+      staticAlpha: 1.0
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Player", {
+    superClass: "ps.OutlinedSprite",
 
     controllable: true,
     muteki: false,
@@ -1108,7 +1177,7 @@ phina.namespace(function() {
       }
 
       if (moveVector.x) {
-        this.roll += moveVector.x * 0.1;
+        this.roll = Math.clamp(this.roll + moveVector.x * 0.1, -4, 4);
       } else {
         this.roll *= 0.8;
         if (Math.abs(this.roll) < 0.1) {
@@ -1246,7 +1315,7 @@ phina.namespace(function() {
 
   phina.define("ps.BulletConfig", {
 
-    speedRate: 2,
+    speedRate: 3,
     target: null,
     bulletLayer: null,
 
@@ -1421,6 +1490,10 @@ phina.namespace(function() {
         backgroundColor: "hsl(30, 60%, 60%)",
       });
 
+      ps.TextureEdit.outline("bullet", "red");
+      ps.TextureEdit.outline("player");
+      ps.TextureEdit.outline("bomb", "lightgreen");
+
       this.stage = ps.Stage.create(params.stageId);
 
       this.fromJSON({
@@ -1457,8 +1530,12 @@ phina.namespace(function() {
     },
 
     update: function(app) {
-      this.gameData.updateView(app.ticker.frame);
+      var frame = app.ticker.frame;
+      
+      this.gameData.updateView(frame);
       runner.update();
+      
+      ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.15) * 0.5;
     },
 
     launchEnemy: function(enemy) {
@@ -1700,17 +1777,17 @@ phina.namespace(function() {
       this.superInit({
         backgroundColor: ps.Color.sec0[1],
         fill: ps.Color.sec0a[6].format(0.2),
-        stroke: ps.Color.sec0[3],
+        stroke: ps.Color.sec0[4],
       });
 
       this.camera.x = -1;
       this.camera.y = 35;
       this.camera.z = 4;
-      var f = 0;
+      var frame = 0;
       this.camera.on("enterframe", function(e) {
-        this.x = Math.sin(f * 0.003);
-        this.y = 20 + Math.cos(f * 0.001) * 10;
-        f += 1;
+        this.y = 18 + Math.cos(frame * 0.001) * 14;
+        this.z = 4 + Math.sin(frame * 0.001) * 2;
+        frame += 1;
       });
 
       var self = this;
@@ -1718,18 +1795,17 @@ phina.namespace(function() {
       var dx = 0.01;
       var dz = 0.04;
 
-      var rangeX2 = 1.205 * 5;
-      var rangeZ2 = 1.205 * 5;
+      var rangeX2 = 1.6 * 5;
+      var rangeZ2 = 1.6 * 5;
       var vertices2 = [
         [0, 0, 0],
       ];
-
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
           ps.bg.Polygon({
               vertices: vertices2,
             })
-            .setTranslation(x * 1.205, 0, z * 1.205)
+            .setTranslation(x * 1.6, 0, z * 1.6)
             .addChildTo(self)
             .on("enterframe", function() {
               this.x += dx;
@@ -1743,23 +1819,21 @@ phina.namespace(function() {
         });
       });
 
-      var rangeX = 3.0 * 5.6;
-      var rangeZ = 3.0 * 5.0;
-
+      var rangeX = 3.0 * 5.0;
+      var rangeZ = 4.0 * 5.6;
       var vertices = [
         [-0.5, 0, -0.5],
         [-0.5, 0, +0.5],
         [+0.5, 0, +0.5],
         [+0.5, 0, -0.5],
       ];
-
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
           Array.range(0, Math.randint(4, 9)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.25, z * 3.0)
+              .setTranslation(x * 3.0, y * 0.25, z * 4.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;
@@ -1936,6 +2010,59 @@ phina.namespace(function() {
       this.superInit();
     }
 
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.TextureEdit", {
+    init: function() {},
+    _static: {
+      outline: function(textureName, color, lineWidth) {
+        color = color || "white";
+        lineWidth = lineWidth || 1;
+
+        var texture = phina.asset.AssetManager.get("image", textureName);
+        if (texture == null) {
+          return;
+        }
+        var w = texture.domElement.width;
+        var h = texture.domElement.height;
+
+        var src = phina.graphics.Canvas().setSize(w, h);
+        src.context.drawImage(texture.domElement, 0, 0);
+
+        var srcData = src.context.getImageData(0, 0, w, h);
+        var data = srcData.data;
+
+        var dst = phina.graphics.Canvas().setSize(w, h);
+        dst.fillStyle = color;
+        for (var y = 0; y < h; y++) {
+          for (var x = 0; x < w; x++) {
+
+            var cIndex = ((y + 0) * w + (x + 0)) * 4 + 3;
+
+            var lIndex = ((y + 0) * w + (x - 1)) * 4 + 3;
+            var rIndex = ((y + 0) * w + (x + 1)) * 4 + 3;
+            var tIndex = ((y - 1) * w + (x + 0)) * 4 + 3;
+            var bIndex = ((y + 1) * w + (x + 0)) * 4 + 3;
+            var l = (0 <= lIndex && lIndex < data.length) ? data[lIndex] : 255;
+            var r = (0 <= rIndex && rIndex < data.length) ? data[rIndex] : 255;
+            var t = (0 <= tIndex && tIndex < data.length) ? data[tIndex] : 255;
+            var b = (0 <= bIndex && bIndex < data.length) ? data[bIndex] : 255;
+
+            var a = data[cIndex];
+
+            if (a > 0 && (l == 0 || r == 0 || t == 0 || b == 0)) {
+              dst.fillRect(x - lineWidth * 0.5, y - lineWidth * 0.5, lineWidth, lineWidth);
+            }
+          }
+        }
+
+        phina.asset.AssetManager.set("image", textureName + "Outline", dst);
+      }
+    }
   });
 
 });

@@ -79,7 +79,7 @@ phina.namespace(function() {
           },
 
           b: {
-            className: "phina.display.Sprite",
+            className: "ps.OutlinedSprite",
             arguments: ["bomb"],
             x: GAMEAREA_WIDTH * 0.5,
             y: GAMEAREA_HEIGHT * 0.2,

@@ -1,7 +1,9 @@
 phina.namespace(function() {
 
   phina.define("ps.BulletLayer", {
-    superClass: "phina.display.Layer",
+    superClass: "phina.display.CanvasElement",
+    
+    bullets: null,
 
     init: function() {
       this.superInit({
@@ -10,10 +12,14 @@ phina.namespace(function() {
       });
       this.setOrigin(0, 0);
       this.backgroundColor = null;
+      
+      this.bullets = [];
     },
 
     spawn: function(runner, spec) {
       var bullet = ps.Bullet().addChildTo(this);
+      bullet.position.x = runner.x;
+      bullet.position.y = runner.y;
       bullet.runner = runner;
       bullet.frameIndex = spec.type || 0;
       if (spec.dummy) {
