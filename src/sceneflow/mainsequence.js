@@ -26,10 +26,26 @@ phina.namespace(function() {
             className: "ps.ArcadeModeSequence",
             nextLabel: "title",
           },
-          
-        ],
 
-        startLabel: "load",
+          {
+            label: "tutorial",
+            className: "ps.TutorialScene",
+            nextLabel: "title",
+          },
+
+          {
+            label: "setting",
+            className: "ps.SettingScene",
+            nextLabel: "title",
+          },
+
+          {
+            label: "ranking",
+            className: "ps.RankingScene",
+            nextLabel: "title",
+          },
+
+        ],
       });
     }
   });
