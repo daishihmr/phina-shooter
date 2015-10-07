@@ -17,6 +17,7 @@ var FONT_SIZE_M = ~~(0.02 * SCREEN_WIDTH);
 var FONT_SIZE_S = ~~(0.01 * SCREEN_WIDTH);
 
 phina.main(function() {
+  ps.Color.initialize();
 
   var app = ps.Application();
   app.run();

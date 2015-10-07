@@ -5,18 +5,31 @@ phina.namespace(function() {
 
     stageId: null,
     gameData: null,
+    bulletConfig: null,
 
     init: function(params) {
       this.superInit({
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT,
-        backgroundColor: "black",
+        backgroundColor: "hsl(30, 60%, 60%)",
       });
 
+      ps.TextureEdit.outline("bullet", "red");
+      ps.TextureEdit.outline("player");
+      ps.TextureEdit.outline("bomb", "lightgreen");
+
+      this.stage = ps.Stage.create(params.stageId);
+
       this.fromJSON({
-        stageId: params.stageId,
-        gameData: params.gameData,
         children: {
+          mainLayer: {
+            className: "ps.gamescene.MainLayer",
+            arguments: {
+              stage: this.stage,
+            },
+            x: SIDEBAR_WIDTH,
+            y: 0,
+          },
           leftSideBar: {
             className: "ps.gamescene.LeftSideBar",
             x: 0,
@@ -27,21 +40,33 @@ phina.namespace(function() {
             x: SCREEN_WIDTH - SIDEBAR_WIDTH,
             y: 0,
           },
-          mainLayer: {
-            className: "ps.gamescene.MainLayer",
-            x: SIDEBAR_WIDTH,
-            y: 0,
-          },
         }
       });
 
+      this.gameData = params.gameData;
       this.leftSideBar.bindGameData(this.gameData);
       this.rightSideBar.bindGameData(this.gameData);
+      this.bulletConfig = ps.BulletConfig(this.mainLayer.player, this.mainLayer.bulletLayer);
+      
+      runner = ps.danmaku.akimoto1.createRunner(this.bulletConfig);
+      runner.x = GAMEAREA_WIDTH * 0.5;
+      runner.y = GAMEAREA_HEIGHT * 0.2;
     },
 
     update: function(app) {
-      this.gameData.updateView(app.ticker.frame);
+      var frame = app.ticker.frame;
+      
+      this.gameData.updateView(frame);
+      runner.update();
+      
+      ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.15) * 0.5;
+    },
+
+    launchEnemy: function(enemy) {
+      // TODO
     },
 
   });
+
+  var runner;
 });

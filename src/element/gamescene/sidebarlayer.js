@@ -11,7 +11,7 @@ phina.namespace(function() {
         height: SIDEBAR_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = "hsl(0, 100%, 7%)";
+      this.backgroundColor = ps.Color.sec1[0];
       this.gridX = phina.util.Grid(SIDEBAR_WIDTH, 16);
       this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
     },

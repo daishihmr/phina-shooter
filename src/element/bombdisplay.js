@@ -4,7 +4,7 @@ phina.namespace(function() {
     superClass: "ps.ItemDisplay",
 
     init: function(initialValue) {
-      this.superInit("bomb", initialValue);
+      this.superInit("bombIcon", initialValue);
     },
 
   });

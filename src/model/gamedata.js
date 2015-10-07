@@ -6,8 +6,8 @@ phina.namespace(function() {
     currentStage: 0,
 
     score: 0,
-    zanki: 0,
-    bomb: 0,
+    zanki: 2,
+    bomb: 3,
     psyche: 0,
     highScore: 0,
 
@@ -20,7 +20,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit();
       this._binder = {};
-
+      
       this.extendMode = "normal";
       this.extendScore = [100000000, 200000000];
     },
