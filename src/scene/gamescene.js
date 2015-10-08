@@ -18,6 +18,10 @@ phina.namespace(function() {
       ps.TextureEdit.outline("player");
       ps.TextureEdit.outline("bomb", "lightgreen");
 
+      var c = phina.graphics.Canvas().setSize(5, 5);
+      c.clearColor("rgba(255, 255, 255, 0.5)");
+      phina.asset.AssetManager.set("image", "particleW", c);
+
       this.stage = ps.Stage.create(params.stageId);
 
       this.fromJSON({
@@ -47,7 +51,7 @@ phina.namespace(function() {
       this.leftSideBar.bindGameData(this.gameData);
       this.rightSideBar.bindGameData(this.gameData);
       this.bulletConfig = ps.BulletConfig(this.mainLayer.player, this.mainLayer.bulletLayer);
-      
+
       runner = ps.danmaku.akimoto1.createRunner(this.bulletConfig);
       runner.x = GAMEAREA_WIDTH * 0.5;
       runner.y = GAMEAREA_HEIGHT * 0.2;
@@ -55,10 +59,10 @@ phina.namespace(function() {
 
     update: function(app) {
       var frame = app.ticker.frame;
-      
+
       this.gameData.updateView(frame);
       runner.update();
-      
+
       ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.15) * 0.5;
     },
 

@@ -5,11 +5,11 @@ phina.namespace(function() {
 
     currentStage: 0,
 
-    score: 0,
+    score: Math.randint(0, 100000000000),
     zanki: 2,
     bomb: 3,
-    psyche: 0,
-    highScore: 0,
+    psyche: Math.randint(0, 100000000000),
+    highScore: Math.randint(0, 100000000000),
 
     /**
      * "normal" or "every"
@@ -20,7 +20,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit();
       this._binder = {};
-      
+
       this.extendMode = "normal";
       this.extendScore = [100000000, 200000000];
     },

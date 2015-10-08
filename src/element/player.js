@@ -64,4 +64,25 @@ phina.namespace(function() {
 
   var moveVector = phina.geom.Vector2(0, 0);
 
+  phina.define("ps.AfterBurner", {
+    superClass: "phina.app.Object2D",
+
+    init: function() {
+      this.superInit();
+    },
+
+    update: function(app) {
+      if (app.ticker.frame % 2 !== 0) return;
+      phina.display.Sprite("particleW")
+        .setPosition(this.position.x, this.position.y)
+        .on("enterframe", function() {
+          this.position.y += 1.8;
+          this.alpha *= 0.4;
+          if (this.alpha < 0.01) this.remove();
+        })
+        .addChildTo(this.parent);
+    },
+
+  });
+
 });

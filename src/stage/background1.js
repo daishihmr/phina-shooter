@@ -5,37 +5,37 @@ phina.namespace(function() {
 
     init: function() {
       this.superInit({
-        backgroundColor: ps.Color.sec0[1],
-        fill: ps.Color.sec0a[6].format(0.2),
-        stroke: ps.Color.sec0[4],
+        backgroundColor: ps.Color.pri[1],
+        fill: ps.Color.pria[7].format(0.2),
+        stroke: ps.Color.pri[4],
       });
 
-      this.camera.x = -1;
+      this.camera.x = 2;
       this.camera.y = 35;
-      this.camera.z = 4;
+      this.camera.z = 8;
+      this.camera.targetY = 3;
       var frame = 0;
       this.camera.on("enterframe", function(e) {
         this.y = 18 + Math.cos(frame * 0.001) * 14;
-        this.z = 4 + Math.sin(frame * 0.001) * 2;
         frame += 1;
       });
 
       var self = this;
 
-      var dx = 0.01;
-      var dz = 0.04;
+      var dx = 0.02;
+      var dz = 0.08;
 
-      var rangeX2 = 1.6 * 5;
-      var rangeZ2 = 1.6 * 5;
+      var rangeX2 = 2.6 * 10;
+      var rangeZ2 = 2.6 * 10;
       var vertices2 = [
         [0, 0, 0],
       ];
-      Array.range(-5, 5).forEach(function(z) {
-        Array.range(-5, 5).forEach(function(x) {
+      Array.range(-10, 10).forEach(function(z) {
+        Array.range(-10, 10).forEach(function(x) {
           ps.bg.Polygon({
               vertices: vertices2,
             })
-            .setTranslation(x * 1.6, 0, z * 1.6)
+            .setTranslation(x * 2.6, 0, z * 2.6)
             .addChildTo(self)
             .on("enterframe", function() {
               this.x += dx;
@@ -63,7 +63,7 @@ phina.namespace(function() {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.25, z * 4.0)
+              .setTranslation(x * 3.0, y * 0.21, z * 4.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;

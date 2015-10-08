@@ -17,7 +17,7 @@ phina.namespace(function() {
         phina.display.Sprite.prototype.draw.call(this, canvas);
       }
     },
-    
+
     _static: {
       staticAlpha: 1.0
     }

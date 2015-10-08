@@ -11,7 +11,7 @@ phina.namespace(function() {
         height: SIDEBAR_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = ps.Color.sec1[0];
+      this.backgroundColor = ps.Color.pri[0];
       this.gridX = phina.util.Grid(SIDEBAR_WIDTH, 16);
       this.gridY = phina.util.Grid(SIDEBAR_HEIGHT, 17);
     },
@@ -120,7 +120,7 @@ phina.namespace(function() {
           bombLabel: {
             className: "ps.HudLabel",
             arguments: {
-              text: "BOMBER",
+              text: "BOMB",
             },
             x: this.gridX.span(1),
             y: this.gridY.span(3),

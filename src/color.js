@@ -27,7 +27,7 @@ phina.namespace(function() {
         var sMax = 90;
         var sLev = (sMax - sMin) / (size - 1);
         var hMin = 5;
-        var hMax = 94;
+        var hMax = 84;
         var hLev = (hMax - hMin) / (size - 1);
         Array.range(0, size).forEach(function(i) {
           var s = Math.floor(sMin + sLev * i);

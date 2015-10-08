@@ -22,7 +22,7 @@
         }
       });
   });
-  
+
   var outline = function(textureName, color) {
     var texture = phina.asset.AssetManager.get("image", textureName);
     if (texture == null) {
@@ -56,11 +56,15 @@
         var a = data[cIndex];
 
         if (a > 0 && (l == 0 || r == 0 || t == 0 || b == 0)) {
-          dst.fillRect(x, y, 1, 1);
+          var g = dst.context.createRadialGradient(x, y, 0, x, y, 2);
+          g.addColorStop(0.0, "rgba(255, 255, 255, 0.6)");
+          g.addColorStop(1.0, "rgba(255, 255, 255, 0.0)");
+          dst.fillStyle = g;
+          dst.fillCircle(x, y, 2);
         }
       }
     }
-    
+
     phina.asset.AssetManager.set("image", textureName + "Outline", dst);
   };
 

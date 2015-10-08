@@ -19,8 +19,8 @@ phina.namespace(function() {
               font: {
                 title: "asset/Black_Ops_One/BlackOpsOne-Regular.ttf",
                 main: "asset/Press_Start_2P/PressStart2P-Regular.ttf",
-                mono: "asset/VT323/VT323-Regular.ttf",
-                // mono: "asset/Share_Tech_Mono/ShareTechMono-Regular.ttf",
+                // mono: "asset/VT323/VT323-Regular.ttf",
+                mono: "asset/Share_Tech_Mono/ShareTechMono-Regular.ttf",
               },
             };
 

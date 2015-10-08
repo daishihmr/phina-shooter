@@ -59,6 +59,10 @@ phina.namespace(function() {
             }
           }
 
+          var alpha = Math.clamp(1.0 - src[0][2] * 0.032, 0.0, 1.0);
+          if (alpha < 0.01) continue;
+          canvas.context.globalAlpha = alpha;
+
           if (4 <= positions.length) {
             canvas.beginPath();
             canvas.lines.apply(canvas, positions);
@@ -74,11 +78,12 @@ phina.namespace(function() {
           }
         }
       }
+
+      canvas.context.globalAlpha = 1.0;
     },
 
     draw: function(canvas) {
       if (!this.skip) this.render();
-
 
       var image = this.canvas.domElement;
       canvas.context.drawImage(image,
