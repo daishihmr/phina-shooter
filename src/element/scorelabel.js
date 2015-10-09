@@ -13,7 +13,7 @@ phina.namespace(function() {
         baseline: "middle",
       }));
 
-      this.value = Math.rand(0, 10000000000000);
+      this.value = 0;
     },
 
     formatText: function() {

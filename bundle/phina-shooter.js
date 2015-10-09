@@ -1280,7 +1280,7 @@ phina.namespace(function() {
         baseline: "middle",
       }));
 
-      this.value = Math.rand(0, 10000000000000);
+      this.value = 0;
     },
 
     formatText: function() {
@@ -1968,9 +1968,10 @@ phina.namespace(function() {
         [+0.5, 0, +0.5],
         [+0.5, 0, -0.5],
       ];
+      var random = phina.util.Random(12345);
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
-          Array.range(0, Math.randint(4, 9)).forEach(function(y) {
+          Array.range(0, random.randint(4, 9)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
