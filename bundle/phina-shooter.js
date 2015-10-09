@@ -1644,24 +1644,24 @@ phina.namespace(function() {
             x: SIDEBAR_WIDTH,
             y: 0,
           },
-          leftSideBar: {
-            className: "ps.gamescene.LeftSideBar",
-            x: 0,
-            y: 0,
-          },
-          rightSideBar: {
-            className: "ps.gamescene.RightSideBar",
-            x: SCREEN_WIDTH - SIDEBAR_WIDTH,
-            y: 0,
-          },
+          // leftSideBar: {
+          //   className: "ps.gamescene.LeftSideBar",
+          //   x: 0,
+          //   y: 0,
+          // },
+          // rightSideBar: {
+          //   className: "ps.gamescene.RightSideBar",
+          //   x: SCREEN_WIDTH - SIDEBAR_WIDTH,
+          //   y: 0,
+          // },
         }
       });
       
       var player = this.mainLayer.player;
 
       this.gameData = params.gameData;
-      this.leftSideBar.bindGameData(this.gameData);
-      this.rightSideBar.bindGameData(this.gameData);
+      // this.leftSideBar.bindGameData(this.gameData);
+      // this.rightSideBar.bindGameData(this.gameData);
       this.bulletConfig = ps.BulletConfig(player, this.mainLayer.bulletLayer);
 
       player.shotLayer = this.mainLayer.shotLayer;
