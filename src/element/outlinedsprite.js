@@ -14,7 +14,9 @@ phina.namespace(function() {
         this.alpha = ps.OutlinedSprite.staticAlpha;
       };
       this.outline.draw = function(canvas) {
+        canvas.context.globalCompositeOperation = "lighter";
         phina.display.Sprite.prototype.draw.call(this, canvas);
+        canvas.context.globalCompositeOperation = "source-over";
       }
     },
 

@@ -9,6 +9,8 @@ phina.namespace(function() {
     roll: 0,
 
     speed: 3.6,
+    
+    shotLayer: null,
 
     init: function() {
       this.superInit("player", 32, 32);
@@ -17,11 +19,13 @@ phina.namespace(function() {
 
     update: function(app) {
       if (!this.controllable) return;
+      
+      var frame = app.ticker.frame;
 
       var kb = app.keyboard;
       var gp = app.gamepads.get(0);
       var p = app.pointer;
-
+      
       moveVector.set(0, 0);
 
       moveVector.add(kb.getKeyDirection().mul(this.speed));
@@ -49,9 +53,18 @@ phina.namespace(function() {
         this.frameIndex = Math.clamp(4 + r, 0, 8);
       }
 
-      this.position.add(moveVector);
-      this.position.x = Math.clamp(this.position.x, 4, GAMEAREA_WIDTH - 4);
-      this.position.y = Math.clamp(this.position.y, 4, GAMEAREA_HEIGHT - 4);
+      var position = this.position;
+      position.add(moveVector);
+      position.x = Math.clamp(position.x, 4, GAMEAREA_WIDTH - 4);
+      position.y = Math.clamp(position.y, 4, GAMEAREA_HEIGHT - 4);
+      
+      if (frame % 4 === 0) {
+        var xv = Math.sin(frame / 4 * 0.6) * 8;
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 4, -90);
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 4, -90);
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -93);
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -87);
+      }
     },
 
     launch: function() {
@@ -73,16 +86,22 @@ phina.namespace(function() {
 
     update: function(app) {
       if (app.ticker.frame % 2 !== 0) return;
-      phina.display.Sprite("particleW")
+      var p = phina.display.Sprite("particleB")
+        .setScale(0.125)
         .setPosition(this.position.x, this.position.y)
         .on("enterframe", function() {
-          this.position.y += 1.8;
-          this.alpha *= 0.4;
+          this.position.y += 1;
+          this.alpha -= 0.1;
           if (this.alpha < 0.01) this.remove();
         })
         .addChildTo(this.parent);
+      p.draw = function(canvas) {
+        canvas.context.globalCompositeOperation = "lighter";
+        phina.display.Sprite.prototype.draw.call(this, canvas);
+        canvas.context.globalCompositeOperation = "source-over";
+      };
     },
-
+    
   });
 
 });

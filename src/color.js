@@ -22,7 +22,7 @@ phina.namespace(function() {
         var s0 = (p0 - r + 360) % 360;
         var s1 = (p0 + r + 360) % 360;
 
-        var size = 15;
+        var size = 16;
         var sMin = 48;
         var sMax = 90;
         var sLev = (sMax - sMin) / (size - 1);
