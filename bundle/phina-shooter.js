@@ -827,9 +827,9 @@ phina.namespace(function() {
 
       this.fromJSON({
         children: {
-          backgroundLayer: {
-            className: params.stage.backgroundClassName,
-          },
+          // backgroundLayer: {
+          //   className: params.stage.backgroundClassName,
+          // },
 
           scoreItemLayer: {
             className: "phina.app.Element",
