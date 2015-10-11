@@ -9,8 +9,11 @@ phina.namespace(function() {
     roll: 0,
 
     speed: 3.6,
-    
+
     shotLayer: null,
+
+    trigger: 0,
+    fireFrame: 0,
 
     init: function() {
       this.superInit("player", 32, 32);
@@ -19,25 +22,25 @@ phina.namespace(function() {
 
     update: function(app) {
       if (!this.controllable) return;
-      
+
       var frame = app.ticker.frame;
 
-      var kb = app.keyboard;
-      var gp = app.gamepads.get(0);
-      var p = app.pointer;
-      
+      var keyboard = app.keyboard;
+      var gamepad = app.gamepads.get(0);
+      // var pointer = app.pointer;
+
       moveVector.set(0, 0);
 
-      moveVector.add(kb.getKeyDirection().mul(this.speed));
-      if (gp) {
-        var stick = gp.getStickDirection();
+      moveVector.add(keyboard.getKeyDirection().mul(this.speed));
+      if (gamepad) {
+        var stick = gamepad.getStickDirection();
         if (0.4 < stick.length()) {
           moveVector.add(stick.normalize().mul(this.speed));
         }
       }
-      if (p.getPointing()) {
-        moveVector.add(p.deltaPosition.mul(2));
-      }
+      // if (pointer.getPointing()) {
+      //   moveVector.add(pointer.deltaPosition.mul(2));
+      // }
 
       if (moveVector.x) {
         this.roll = Math.clamp(this.roll + moveVector.x * 0.1, -4, 4);
@@ -57,13 +60,25 @@ phina.namespace(function() {
       position.add(moveVector);
       position.x = Math.clamp(position.x, 4, GAMEAREA_WIDTH - 4);
       position.y = Math.clamp(position.y, 4, GAMEAREA_HEIGHT - 4);
-      
-      if (frame % 4 === 0) {
-        var xv = Math.sin(frame / 4 * 0.6) * 8;
-        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 4, -90);
-        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 4, -90);
-        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -93);
-        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -87);
+
+      if (keyboard.getKeyDown("shot") || gamepad.getKeyDown("shot")) {
+        this.trigger = 14;
+      } else {
+        this.trigger -= 1;
+      }
+
+      if (0 < this.trigger && frame % 14 === 0) {
+        ps.SoundManager.playSound("shot");
+      }
+
+      if (0 < this.trigger && frame % 4 === 0) {
+        var xv = Math.sin(this.fireFrame * 0.6) * 8;
+        var dv = Math.sin(this.fireFrame * 1.0) * 8;
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90);
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90);
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv);
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv);
+        this.fireFrame += 1;
       }
     },
 
@@ -101,7 +116,7 @@ phina.namespace(function() {
         canvas.context.globalCompositeOperation = "source-over";
       };
     },
-    
+
   });
 
 });

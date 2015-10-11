@@ -10,7 +10,7 @@ phina.namespace(function() {
 
       this.outline = phina.display.Sprite(texture + "Outline", width, height).addChildTo(this);
       this.outline.update = function(app) {
-        this.frameIndex = self.frameIndex;
+        this.srcRect = self.srcRect;
         this.alpha = ps.OutlinedSprite.staticAlpha;
       };
       this.outline.draw = function(canvas) {

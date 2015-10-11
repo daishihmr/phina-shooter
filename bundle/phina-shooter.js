@@ -1,3 +1,5 @@
+var DEBUG = true;
+
 var SCREEN_WIDTH = 480;
 var SCREEN_HEIGHT = 320;
 // var SCREEN_WIDTH = 720;
@@ -16,13 +18,21 @@ var FONT_SIZE_L = ~~(0.03 * SCREEN_WIDTH);
 var FONT_SIZE_M = ~~(0.02 * SCREEN_WIDTH);
 var FONT_SIZE_S = ~~(0.01 * SCREEN_WIDTH);
 
+phina.input.Keyboard.KEY_CODE["shot"] = phina.input.Keyboard.KEY_CODE["z"];
+phina.input.Keyboard.KEY_CODE["bomb"] = phina.input.Keyboard.KEY_CODE["x"];
+phina.input.Keyboard.KEY_CODE["start"] = phina.input.Keyboard.KEY_CODE["space"];
+
+phina.input.Gamepad.BUTTON_CODE["shot"] = phina.input.Gamepad.BUTTON_CODE["x"];
+phina.input.Gamepad.BUTTON_CODE["bomb"] = phina.input.Gamepad.BUTTON_CODE["a"];
+phina.input.Gamepad.BUTTON_CODE["start"] = phina.input.Gamepad.BUTTON_CODE["y"];
+
 phina.main(function() {
   ps.Color.initialize();
 
   var app = ps.Application();
   app.run();
-  
-  app.enableStats();
+
+  if (DEBUG) app.enableStats();
 });
 
 phina.namespace(function() {
@@ -46,11 +56,13 @@ phina.namespace(function() {
     },
 
     update: function() {
-      this.mouse.update();
-      this.touch.update();
-      this.touchList.update();
+      // this.mouse.update();
+      // this.touch.update();
+      // this.touchList.update();
       this.keyboard.update();
       this.gamepads.update();
+      
+      ps.SoundManager.update(this);
     },
 
   });
@@ -81,12 +93,19 @@ phina.namespace(function() {
                 // mono: "asset/VT323/VT323-Regular.ttf",
                 mono: "asset/Share_Tech_Mono/ShareTechMono-Regular.ttf",
               },
+              
+              sound: {
+                shot: "asset/sen_ge_kijuu01.mp3"
+              },
             };
 
           case "stage0":
             return {
               image: {
-                dummy: "asset/zankiIcon.png",
+                enemy_stage0: "asset/enemy_stage0.png",
+              },
+              sound: {
+                bgm: "asset/ReBoot_FreeBGM.mp3",
               },
             };
 
@@ -202,25 +221,30 @@ phina.namespace(function() {
   ps.danmaku = {};
 
   // ザコ
-  var basic = function(dir) {
+  var basic = function(s, dir) {
     return new bulletml.Root({
       top: action([
         interval(10),
         repeat(Infinity, [
-          fire(DM, spd(1), direction(dir)),
+          fire(DM, spd(s), direction(dir)),
           repeat("$burst", [
             fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
-          interval(90),
+          interval(50),
         ]),
       ]),
     });
   };
-  ps.danmaku.basic = basic(0);
-  ps.danmaku.basicR1 = basic(-5);
-  ps.danmaku.basicL1 = basic(+5);
-  ps.danmaku.basicR2 = basic(-15);
-  ps.danmaku.basicL2 = basic(+15);
+  ps.danmaku.basic = basic(1, 0);
+  ps.danmaku.basicR1 = basic(1, -5);
+  ps.danmaku.basicL1 = basic(1, +5);
+  ps.danmaku.basicR2 = basic(1, -15);
+  ps.danmaku.basicL2 = basic(1, +15);
+  ps.danmaku.basicF = basic(1.2, 0);
+  ps.danmaku.basicFR1 = basic(1.2, -5);
+  ps.danmaku.basicFL1 = basic(1.2, +5);
+  ps.danmaku.basicFR2 = basic(1.2, -15);
+  ps.danmaku.basicFL2 = basic(1.2, +15);
 
   // ザコ3way
   var basic3 = function(dir) {
@@ -235,7 +259,7 @@ phina.namespace(function() {
             fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(DM, spdSeq(0), direction(-14, "sequence")),
           ]),
-          interval(90),
+          interval(50),
         ]),
       ]),
     });
@@ -245,6 +269,35 @@ phina.namespace(function() {
   ps.danmaku.basic3L1 = basic3(+5);
   ps.danmaku.basic3R2 = basic3(-15);
   ps.danmaku.basic3L2 = basic3(+15);
+
+  // ザコ
+  var forward = function(s, dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
+          repeat(3, [
+            fire(DM, spd(s), direction(dir, "relative")),
+            repeat("$burst", [
+              fire(R2, spdSeq(0.15), direction(0, "sequence")),
+            ]),
+            interval(10),
+          ]),
+          interval(50),
+        ]),
+      ]),
+    });
+  };
+  ps.danmaku.forward = forward(1, 0);
+  ps.danmaku.forwardR1 = forward(1, -5);
+  ps.danmaku.forwardL1 = forward(1, +5);
+  ps.danmaku.forwardR2 = forward(1, -15);
+  ps.danmaku.forwardL2 = forward(1, +15);
+  ps.danmaku.forwardF = forward(1.2, 0);
+  ps.danmaku.forwardFR1 = forward(1.2, -5);
+  ps.danmaku.forwardFL1 = forward(1.2, +5);
+  ps.danmaku.forwardFR2 = forward(1.2, -15);
+  ps.danmaku.forwardFL2 = forward(1.2, +15);
 
   // Stage1 ------------------------------
 
@@ -295,11 +348,11 @@ phina.namespace(function() {
     top: action([
       interval(20),
       repeat(Infinity, [
-        fire(DM, spd(1.4)),
+        fire(DM, spd(0.8)),
         repeat(12, [
           fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
         ]),
-        interval(90),
+        interval(50),
       ]),
     ]),
   });
@@ -308,93 +361,6 @@ phina.namespace(function() {
   // Stage3 ------------------------------
   // Stage4 ------------------------------
   // Stage5 ------------------------------
-
-});
-
-phina.namespace(function() {
-  // Color Palette by Paletton.com
-  // Palette URL: http://paletton.com/#uid=50f1n0kmGpNdfBfixtwqklHuEgU
-
-  phina.define("ps.Color", {
-    init: function() {},
-    _static: {
-      pri: [],
-      sec0: [],
-      sec1: [],
-
-      initialize: function(scene) {
-        ps.Color.pri = [];
-        ps.Color.sec0 = [];
-        ps.Color.sec1 = [];
-        ps.Color.pria = [];
-        ps.Color.sec0a = [];
-        ps.Color.sec1a = [];
-
-        var p0 = 21;
-        var r = 140;
-        var s0 = (p0 - r + 360) % 360;
-        var s1 = (p0 + r + 360) % 360;
-
-        var size = 16;
-        var sMin = 48;
-        var sMax = 90;
-        var sLev = (sMax - sMin) / (size - 1);
-        var hMin = 5;
-        var hMax = 84;
-        var hLev = (hMax - hMin) / (size - 1);
-        Array.range(0, size).forEach(function(i) {
-          var s = Math.floor(sMin + sLev * i);
-          var h = Math.floor(hMin + hLev * i);
-          ps.Color.pri[i] = "hsl({0},{1}%,{2}%)"    .format(p0, s, h);
-          ps.Color.sec0[i] = "hsl({0},{1}%,{2}%)"   .format(s0, s, h);
-          ps.Color.sec1[i] = "hsl({0},{1}%,{2}%)"   .format(s1, s, h);
-          ps.Color.pria[i] = "hsla({0},{1}%,{2}%,"  .format(p0, s, h) + "{0})";
-          ps.Color.sec0a[i] = "hsla({0},{1}%,{2}%," .format(s0, s, h) + "{0})";
-          ps.Color.sec1a[i] = "hsla({0},{1}%,{2}%," .format(s1, s, h) + "{0})";
-        });
-
-        if (scene) ps.Color.test().addChildTo(scene);
-      },
-
-      test: function() {
-        var r = phina.display.CanvasElement();
-        ps.Color.pri.forEach(function(c, i) {
-          phina.display.RectangleShape({
-              width: 20,
-              height: 20,
-              fill: c,
-              stroke: null,
-            })
-            .setPosition(20 + i * 20, 20 + 20)
-            .addChildTo(r);
-        });
-
-        ps.Color.sec0.forEach(function(c, i) {
-          phina.display.RectangleShape({
-              width: 20,
-              height: 20,
-              fill: c,
-              stroke: null,
-            })
-            .setPosition(20 + i * 20, 20 + 0)
-            .addChildTo(r);
-        });
-
-        ps.Color.sec1.forEach(function(c, i) {
-          phina.display.RectangleShape({
-              width: 20,
-              height: 20,
-              fill: c,
-              stroke: null,
-            })
-            .setPosition(20 + i * 20, 20 + 40)
-            .addChildTo(r);
-        });
-
-        return r;
-      }
-    },
-  });
 
 });
 
@@ -452,15 +418,238 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  phina.define("ps.Kujo1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 24, 24, params.$safe({
+        danmakuName: "basic",
+      }));
+      this.setSrcRect(32, 0, 24, 24);
+
+      var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
+        .addChildTo(this)
+        .on("enterframe", function() {
+          this.rotation += 20;
+        });
+      propeler.srcRect.x = 0;
+      propeler.srcRect.y = 128;
+      propeler.srcRect.width = 32;
+      propeler.srcRect.height = 32;
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 1.0
+        }, 80, "easeOutQuad")
+        .wait(120)
+        .to({
+          y: params.y
+        }, 80, "easeInQuad");
+    },
+
+    update: function(app) {
+      var player = app.currentScene.player;
+      this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
+    }
+  });
+
+  phina.define("ps.Kiryu1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 24, 24, params.$safe({
+        danmakuName: "basic",
+      }));
+      this.setSrcRect(0, 0, 24, 24);
+
+      var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
+        .addChildTo(this)
+        .on("enterframe", function() {
+          this.rotation += 20;
+        });
+      propeler.srcRect.x = 0;
+      propeler.srcRect.y = 128;
+      propeler.srcRect.width = 32;
+      propeler.srcRect.height = 32;
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        });
+    },
+
+    update: function(app) {
+      var player = app.currentScene.player;
+      this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
+    }
+  });
+
+  phina.define("ps.Kise1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 32, 32, params.$safe({
+        danmakuName: "kise1",
+      }));
+      this.setSrcRect(0, 32, 32, 32);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        });
+    },
+  });
+
+  phina.define("ps.Natsuki1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 32, 32, params.$safe({
+        danmakuName: "forward",
+      }));
+      this.setSrcRect(32, 32, 32, 32);
+
+      this.direction = params.direction * Math.DEG_TO_RAD;
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        });
+    },
+
+    update: function(app) {
+      this.x += Math.cos(this.direction) * 0.5;
+      this.y += Math.sin(this.direction) * 0.5;
+      this.rotation = this.direction * Math.RAD_TO_DEG;
+
+      var player = app.currentScene.player;
+      var t = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI * 2;
+      if (this.runner) this.runner.direction = ~~((t + U225) / U45) * U45;
+    }
+  });
+
+  var U45 = Math.PI * 2 / 8;
+  var U225 = Math.PI * 2 / 16;
+});
+
+phina.namespace(function() {
+
   phina.define("ps.Enemy", {
-    superClass: "phina.display.Sprite",
+    superClass: "ps.OutlinedSprite",
 
     hp: 0,
     score: 0,
 
-    init: function(params) {
-      this.superInit(params.texture, params.width, params.height);
-      this.$extend(params);
+    danmakuName: null,
+    runner: null,
+
+    init: function(texture, width, height, params) {
+      this.superInit(texture, width, height);
+      this.setPosition(params.x, params.y);
+      this.danmakuName = params.danmakuName;
+    },
+
+    startAttack: function() {
+      this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
+      this.on("enterframe", function() {
+        this.runner.x = this.position.x;
+        this.runner.y = this.position.y;
+        this.runner.update();
+      });
+    },
+
+    setSrcRect: function(x, y, w, h) {
+      this.srcRect.x = x;
+      this.srcRect.y = y;
+      this.srcRect.width = w;
+      this.srcRect.height = h;
+      return this;
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.EnemyUnit", {
+    init: function() {},
+    _static: {
+      formation: {
+
+        "basic0": [{
+          x: GAMEAREA_WIDTH * -0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.05,
+          y: GAMEAREA_HEIGHT * -0.1,
+          wait: 20,
+        }, ],
+
+        "line6": [{
+          x: 32 * 0,
+          y: 32 * 0,
+          wait: 0,
+        }, {
+          x: 32 * 1,
+          y: 32 * 0,
+          wait: 0,
+        }, {
+          x: 32 * 2,
+          y: 32 * 0,
+          wait: 0,
+        }, {
+          x: 32 * 3,
+          y: 32 * 0,
+          wait: 0,
+        }, {
+          x: 32 * 4,
+          y: 32 * 0,
+          wait: 0,
+        }, ],
+
+        "line7": [{
+          x: 32 * -0,
+          y: 32 * -0,
+          wait: 0,
+        }, {
+          x: 32 * -1,
+          y: 32 * -1,
+          wait: 0,
+        }, {
+          x: 32 * -2,
+          y: 32 * -2,
+          wait: 0,
+        }, {
+          x: 32 * -3,
+          y: 32 * -3,
+          wait: 0,
+        }, {
+          x: 32 * -4,
+          y: 32 * -4,
+          wait: 0,
+        }, ],
+
+      }
     }
   });
 
@@ -832,7 +1021,7 @@ phina.namespace(function() {
           },
 
           scoreItemLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           shotLayer: {
@@ -853,11 +1042,11 @@ phina.namespace(function() {
           },
 
           itemLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           enemyLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           effectLayer1: {
@@ -882,17 +1071,6 @@ phina.namespace(function() {
 
           bulletLayer: {
             className: "ps.BulletLayer",
-          },
-
-          dummy: {
-            className: "ps.OutlinedSprite",
-            arguments: ["bomb"],
-            x: 20,
-            y: 70,
-            onenterframe: function() {
-              this.x += 0.2;
-              this.y += 0.2;
-            }
           },
 
           playerMarker: {
@@ -1173,7 +1351,7 @@ phina.namespace(function() {
 
       this.outline = phina.display.Sprite(texture + "Outline", width, height).addChildTo(this);
       this.outline.update = function(app) {
-        this.frameIndex = self.frameIndex;
+        this.srcRect = self.srcRect;
         this.alpha = ps.OutlinedSprite.staticAlpha;
       };
       this.outline.draw = function(canvas) {
@@ -1201,8 +1379,11 @@ phina.namespace(function() {
     roll: 0,
 
     speed: 3.6,
-    
+
     shotLayer: null,
+
+    trigger: 0,
+    fireFrame: 0,
 
     init: function() {
       this.superInit("player", 32, 32);
@@ -1211,25 +1392,25 @@ phina.namespace(function() {
 
     update: function(app) {
       if (!this.controllable) return;
-      
+
       var frame = app.ticker.frame;
 
-      var kb = app.keyboard;
-      var gp = app.gamepads.get(0);
-      var p = app.pointer;
-      
+      var keyboard = app.keyboard;
+      var gamepad = app.gamepads.get(0);
+      // var pointer = app.pointer;
+
       moveVector.set(0, 0);
 
-      moveVector.add(kb.getKeyDirection().mul(this.speed));
-      if (gp) {
-        var stick = gp.getStickDirection();
+      moveVector.add(keyboard.getKeyDirection().mul(this.speed));
+      if (gamepad) {
+        var stick = gamepad.getStickDirection();
         if (0.4 < stick.length()) {
           moveVector.add(stick.normalize().mul(this.speed));
         }
       }
-      if (p.getPointing()) {
-        moveVector.add(p.deltaPosition.mul(2));
-      }
+      // if (pointer.getPointing()) {
+      //   moveVector.add(pointer.deltaPosition.mul(2));
+      // }
 
       if (moveVector.x) {
         this.roll = Math.clamp(this.roll + moveVector.x * 0.1, -4, 4);
@@ -1249,13 +1430,25 @@ phina.namespace(function() {
       position.add(moveVector);
       position.x = Math.clamp(position.x, 4, GAMEAREA_WIDTH - 4);
       position.y = Math.clamp(position.y, 4, GAMEAREA_HEIGHT - 4);
-      
-      if (frame % 4 === 0) {
-        var xv = Math.sin(frame / 4 * 0.6) * 8;
-        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 4, -90);
-        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 4, -90);
-        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -93);
-        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -87);
+
+      if (keyboard.getKeyDown("shot") || gamepad.getKeyDown("shot")) {
+        this.trigger = 14;
+      } else {
+        this.trigger -= 1;
+      }
+
+      if (0 < this.trigger && frame % 14 === 0) {
+        ps.SoundManager.playSound("shot");
+      }
+
+      if (0 < this.trigger && frame % 4 === 0) {
+        var xv = Math.sin(this.fireFrame * 0.6) * 8;
+        var dv = Math.sin(this.fireFrame * 1.0) * 8;
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90);
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90);
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv);
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv);
+        this.fireFrame += 1;
       }
     },
 
@@ -1293,7 +1486,7 @@ phina.namespace(function() {
         canvas.context.globalCompositeOperation = "source-over";
       };
     },
-    
+
   });
 
 });
@@ -1432,27 +1625,30 @@ phina.namespace(function() {
 phina.namespace(function() {
 
   phina.define("ps.BulletConfig", {
+    init: function() {},
+    _static: {
 
-    speedRate: 3,
-    target: null,
-    bulletLayer: null,
+      speedRate: 3,
+      target: null,
+      bulletLayer: null,
 
-    init: function(target, bulletLayer) {
-      this.target = target;
-      this.bulletLayer = bulletLayer;
-      
-      this.put("densityRank", 0.0);
-      this.put("speedRank", 0.0);
-      this.put("burst", 0);
-    },
+      setup: function(target, bulletLayer) {
+        this.target = target;
+        this.bulletLayer = bulletLayer;
 
-    createNewBullet: function(runner, spec) {
-      this.bulletLayer.spawn(runner, spec);
-    },
-    
-    put: function(name, value) {
-      bulletml.Walker.globalScope["$" + name] = value;
-    },
+        this.put("densityRank", 0.00);
+        this.put("speedRank", 0.00);
+        this.put("burst", 0);
+      },
+
+      createNewBullet: function(runner, spec) {
+        this.bulletLayer.spawn(runner, spec);
+      },
+
+      put: function(name, value) {
+        bulletml.Walker.globalScope["$" + name] = value;
+      },
+    }
   });
 
 });
@@ -1599,7 +1795,6 @@ phina.namespace(function() {
 
     stageId: null,
     gameData: null,
-    bulletConfig: null,
 
     init: function(params) {
       this.superInit({
@@ -1607,30 +1802,6 @@ phina.namespace(function() {
         height: SCREEN_HEIGHT,
         backgroundColor: "hsl(30, 60%, 60%)",
       });
-
-      ps.TextureEdit.outline("bullet", "rgba(255,180,0,0.5)", 2);
-      ps.TextureEdit.outline("player", "rgba(0,100,255,0.5)", 2);
-      ps.TextureEdit.outline("bomb", "lightgreen", 2);
-
-      var c = phina.graphics.Canvas().setSize(32, 32);
-      c.clearColor("rgba(255, 255, 255, 0.5)");
-      phina.asset.AssetManager.set("image", "particleW", c);
-
-      c = phina.graphics.Canvas().setSize(32, 32);
-      c.clearColor("hsla(0, 100%, 70%, 0.5)");
-      phina.asset.AssetManager.set("image", "particleR", c);
-
-      c = phina.graphics.Canvas().setSize(32, 32);
-      c.clearColor("hsla(60, 100%, 70%, 0.5)");
-      phina.asset.AssetManager.set("image", "particleY", c);
-
-      c = phina.graphics.Canvas().setSize(32, 32);
-      c.clearColor("hsla(120, 100%, 70%, 0.5)");
-      phina.asset.AssetManager.set("image", "particleG", c);
-
-      c = phina.graphics.Canvas().setSize(32, 32);
-      c.clearColor("hsla(240, 100%, 70%, 0.5)");
-      phina.asset.AssetManager.set("image", "particleB", c);
 
       this.stage = ps.Stage.create(params.stageId);
 
@@ -1656,41 +1827,85 @@ phina.namespace(function() {
           },
         }
       });
-      
-      var player = this.mainLayer.player;
+
+      var player = this.player = this.mainLayer.player;
 
       this.gameData = params.gameData;
       this.leftSideBar.bindGameData(this.gameData);
       this.rightSideBar.bindGameData(this.gameData);
-      this.bulletConfig = ps.BulletConfig(player, this.mainLayer.bulletLayer);
+      ps.BulletConfig.setup(player, this.mainLayer.bulletLayer);
 
       player.shotLayer = this.mainLayer.shotLayer;
-
-      // TODO atdks
-      runner = ps.danmaku.akimoto1.createRunner(this.bulletConfig);
-      runner.x = GAMEAREA_WIDTH * 0.5;
-      runner.y = GAMEAREA_HEIGHT * 0.2;
     },
 
     update: function(app) {
+      this.stage.update(app);
+
       var frame = app.ticker.frame;
 
       this.gameData.updateView(frame);
 
-      ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.15) * 0.5;
-
-      // TODO atdks
-      runner.update();
+      ps.OutlinedSprite.staticAlpha = 0.5 + Math.sin(frame * 0.26) * 0.5;
     },
 
     launchEnemy: function(enemy) {
-      // TODO
+      this.mainLayer.enemyLayer.addChild(enemy);
     },
 
   });
+});
 
-  // TODO atdks
-  var runner;
+phina.namespace(function() {
+
+  phina.define("ps.GenerateAssetScene", {
+    superClass: "phina.display.CanvasScene",
+
+    init: function(params) {
+      this.superInit();
+      this.one("enterframe", function() {
+        this.generate(params.assetType);
+      });
+    },
+
+    generate: function(assetType) {
+      switch (assetType) {
+        case "stage0":
+          ps.TextureEdit.outline("enemy_stage0", "red");
+
+          break;
+
+        default:
+          ps.TextureEdit.outline("bullet", "rgba(255,180,0,0.5)", 2);
+          ps.TextureEdit.outline("player", "rgba(0,100,255,0.5)", 2);
+          ps.TextureEdit.outline("bomb", "lightgreen", 2);
+
+          var c = phina.graphics.Canvas().setSize(32, 32);
+          c.clearColor("rgba(255, 255, 255, 0.5)");
+          phina.asset.AssetManager.set("image", "particleW", c);
+
+          c = phina.graphics.Canvas().setSize(32, 32);
+          c.clearColor("hsla(0, 100%, 70%, 0.5)");
+          phina.asset.AssetManager.set("image", "particleR", c);
+
+          c = phina.graphics.Canvas().setSize(32, 32);
+          c.clearColor("hsla(60, 100%, 70%, 0.5)");
+          phina.asset.AssetManager.set("image", "particleY", c);
+
+          c = phina.graphics.Canvas().setSize(32, 32);
+          c.clearColor("hsla(120, 100%, 70%, 0.5)");
+          phina.asset.AssetManager.set("image", "particleG", c);
+
+          c = phina.graphics.Canvas().setSize(32, 32);
+          c.clearColor("hsla(240, 100%, 70%, 0.5)");
+          phina.asset.AssetManager.set("image", "particleB", c);
+
+          break;
+      }
+
+      this.exit();
+    },
+  });
+
 });
 
 phina.namespace(function() {
@@ -1821,6 +2036,7 @@ phina.namespace(function() {
         }
       });
 
+      // TODO
       this.tweener.wait(500).call(function() {
         this.exit("arcadeMode");
       }.bind(this));
@@ -1875,7 +2091,14 @@ phina.namespace(function() {
                 arguments: {
                   assetType: stageName
                 },
-                nextLabel: stageName,
+              },
+
+              {
+                label: stageName + "generate",
+                className: "ps.GenerateAssetScene",
+                arguments: {
+                  assetType: stageName
+                },
               },
 
               {
@@ -1885,7 +2108,6 @@ phina.namespace(function() {
                   stageId: stageId,
                   gameData: gameData,
                 },
-                nextLabel: stageName + "result",
               },
 
               {
@@ -1894,7 +2116,6 @@ phina.namespace(function() {
                 arguments: {
                   gameData: gameData,
                 },
-                nextLabel: next,
               },
 
             ];
@@ -1939,7 +2160,11 @@ phina.namespace(function() {
             arguments: {
               assetType: "common"
             },
-            nextLabel: "title",
+          },
+
+          {
+            label: "generate",
+            className: "ps.GenerateAssetScene",
           },
 
           {
@@ -2011,17 +2236,19 @@ phina.namespace(function() {
       this.camera.targetY = 3;
       var frame = 0;
       this.camera.on("enterframe", function(e) {
-        this.y = 18 + Math.cos(frame * 0.001) * 14;
+        this.y = 16 + Math.cos(frame * 0.001) * 13;
         frame += 1;
       });
 
       var self = this;
 
-      var dx = 0.02;
-      var dz = 0.08;
+      var dx = 0.04;
+      var dz = 0.16;
 
-      var rangeX2 = 2.6 * 10;
-      var rangeZ2 = 2.6 * 10;
+      var rangeX = 3.0 * 5.0;
+      var rangeZ = 4.0 * 5.6;
+
+      // 床
       var vertices2 = [
         [0, 0, 0],
       ];
@@ -2036,16 +2263,105 @@ phina.namespace(function() {
               this.x += dx;
               this.z += dz;
 
-              if (this.x < -rangeX2) this.x += rangeX2 * 2;
-              if (rangeX2 < this.x) this.x += -rangeX2 * 2;
-              if (this.z < -rangeZ2) this.z += rangeZ2 * 2;
-              if (rangeZ2 < this.z) this.z += -rangeZ2 * 2;
+              if (this.x < -rangeX) this.x += rangeX * 2;
+              if (rangeX < this.x) this.x += -rangeX * 2;
+              if (this.z < -rangeZ) this.z += rangeZ * 2;
+              if (rangeZ < this.z) this.z += -rangeZ * 2;
             });
         });
       });
 
+      // 建造物
+      var vertices = [
+        [-0.7, 0, -0.7],
+        [-0.7, 0, +0.7],
+        [+0.7, 0, +0.7],
+        [+0.7, 0, -0.7],
+      ];
+      var random = phina.util.Random(12345);
+      Array.range(-5, 5).forEach(function(z) {
+        Array.range(-5, 5).forEach(function(x) {
+          Array.range(0, random.randint(6, 11)).forEach(function(y) {
+            ps.bg.Polygon({
+                vertices: vertices,
+              })
+              .setTranslation(x * 3.0, y * 0.21, z * 4.0)
+              .addChildTo(self)
+              .on("enterframe", function() {
+                this.x += dx;
+                this.z += dz;
+
+                if (this.x < -rangeX) this.x += rangeX * 2;
+                if (rangeX < this.x) this.x += -rangeX * 2;
+                if (this.z < -rangeZ) this.z += rangeZ * 2;
+                if (rangeZ < this.z) this.z += -rangeZ * 2;
+              });
+          });
+        });
+      });
+    }
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.Background2", {
+    superClass: "ps.BackgroundLayer",
+
+    init: function() {
+      this.superInit({
+        backgroundColor: ps.Color.sec0[1],
+        fill: ps.Color.sec0a[8].format(0.1),
+        stroke: ps.Color.sec0[8],
+      });
+
+      this.camera.x = 5;
+      this.camera.y = 0.5;
+      this.camera.z = 10;
+      this.camera.targetX = 0;
+      this.camera.targetY = 0.5;
+      this.camera.targetZ = 0;
+      var frame = 0;
+      this.camera.on("enterframe", function(e) {
+        this.targetY = -2 + Math.sin(frame * 0.002) * -2;
+        frame += 1;
+      });
+
+      var self = this;
+
+      var dx = 0.05;
+      var dz = 0.10;
+
       var rangeX = 3.0 * 5.0;
       var rangeZ = 4.0 * 5.6;
+
+      // 床
+      var vertices2 = [
+        [0, 0, 0],
+      ];
+      Array.range(-10, 10).forEach(function(z) {
+        Array.range(-10, 10).forEach(function(x) {
+          [-1, 1].forEach(function(y) {
+            ps.bg.Polygon({
+                vertices: vertices2,
+              })
+              .setTranslation(x * 2.6, y * 2.0, z * 2.6)
+              .addChildTo(self)
+              .on("enterframe", function() {
+                this.x += dx;
+                this.z += dz;
+
+                if (this.x < -rangeX) this.x += rangeX * 2;
+                if (rangeX < this.x) this.x += -rangeX * 2;
+                if (this.z < -rangeZ) this.z += rangeZ * 2;
+                if (rangeZ < this.z) this.z += -rangeZ * 2;
+              });
+          });
+        });
+      });
+
+      // 建造物
       var vertices = [
         [-0.5, 0, -0.5],
         [-0.5, 0, +0.5],
@@ -2055,11 +2371,11 @@ phina.namespace(function() {
       var random = phina.util.Random(12345);
       Array.range(-5, 5).forEach(function(z) {
         Array.range(-5, 5).forEach(function(x) {
-          Array.range(0, random.randint(4, 9)).forEach(function(y) {
+          [-1, 1].forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.21, z * 4.0)
+              .setTranslation(x * 3.0, y * 2.0, z * 3.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;
@@ -2085,19 +2401,24 @@ phina.namespace(function() {
 
     waitFor: -1,
     sequencer: null,
+    random: null,
+
+    block: false,
 
     init: function() {
       this.superInit();
-
       this.sequencer = ps.StageSequancer();
+      this.random = phina.util.Random(12345);
     },
 
     update: function(app) {
       var frame = app.ticker.frame;
-      while (this.waitFor <= frame) {
+      while (this.sequencer.hasNext() && this.waitFor <= frame) {
         var task = this.sequencer.next();
         if (task) {
-          task.execute(app, app.currentScene, this);
+          if (!((task instanceof ps.LaunchEnemyTask || task instanceof ps.LaunchEnemyUnitTask) && this.block)) {
+            task.execute(app, app.currentScene, this);
+          }
         }
       }
     },
@@ -2118,6 +2439,10 @@ phina.namespace(function() {
       this.seq = [];
     },
 
+    hasNext: function() {
+      return this.seq.length > 0;
+    },
+
     addTask: function(task) {
       this.seq.push(task);
       return this;
@@ -2128,15 +2453,15 @@ phina.namespace(function() {
     },
 
     wait: function(frame) {
-      return this.addTask(ps.StageTask(frame));
+      return this.addTask(ps.WaitTask(frame));
     },
 
-    playBgm: function(bgmData) {
-      return this.addTask(ps.PlayBgmTask(bgmData));
+    startBgm: function(bgmData) {
+      return this.addTask(ps.StartBgmTask(bgmData));
     },
 
-    stopBgm: function() {
-      return this.addTask(ps.StopBgmTask());
+    stopBgm: function(fadeOut) {
+      return this.addTask(ps.StopBgmTask(fadeOut));
     },
 
     warning: function() {
@@ -2145,6 +2470,10 @@ phina.namespace(function() {
 
     launchEnemy: function(enemyClassName, params) {
       return this.addTask(ps.LaunchEnemyTask(enemyClassName, params));
+    },
+
+    launchEnemyUnit: function(enemyClassName, params) {
+      return this.addTask(ps.LaunchEnemyUnitTask(enemyClassName, params));
     },
 
     launchBoss: function(bossClassName) {
@@ -2171,7 +2500,7 @@ phina.namespace(function() {
     }
   });
 
-  phina.define("ps.PlayBgmTask", {
+  phina.define("ps.StartBgmTask", {
     superClass: "ps.StageTask",
 
     bgmData: null,
@@ -2179,14 +2508,23 @@ phina.namespace(function() {
     init: function(bgmData) {
       this.superInit();
       this.bgmData = bgmData;
+    },
+
+    execute: function(app, gameScene, stage) {
+      ps.SoundManager.startBgm(this.bgmData);
     }
   });
 
   phina.define("ps.StopBgmTask", {
     superClass: "ps.StageTask",
 
-    init: function() {
+    init: function(fadeOut) {
       this.superInit();
+      this.fadeOut = fadeOut;
+    },
+
+    execute: function(app, gameScene, stage) {
+      ps.SoundManager.stopBgm(this.fadeOut);
     }
   });
 
@@ -2195,7 +2533,9 @@ phina.namespace(function() {
 
     init: function() {
       this.superInit();
-    }
+    },
+
+    execute: function(app, gameScene, stage) {}
   });
 
   phina.define("ps.LaunchEnemyTask", {
@@ -2207,7 +2547,54 @@ phina.namespace(function() {
     init: function(enemyClassName, params) {
       this.superInit();
       this.enemyClassName = enemyClassName;
-      this.params = params;
+      this.params = params.$safe({
+        x: GAMEAREA_WIDTH * 0.5,
+        y: GAMEAREA_HEIGHT * -0.1,
+        blockFlag: false,
+        wait: 0,
+      });
+    },
+
+    execute: function(app, gameScene, stage) {
+      var EnemyClazz = phina.using(this.enemyClassName);
+      var params = this.params;
+      var enemy = EnemyClazz(params);
+      gameScene.launchEnemy(enemy);
+
+      stage.block = this.params.blockFlag;
+    }
+  });
+
+  phina.define("ps.LaunchEnemyUnitTask", {
+    superClass: "ps.StageTask",
+
+    enemyClassName: null,
+    params: null,
+
+    init: function(enemyClassName, params) {
+      this.superInit();
+      this.enemyClassName = enemyClassName;
+      this.params = params.$safe({
+        x: GAMEAREA_WIDTH * 0.5,
+        y: GAMEAREA_HEIGHT * -0.1,
+        blockFlag: false,
+        formation: "basic0",
+        wait: 0,
+      });
+    },
+
+    execute: function(app, gameScene, stage) {
+      var EnemyClazz = phina.using(this.enemyClassName);
+      var params = this.params;
+      var enemy = null;
+      ps.EnemyUnit.formation[params.formation].forEach(function(f) {
+        enemy = EnemyClazz({}.$extend(params, {
+          x: params.x + f.x,
+          y: params.y + f.y,
+          wait: f.wait,
+        }));
+        gameScene.launchEnemy(enemy);
+      });
     }
   });
 
@@ -2220,7 +2607,9 @@ phina.namespace(function() {
       this.superInit();
       this.bossClassName = bossClassName;
       this.params = params;
-    }
+    },
+
+    execute: function(app, gameScene, stage) {}
   });
 
 });
@@ -2234,7 +2623,519 @@ phina.namespace(function() {
 
     init: function() {
       this.superInit();
+
+      var x = function(v) {
+        return GAMEAREA_WIDTH * v * 0.1;
+      };
+      var y = function(v) {
+        return GAMEAREA_HEIGHT * v * 0.1;
+      };
+
+      this.sequencer
+        .startBgm()
+        //
+        .wait(150)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+        })
+        //
+        .wait(150)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+        })
+        //
+        .wait(150)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+        })
+        //
+        .launchEnemyUnit("ps.Natsuki1", {
+          x: x(-1),
+          y: y(2),
+          direction: 45,
+          formation: "line7",
+        })
+        //
+        .wait(250)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+        })
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-5),
+        })
+        //
+        .launchEnemyUnit("ps.Natsuki1", {
+          x: x(11),
+          y: y(3),
+          direction: 180,
+          formation: "line6",
+        })
+        //
+      ;
     }
+
+  });
+
+});
+
+phina.namespace(function() {
+  // Color Palette by Paletton.com
+  // Palette URL: http://paletton.com/#uid=50f1n0kmGpNdfBfixtwqklHuEgU
+
+  phina.define("ps.Color", {
+    init: function() {},
+    _static: {
+      pri: [],
+      sec0: [],
+      sec1: [],
+
+      initialize: function(scene) {
+        ps.Color.pri = [];
+        ps.Color.sec0 = [];
+        ps.Color.sec1 = [];
+        ps.Color.pria = [];
+        ps.Color.sec0a = [];
+        ps.Color.sec1a = [];
+
+        var p0 = 21;
+        var r = 140;
+        var s0 = (p0 - r + 360) % 360;
+        var s1 = (p0 + r + 360) % 360;
+
+        var size = 16;
+        var sMin = 48;
+        var sMax = 90;
+        var sLev = (sMax - sMin) / (size - 1);
+        var hMin = 5;
+        var hMax = 84;
+        var hLev = (hMax - hMin) / (size - 1);
+        Array.range(0, size).forEach(function(i) {
+          var s = Math.floor(sMin + sLev * i);
+          var h = Math.floor(hMin + hLev * i);
+          ps.Color.pri[i] = "hsl({0},{1}%,{2}%)"    .format(p0, s, h);
+          ps.Color.sec0[i] = "hsl({0},{1}%,{2}%)"   .format(s0, s, h);
+          ps.Color.sec1[i] = "hsl({0},{1}%,{2}%)"   .format(s1, s, h);
+          ps.Color.pria[i] = "hsla({0},{1}%,{2}%,"  .format(p0, s, h) + "{0})";
+          ps.Color.sec0a[i] = "hsla({0},{1}%,{2}%," .format(s0, s, h) + "{0})";
+          ps.Color.sec1a[i] = "hsla({0},{1}%,{2}%," .format(s1, s, h) + "{0})";
+        });
+
+        if (scene) ps.Color.test().addChildTo(scene);
+      },
+
+      test: function() {
+        var r = phina.display.CanvasElement();
+        ps.Color.pri.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 20)
+            .addChildTo(r);
+        });
+
+        ps.Color.sec0.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 0)
+            .addChildTo(r);
+        });
+
+        ps.Color.sec1.forEach(function(c, i) {
+          phina.display.RectangleShape({
+              width: 20,
+              height: 20,
+              fill: c,
+              stroke: null,
+            })
+            .setPosition(20 + i * 20, 20 + 40)
+            .addChildTo(r);
+        });
+
+        return r;
+      }
+    },
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.FramebasedTweener", {
+    superClass: 'phina.accessory.Accessory',
+
+    /**
+     * @constructor
+     */
+    init: function(target) {
+      this.superInit(target);
+
+      this._loop = false;
+      this._init();
+    },
+
+    _init: function() {
+      this._tasks = [];
+      this._index = 0;
+      this.playing = true;
+      this._update = this._updateTask;
+    },
+
+    update: function(app) {
+      this._update(app);
+    },
+
+    to: function(props, duration, easing) {
+      this._add({
+        type: 'tween',
+        mode: 'to',
+        props: props,
+        duration: duration,
+        easing: easing,
+      });
+      return this;
+    },
+
+    by: function(props, duration, easing) {
+      this._add({
+        type: 'tween',
+        mode: 'by',
+        props: props,
+        duration: duration,
+        easing: easing,
+      });
+
+      return this;
+    },
+
+    from: function(props, duration, easing) {
+      this._add({
+        type: 'tween',
+        mode: 'from',
+        props: props,
+        duration: duration,
+        easing: easing,
+      });
+      return this;
+    },
+
+    wait: function(time) {
+      this._add({
+        type: 'wait',
+        data: {
+          limit: time,
+        },
+      });
+      return this;
+    },
+
+    call: function(func, self, args) {
+      this._add({
+        type: 'call',
+        data: {
+          func: func,
+          self: self || this,
+          args: args,
+        },
+      });
+      return this;
+    },
+
+    /**
+     * プロパティをセット
+     * @param {Object} key
+     * @param {Object} value
+     */
+    set: function(key, value) {
+      var values = null;
+      if (arguments.length == 2) {
+        values = {};
+        values[key] = value;
+      } else {
+        values = key;
+      }
+      this._tasks.push({
+        type: "set",
+        data: {
+          values: values
+        }
+      });
+
+      return this;
+    },
+
+    moveTo: function(x, y, duration, easing) {
+      return this.to({
+        x: x,
+        y: y
+      }, duration, easing);
+    },
+    moveBy: function(x, y, duration, easing) {
+      return this.by({
+        x: x,
+        y: y
+      }, duration, easing);
+    },
+
+    fade: function(value, duration, easing) {
+      return this.to({
+        alpha: value
+      }, duration, easing);
+    },
+
+    fadeOut: function(duration, easing) {
+      return this.fade(0.0, duration, easing)
+    },
+
+    fadeIn: function(duration, easing) {
+      return this.fade(1.0, duration, easing)
+    },
+
+    /**
+     * アニメーション開始
+     */
+    play: function() {
+      this.playing = true;
+      return this;
+    },
+
+    /**
+     * アニメーションを一時停止
+     */
+    pause: function() {
+      this.playing = false;
+      return this;
+    },
+
+    stop: function() {
+      this.playing = false;
+      this.rewind();
+      return this;
+    },
+
+    /**
+     * アニメーションを巻き戻す
+     */
+    rewind: function() {
+      this._update = this._updateTask;
+      this._index = 0;
+      this.play();
+      return this;
+    },
+
+    yoyo: function() {
+      // TODO: 最初の値が分からないので反転できない...
+      this._update = this._updateTask;
+      this._index = 0;
+      this._tasks.each(function(task) {
+        if (task.type === 'tween') {
+
+        }
+      });
+      this.play();
+
+      return this;
+    },
+
+    /**
+     * アニメーションループ設定
+     * @param {Boolean} flag
+     */
+    setLoop: function(flag) {
+      this._loop = flag;
+      return this;
+    },
+
+    /**
+     * アニメーションをクリア
+     */
+    clear: function() {
+      this._init();
+      return this;
+    },
+
+    fromJSON: function(json) {
+      if (json.loop !== undefined) {
+        this.setLoop(json.loop);
+      }
+
+      json.tweens.each(function(t) {
+        var t = t.clone();
+        var method = t.shift();
+        this[method].apply(this, t);
+      }, this);
+
+      return this;
+    },
+
+    _add: function(params) {
+      this._tasks.push(params);
+    },
+
+    _updateTask: function(app) {
+      if (!this.playing) return;
+
+      var task = this._tasks[this._index];
+      if (!task) {
+        if (this._loop) {
+          this.rewind();
+          this._update(app);
+        } else {
+          this.playing = false;
+        }
+        return;
+      } else {
+        ++this._index;
+      }
+
+      if (task.type === 'tween') {
+        this._tween = phina.util.Tween();
+
+        if (task.mode === 'to') {
+          this._tween.to(this.target, task.props, task.duration, task.easing);
+        } else if (task.mode === 'by') {
+          this._tween.by(this.target, task.props, task.duration, task.easing);
+        } else {
+          this._tween.from(this.target, task.props, task.duration, task.easing);
+        }
+        this._update = this._updateTween;
+        this._update(app);
+      } else if (task.type === 'wait') {
+        this._wait = {
+          time: 0,
+          limit: task.data.limit,
+        };
+
+        this._update = this._updateWait;
+        this._update(app);
+      } else if (task.type === 'call') {
+        task.data.func.apply(task.data.self, task.data.args);
+        // 1フレーム消費しないよう再帰
+        this._update(app);
+      } else if (task.type === 'set') {
+        this.target.$extend(task.data.values);
+        // 1フレーム消費しないよう再帰
+        this._update(app);
+      }
+    },
+
+    _updateTween: function(app) {
+      var tween = this._tween;
+      var time = 1;
+
+      tween.forward(time);
+      this.flare('tween');
+
+      if (tween.time >= tween.duration) {
+        delete this._tween;
+        this._tween = null;
+        this._update = this._updateTask;
+      }
+    },
+
+    _updateWait: function(app) {
+      var wait = this._wait;
+      var time = 1;
+      wait.time += time;
+
+      if (wait.time >= wait.limit) {
+        delete this._wait;
+        this._wait = null;
+        this._update = this._updateTask;
+      }
+    },
+  });
+
+  phina.app.Element.prototype.getter('ftweener', function() {
+    if (!this._tweener) {
+      this._tweener = ps.FramebasedTweener().attachTo(this);
+    }
+    return this._tweener;
+  });
+
+});
+
+phina.namespace(function() {
+
+  phina.define("ps.SoundManager", {
+    init: function() {},
+    _static: {
+      bgmVolume: 0.0,
+      soundVolume: 0.8,
+      
+      beforeBgm: null,
+      currentBgm: null,
+      
+      currentFrame: 0,
+      _lastPlayFrame: {},
+
+      update: function(app) {
+        this.currentFrame = app.ticker.frame;
+
+        if (this.beforeBgm) {
+          this.beforeBgm.volume -= this.bgmVolume / (60 * 5);
+          if (this.beforeBgm.volume < 0.01) {
+            this.beforeBgm.stop();
+            this.beforeBgm = null;
+          }
+        }
+      },
+
+      startBgm: function(bgmData) {
+        bgmData = (bgmData || {}).$safe({
+          name: "bgm",
+          loop: true,
+          loopStart: 0,
+          loopEnd: 0,
+        });
+
+        if (this.currentBgm) {
+          if (this.beforeBgm) this.beforeBgm.stop();
+          this.beforeBgm = this.currentBgm;
+        }
+        this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).clone().play();
+        this.currentBgm.volume = this.bgmVolume;
+        this.currentBgm.loop = bgmData.loop;
+        this.currentBgm.loopStart = bgmData.loopStart;
+        this.currentBgm.loopEnd = bgmData.loopEnd;
+      },
+
+      stopBgm: function(fadeOut) {
+        if (this.beforeBgm) {
+          this.beforeBgm.stop();
+          this.beforeBgm = null;
+        }
+        if (this.currentBgm) {
+          if (fadeOut) {
+            this.beforeBgm = this.currentBgm;
+            this.currentBgm = null;
+          } else {
+            this.currentBgm.stop();
+            this.currentBgm = null;
+          }
+        }
+      },
+      
+      playSound: function(name) {
+        if (this._lastPlayFrame[name] !== this.currentFrame) {
+          var sound = phina.asset.AssetManager.get("sound", name).clone();
+          sound.volume = this.soundVolume;
+          sound.play();
+          this._lastPlayFrame[name] = this.currentFrame;
+        }
+      }
+    },
 
   });
 

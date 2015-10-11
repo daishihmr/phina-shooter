@@ -3700,6 +3700,13 @@ phina.namespace(function() {
    */
   phina.define('phina.asset.Sound', {
     superClass: "phina.asset.Asset",
+    
+    _loop: false,
+    _loopStart: 0,
+    _loopEnd: 0,
+    
+    _volume: 1.0,
+    gainNode: null,
 
     /**
      * @constructor
@@ -3715,6 +3722,9 @@ phina.namespace(function() {
     clone: function() {
       var sound = phina.asset.Sound();
       sound.loadFromBuffer(this.buffer);
+      sound.loop = this.loop;
+      sound.loopStart = this.loopStart;
+      sound.loopEnd = this.loopEnd;
       sound.volume = this.volume;
       return sound;
     },
@@ -3726,8 +3736,14 @@ phina.namespace(function() {
 
       this.source = this.context.createBufferSource();
       this.source.buffer = this.buffer;
+      this.source.loop = this._loop;
+      this.source.loopStart = this._loopStart;
+      this.source.loopEnd = this._loopEnd;
+      this.gainNode = this.context.createGain();
+      this.gainNode.gain.value = this._volume;
       // connect
-      this.source.connect(this.context.destination);
+      this.source.connect(this.gainNode);
+      this.gainNode.connect(this.context.destination);
       // play
       this.source.start(0);
 
@@ -3809,6 +3825,45 @@ phina.namespace(function() {
 
       xml.responseType = 'arraybuffer';
       xml.send(null);
+    },
+    
+    _accessor: {
+      loop: {
+        get: function() {
+          return this._loop;
+        },
+        set: function(v) {
+          this._loop = v;
+          if (this.source) this.source.loop = v;
+        }
+      },
+      loopStart: {
+        get: function() {
+          return this._loopStart;
+        },
+        set: function(v) {
+          this._loopStart = v;
+          if (this.source) this.source.loopStart = v;
+        }
+      },
+      loopEnd: {
+        get: function() {
+          return this._loopEnd;
+        },
+        set: function(v) {
+          this._loopEnd = v;
+          if (this.source) this.source.loopEnd = v;
+        }
+      },
+      volume: {
+        get: function() {
+          return this._volume;
+        },
+        set: function(v) {
+          this._volume = v;
+          if (this.gainNode) this.gainNode.gain.value = v;
+        }
+      }
     },
 
     _static: {
@@ -7847,9 +7902,15 @@ phina.namespace(function() {
       var image = this.canvas.domElement;
       var w = image.width;
       var h = image.height;
+      
+      // var x = -this.width*this.originX - this.padding;
+      // var y = -this.height*this.originY - this.padding;
+      var x = -w*this.origin.x;
+      var y = -h*this.origin.y;
+
       canvas.context.drawImage(image,
         0, 0, w, h,
-        -w*this.origin.x, -h*this.origin.y, w, h
+        x, y, w, h
         );
     },
 
@@ -8274,7 +8335,6 @@ phina.namespace(function() {
   });
 
 });
-
 
 
 phina.namespace(function() {

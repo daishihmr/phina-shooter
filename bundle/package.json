@@ -1,0 +1,24 @@
+{
+  "name": "phina-shooter",
+  "version": "0.0.1",
+  "description": "Phina Shooter. JavaScript bullethell shooter for web browser.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daishihmr/phina-shooter.git"
+  },
+  "author": "daishihmr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daishihmr/phina-shooter/issues"
+  },
+  "homepage": "https://github.com/daishihmr/phina-shooter#readme",
+  "window": {
+    "toolbar": false,
+    "width": 960,
+    "height": 640
+  }
+}

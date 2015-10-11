@@ -23,6 +23,7 @@ phina.namespace(function() {
         }
       });
 
+      // TODO
       this.tweener.wait(500).call(function() {
         this.exit("arcadeMode");
       }.bind(this));

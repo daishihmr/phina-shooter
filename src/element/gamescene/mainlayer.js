@@ -20,7 +20,7 @@ phina.namespace(function() {
           },
 
           scoreItemLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           shotLayer: {
@@ -41,11 +41,11 @@ phina.namespace(function() {
           },
 
           itemLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           enemyLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           effectLayer1: {
@@ -70,17 +70,6 @@ phina.namespace(function() {
 
           bulletLayer: {
             className: "ps.BulletLayer",
-          },
-
-          dummy: {
-            className: "ps.OutlinedSprite",
-            arguments: ["bomb"],
-            x: 20,
-            y: 70,
-            onenterframe: function() {
-              this.x += 0.2;
-              this.y += 0.2;
-            }
           },
 
           playerMarker: {

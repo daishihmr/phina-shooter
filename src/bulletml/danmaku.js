@@ -76,25 +76,30 @@ phina.namespace(function() {
   ps.danmaku = {};
 
   // ザコ
-  var basic = function(dir) {
+  var basic = function(s, dir) {
     return new bulletml.Root({
       top: action([
         interval(10),
         repeat(Infinity, [
-          fire(DM, spd(1), direction(dir)),
+          fire(DM, spd(s), direction(dir)),
           repeat("$burst", [
             fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
-          interval(90),
+          interval(50),
         ]),
       ]),
     });
   };
-  ps.danmaku.basic = basic(0);
-  ps.danmaku.basicR1 = basic(-5);
-  ps.danmaku.basicL1 = basic(+5);
-  ps.danmaku.basicR2 = basic(-15);
-  ps.danmaku.basicL2 = basic(+15);
+  ps.danmaku.basic = basic(1, 0);
+  ps.danmaku.basicR1 = basic(1, -5);
+  ps.danmaku.basicL1 = basic(1, +5);
+  ps.danmaku.basicR2 = basic(1, -15);
+  ps.danmaku.basicL2 = basic(1, +15);
+  ps.danmaku.basicF = basic(1.2, 0);
+  ps.danmaku.basicFR1 = basic(1.2, -5);
+  ps.danmaku.basicFL1 = basic(1.2, +5);
+  ps.danmaku.basicFR2 = basic(1.2, -15);
+  ps.danmaku.basicFL2 = basic(1.2, +15);
 
   // ザコ3way
   var basic3 = function(dir) {
@@ -109,7 +114,7 @@ phina.namespace(function() {
             fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(DM, spdSeq(0), direction(-14, "sequence")),
           ]),
-          interval(90),
+          interval(50),
         ]),
       ]),
     });
@@ -119,6 +124,35 @@ phina.namespace(function() {
   ps.danmaku.basic3L1 = basic3(+5);
   ps.danmaku.basic3R2 = basic3(-15);
   ps.danmaku.basic3L2 = basic3(+15);
+
+  // ザコ
+  var forward = function(s, dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
+          repeat(3, [
+            fire(DM, spd(s), direction(dir, "relative")),
+            repeat("$burst", [
+              fire(R2, spdSeq(0.15), direction(0, "sequence")),
+            ]),
+            interval(10),
+          ]),
+          interval(50),
+        ]),
+      ]),
+    });
+  };
+  ps.danmaku.forward = forward(1, 0);
+  ps.danmaku.forwardR1 = forward(1, -5);
+  ps.danmaku.forwardL1 = forward(1, +5);
+  ps.danmaku.forwardR2 = forward(1, -15);
+  ps.danmaku.forwardL2 = forward(1, +15);
+  ps.danmaku.forwardF = forward(1.2, 0);
+  ps.danmaku.forwardFR1 = forward(1.2, -5);
+  ps.danmaku.forwardFL1 = forward(1.2, +5);
+  ps.danmaku.forwardFR2 = forward(1.2, -15);
+  ps.danmaku.forwardFL2 = forward(1.2, +15);
 
   // Stage1 ------------------------------
 
@@ -169,11 +203,11 @@ phina.namespace(function() {
     top: action([
       interval(20),
       repeat(Infinity, [
-        fire(DM, spd(1.4)),
+        fire(DM, spd(0.8)),
         repeat(12, [
           fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
         ]),
-        interval(90),
+        interval(50),
       ]),
     ]),
   });

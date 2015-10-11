@@ -28,7 +28,14 @@ phina.namespace(function() {
                 arguments: {
                   assetType: stageName
                 },
-                nextLabel: stageName,
+              },
+
+              {
+                label: stageName + "generate",
+                className: "ps.GenerateAssetScene",
+                arguments: {
+                  assetType: stageName
+                },
               },
 
               {
@@ -38,7 +45,6 @@ phina.namespace(function() {
                   stageId: stageId,
                   gameData: gameData,
                 },
-                nextLabel: stageName + "result",
               },
 
               {
@@ -47,7 +53,6 @@ phina.namespace(function() {
                 arguments: {
                   gameData: gameData,
                 },
-                nextLabel: next,
               },
 
             ];

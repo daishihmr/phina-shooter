@@ -22,12 +22,19 @@ phina.namespace(function() {
                 // mono: "asset/VT323/VT323-Regular.ttf",
                 mono: "asset/Share_Tech_Mono/ShareTechMono-Regular.ttf",
               },
+              
+              sound: {
+                shot: "asset/sen_ge_kijuu01.mp3"
+              },
             };
 
           case "stage0":
             return {
               image: {
-                dummy: "asset/zankiIcon.png",
+                enemy_stage0: "asset/enemy_stage0.png",
+              },
+              sound: {
+                bgm: "asset/ReBoot_FreeBGM.mp3",
               },
             };
 
