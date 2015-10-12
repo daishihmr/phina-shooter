@@ -23,6 +23,10 @@ phina.namespace(function() {
             className: "phina.display.CanvasElement",
           },
 
+          deadEnemyLayer: {
+            className: "phina.display.CanvasElement",
+          },
+
           shotLayer: {
             className: "ps.ShotLayer",
             draw: function(canvas) {
@@ -34,6 +38,10 @@ phina.namespace(function() {
             className: "phina.display.CanvasElement",
           },
 
+          enemyLayer: {
+            className: "phina.display.CanvasElement",
+          },
+
           player: {
             className: "ps.Player",
             x: GAMEAREA_WIDTH * 0.5,
@@ -41,10 +49,6 @@ phina.namespace(function() {
           },
 
           itemLayer: {
-            className: "phina.display.CanvasElement",
-          },
-
-          enemyLayer: {
             className: "phina.display.CanvasElement",
           },
 

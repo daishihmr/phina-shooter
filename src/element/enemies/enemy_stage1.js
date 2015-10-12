@@ -4,6 +4,8 @@ phina.namespace(function() {
     superClass: "ps.Enemy",
     init: function(params) {
       this.superInit("enemy_stage0", 24, 24, params.$safe({
+        boundingType: "circle",
+        radius: 10,
         danmakuName: "basic",
       }));
       this.setSrcRect(32, 0, 24, 24);
@@ -43,6 +45,8 @@ phina.namespace(function() {
     superClass: "ps.Enemy",
     init: function(params) {
       this.superInit("enemy_stage0", 24, 24, params.$safe({
+        boundingType: "circle",
+        radius: 10,
         danmakuName: "basic",
       }));
       this.setSrcRect(0, 0, 24, 24);
@@ -75,6 +79,8 @@ phina.namespace(function() {
     superClass: "ps.Enemy",
     init: function(params) {
       this.superInit("enemy_stage0", 32, 32, params.$safe({
+        boundingType: "circle",
+        radius: 14,
         danmakuName: "kise1",
       }));
       this.setSrcRect(0, 32, 32, 32);
@@ -92,6 +98,8 @@ phina.namespace(function() {
     superClass: "ps.Enemy",
     init: function(params) {
       this.superInit("enemy_stage0", 32, 32, params.$safe({
+        boundingType: "circle",
+        radius: 14,
         danmakuName: "forward",
       }));
       this.setSrcRect(32, 32, 32, 32);

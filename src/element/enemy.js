@@ -9,10 +9,17 @@ phina.namespace(function() {
     danmakuName: null,
     runner: null,
 
+    radius: 0,
+
     init: function(texture, width, height, params) {
       this.superInit(texture, width, height);
       this.setPosition(params.x, params.y);
       this.danmakuName = params.danmakuName;
+
+      this.boundingType = params.boundingType;
+      this.radius = params.radius;
+      this.boundingWidth = params.boundingWidth;
+      this.boundingHeight = params.boundingHeight;
     },
 
     startAttack: function() {
@@ -30,7 +37,23 @@ phina.namespace(function() {
       this.srcRect.width = w;
       this.srcRect.height = h;
       return this;
-    }
+    },
+
+    hitTestRect: function(x, y) {
+      var left = -this.boundingWidth * this.originX;
+      var right = +this.boundingWidth * (1 - this.originX);
+      var top = -this.boundingHeight * this.originY;
+      var bottom = +this.boundingHeight * (1 - this.originY);
+
+      return (left < x && x < right) && (top < y && y < bottom);
+    },
+
+    hitTestCircle: function(x, y) {
+      if ((x * x + y * y) < (this.radius * this.radius)) {
+        return true;
+      }
+      return false;
+    },
   });
 
 });

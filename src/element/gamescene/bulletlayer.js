@@ -3,8 +3,6 @@ phina.namespace(function() {
   phina.define("ps.BulletLayer", {
     superClass: "phina.display.CanvasElement",
     
-    bullets: null,
-
     init: function() {
       this.superInit({
         width: GAMEAREA_WIDTH,
@@ -12,8 +10,6 @@ phina.namespace(function() {
       });
       this.setOrigin(0, 0);
       this.backgroundColor = null;
-      
-      this.bullets = [];
     },
 
     spawn: function(runner, spec) {

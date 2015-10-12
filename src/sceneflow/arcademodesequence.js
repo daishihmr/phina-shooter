@@ -61,13 +61,11 @@ phina.namespace(function() {
           {
             label: "ending",
             className: "ps.EndingScene",
-            nextLabel: "gameover",
           },
 
           {
             label: "gameover",
             className: "ps.GameoverScene",
-            nextLabel: "nameEntry",
           },
 
           {
