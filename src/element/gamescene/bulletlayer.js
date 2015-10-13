@@ -2,25 +2,34 @@ phina.namespace(function() {
 
   phina.define("ps.BulletLayer", {
     superClass: "phina.display.CanvasElement",
-    
+
+    pool: null,
+
     init: function() {
       this.superInit({
         width: GAMEAREA_WIDTH,
         height: GAMEAREA_HEIGHT,
       });
       this.setOrigin(0, 0);
-      this.backgroundColor = null;
+
+      var self = this;
+      this.pool = Array.range(0, 256).map(function() {
+        var b = ps.Bullet();
+        b.bulletLayer = self;
+        return b;
+      });
     },
 
     spawn: function(runner, spec) {
-      var bullet = ps.Bullet().addChildTo(this);
-      bullet.position.x = runner.x;
-      bullet.position.y = runner.y;
+      var bullet = this.pool.shift();
+      if (!bullet) return;
+
+      bullet.x = runner.x;
+      bullet.y = runner.y;
       bullet.runner = runner;
       bullet.frameIndex = spec.type || 0;
-      if (spec.dummy) {
-        bullet.visible = false;
-      }
+      bullet.visible = !spec.dummy;
+      bullet.addChildTo(this);
     },
 
     update: function() {

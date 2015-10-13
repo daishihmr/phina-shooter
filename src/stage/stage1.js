@@ -18,22 +18,39 @@ phina.namespace(function() {
       this.sequencer
         .startBgm()
         //
-        .wait(150)
+        .wait(250)
         .launchEnemyUnit("ps.Kujo1", {
           x: x(5),
           y: y(-7),
+          formation: "basic0",
         })
         //
-        .wait(150)
+        .wait(80)
         .launchEnemyUnit("ps.Kujo1", {
           x: x(2),
           y: y(-7),
+          formation: "basic0",
         })
         //
-        .wait(150)
+        .wait(75)
         .launchEnemyUnit("ps.Kujo1", {
           x: x(5),
           y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(80)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
         })
         //
         .launchEnemyUnit("ps.Natsuki1", {
@@ -43,14 +60,45 @@ phina.namespace(function() {
           formation: "line7",
         })
         //
-        .wait(250)
+        .wait(80)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
         .launchEnemyUnit("ps.Kujo1", {
           x: x(5),
           y: y(-7),
+          formation: "basic0",
         })
+        //
+        .wait(80)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(200)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        .wait(50)
         .launchEnemyUnit("ps.Kujo1", {
           x: x(2),
           y: y(-5),
+          formation: "basic0",
         })
         //
         .launchEnemyUnit("ps.Natsuki1", {
@@ -58,6 +106,48 @@ phina.namespace(function() {
           y: y(3),
           direction: 180,
           formation: "line6",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(80)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(80)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(2),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
         })
         //
       ;

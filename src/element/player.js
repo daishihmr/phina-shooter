@@ -3,7 +3,7 @@ phina.namespace(function() {
   phina.define("ps.Player", {
     superClass: "ps.OutlinedSprite",
 
-    controllable: true,
+    controllable: false,
     muteki: false,
 
     roll: 0,
@@ -15,9 +15,16 @@ phina.namespace(function() {
     trigger: 0,
     fireFrame: 0,
 
+    parts: null,
+
     init: function() {
       this.superInit("player", 32, 32);
       this.frameIndex = 4;
+      this.x = GAMEAREA_WIDTH * 0.5;
+      this.y = GAMEAREA_HEIGHT * 1.2;
+      this.controllable = false;
+      this.muteki = true;
+      this.parts = [];
     },
 
     update: function(app) {
@@ -74,18 +81,48 @@ phina.namespace(function() {
       if (0 < this.trigger && frame % 4 === 0) {
         var xv = Math.sin(this.fireFrame * 0.6) * 8;
         var dv = Math.sin(this.fireFrame * 1.0) * 8;
-        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90);
-        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90);
-        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv);
-        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv);
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90, 1.0);
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90, 1.0);
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv, 0.5);
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv, 0.5);
         this.fireFrame += 1;
       }
     },
 
     launch: function() {
-      // TODO
       this.x = GAMEAREA_WIDTH * 0.5;
-      this.y = GAMEAREA_HEIGHT * 0.9;
+      this.y = GAMEAREA_HEIGHT * 1.2;
+
+      this.controllable = false;
+      this.muteki = true;
+      this.visible = true;
+      this.roll = 0;
+      this.frameIndex = 4;
+      this.parts.forEach(function(part) {
+        part.visible = true;
+      });
+
+      var self = this;
+      this.ftweener
+        .clear()
+        .to({
+          y: GAMEAREA_HEIGHT * 0.8,
+        }, 60, "easeOutBack")
+        .call(function() {
+          self.controllable = true;
+          self.timer(180, function() {
+            self.muteki = false;
+          });
+        });
+    },
+
+    miss: function() {
+      this.controllable = false;
+      this.muteki = true;
+      this.visible = false;
+      this.parts.forEach(function(part) {
+        part.visible = false;
+      });
     },
 
   });
@@ -101,6 +138,7 @@ phina.namespace(function() {
 
     update: function(app) {
       if (app.ticker.frame % 2 !== 0) return;
+      if (!this.visible) return;
       var p = phina.display.Sprite("particleB")
         .setScale(0.125)
         .setPosition(this.position.x, this.position.y)
@@ -110,11 +148,7 @@ phina.namespace(function() {
           if (this.alpha < 0.01) this.remove();
         })
         .addChildTo(this.parent);
-      p.draw = function(canvas) {
-        canvas.context.globalCompositeOperation = "lighter";
-        phina.display.Sprite.prototype.draw.call(this, canvas);
-        canvas.context.globalCompositeOperation = "source-over";
-      };
+      p.blendMode = "lighter";
     },
 
   });

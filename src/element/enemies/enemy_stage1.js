@@ -5,11 +5,12 @@ phina.namespace(function() {
     init: function(params) {
       this.superInit("enemy_stage0", 24, 24, params.$safe({
         boundingType: "circle",
-        radius: 10,
+        radius: 12,
         danmakuName: "basic",
+        hp: 2,
       }));
       this.setSrcRect(32, 0, 24, 24);
-
+      
       var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
         .addChildTo(this)
         .on("enterframe", function() {
@@ -35,7 +36,8 @@ phina.namespace(function() {
         }, 80, "easeInQuad");
     },
 
-    update: function(app) {
+    onenterframe: function(e) {
+      var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
     }
@@ -46,8 +48,9 @@ phina.namespace(function() {
     init: function(params) {
       this.superInit("enemy_stage0", 24, 24, params.$safe({
         boundingType: "circle",
-        radius: 10,
+        radius: 12,
         danmakuName: "basic",
+        hp: 2,
       }));
       this.setSrcRect(0, 0, 24, 24);
 
@@ -69,7 +72,8 @@ phina.namespace(function() {
         });
     },
 
-    update: function(app) {
+    onenterframe: function(e) {
+      var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
     }
@@ -80,8 +84,9 @@ phina.namespace(function() {
     init: function(params) {
       this.superInit("enemy_stage0", 32, 32, params.$safe({
         boundingType: "circle",
-        radius: 14,
+        radius: 16,
         danmakuName: "kise1",
+        hp: 10,
       }));
       this.setSrcRect(0, 32, 32, 32);
 
@@ -99,8 +104,9 @@ phina.namespace(function() {
     init: function(params) {
       this.superInit("enemy_stage0", 32, 32, params.$safe({
         boundingType: "circle",
-        radius: 14,
+        radius: 16,
         danmakuName: "forward",
+        hp: 2,
       }));
       this.setSrcRect(32, 32, 32, 32);
 
@@ -114,9 +120,10 @@ phina.namespace(function() {
         });
     },
 
-    update: function(app) {
-      this.x += Math.cos(this.direction) * 0.5;
-      this.y += Math.sin(this.direction) * 0.5;
+    onenterframe: function(e) {
+      var app = e.app;
+      this.x += Math.cos(this.direction) * 0.75;
+      this.y += Math.sin(this.direction) * 0.75;
       this.rotation = this.direction * Math.RAD_TO_DEG;
 
       var player = app.currentScene.player;

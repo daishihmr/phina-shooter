@@ -9,17 +9,11 @@ phina.namespace(function() {
     danmakuName: null,
     runner: null,
 
-    radius: 0,
+    entered: false,
 
     init: function(texture, width, height, params) {
       this.superInit(texture, width, height);
-      this.setPosition(params.x, params.y);
-      this.danmakuName = params.danmakuName;
-
-      this.boundingType = params.boundingType;
-      this.radius = params.radius;
-      this.boundingWidth = params.boundingWidth;
-      this.boundingHeight = params.boundingHeight;
+      this.$extend(params);
     },
 
     startAttack: function() {
@@ -39,7 +33,10 @@ phina.namespace(function() {
       return this;
     },
 
-    hitTestRect: function(x, y) {
+    hitTestRect: function(_x, _y) {
+      var x = _x - this.position.x;
+      var y = _y - this.position.y;
+
       var left = -this.boundingWidth * this.originX;
       var right = +this.boundingWidth * (1 - this.originX);
       var top = -this.boundingHeight * this.originY;
@@ -48,12 +45,44 @@ phina.namespace(function() {
       return (left < x && x < right) && (top < y && y < bottom);
     },
 
-    hitTestCircle: function(x, y) {
-      if ((x * x + y * y) < (this.radius * this.radius)) {
+    hitTestCircle: function(_x, _y) {
+      var x = _x - this.position.x;
+      var y = _y - this.position.y;
+
+      if (((x) * (x) + (y) * (y)) < (this.radius * this.radius)) {
         return true;
       }
       return false;
     },
+
+    update: function() {
+      if (!this.entered) {
+        this.entered = (-this.width * this.originX) < this.x &&
+          this.x < (GAMEAREA_WIDTH + this.width * this.originX) &&
+          (-this.height * this.originY) < this.y &&
+          this.y < (GAMEAREA_HEIGHT + this.height * this.originY);
+      }
+
+      if (this.entered) {
+        if (this.x < (-this.width * this.originX) ||
+          (GAMEAREA_WIDTH + this.width * this.originX) < this.x ||
+          this.y < (-this.height * this.originY) ||
+          (GAMEAREA_HEIGHT + this.height * this.originY) < this.y) {
+          this.remove();
+          return;
+        }
+      }
+    },
+
+    damage: function(power) {
+      if (!this.entered) return false;
+      this.hp -= power;
+      
+      this.flare("killed");
+      
+      return this.hp < 0;
+    },
+
   });
 
 });

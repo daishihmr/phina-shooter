@@ -3,12 +3,12 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      bgmVolume: 0.1,
-      soundVolume: 0.8,
-      
+      _bgmVolume: 0.2,
+      soundVolume: 1.0,
+
       beforeBgm: null,
       currentBgm: null,
-      
+
       currentFrame: 0,
       _lastPlayFrame: {},
 
@@ -16,7 +16,7 @@ phina.namespace(function() {
         this.currentFrame = app.ticker.frame;
 
         if (this.beforeBgm) {
-          this.beforeBgm.volume -= this.bgmVolume / (60 * 5);
+          this.beforeBgm.volume -= this._bgmVolume / (60 * 5);
           if (this.beforeBgm.volume < 0.01) {
             this.beforeBgm.stop();
             this.beforeBgm = null;
@@ -37,7 +37,7 @@ phina.namespace(function() {
           this.beforeBgm = this.currentBgm;
         }
         this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).clone().play();
-        this.currentBgm.volume = this.bgmVolume;
+        this.currentBgm.volume = this._bgmVolume;
         this.currentBgm.loop = bgmData.loop;
         this.currentBgm.loopStart = bgmData.loopStart;
         this.currentBgm.loopEnd = bgmData.loopEnd;
@@ -58,7 +58,7 @@ phina.namespace(function() {
           }
         }
       },
-      
+
       playSound: function(name) {
         if (this._lastPlayFrame[name] !== this.currentFrame) {
           var sound = phina.asset.AssetManager.get("sound", name).clone();
@@ -66,7 +66,15 @@ phina.namespace(function() {
           sound.play();
           this._lastPlayFrame[name] = this.currentFrame;
         }
-      }
+      },
+
+      getBgmVolume: function() {
+        return this._bgmVolume;
+      },
+      setBgmVolume: function(v) {
+        this._bgmVolume = v;
+        if (this.currentBgm) this.currentBgm.volume = v;
+      },
     },
 
   });

@@ -24,7 +24,6 @@ phina.input.Keyboard.KEY_CODE["start"] = phina.input.Keyboard.KEY_CODE["space"];
 
 phina.input.Gamepad.BUTTON_CODE["shot"] = phina.input.Gamepad.BUTTON_CODE["x"];
 phina.input.Gamepad.BUTTON_CODE["bomb"] = phina.input.Gamepad.BUTTON_CODE["a"];
-phina.input.Gamepad.BUTTON_CODE["start"] = phina.input.Gamepad.BUTTON_CODE["y"];
 
 phina.main(function() {
   ps.Color.initialize();

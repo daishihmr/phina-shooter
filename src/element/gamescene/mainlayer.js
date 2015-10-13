@@ -29,9 +29,6 @@ phina.namespace(function() {
 
           shotLayer: {
             className: "ps.ShotLayer",
-            draw: function(canvas) {
-              canvas.context.globalCompositeOperation = "lighter";
-            },
           },
 
           effectLayer0: {
@@ -44,8 +41,7 @@ phina.namespace(function() {
 
           player: {
             className: "ps.Player",
-            x: GAMEAREA_WIDTH * 0.5,
-            y: GAMEAREA_HEIGHT * 0.9,
+            visible: false,
           },
 
           itemLayer: {
@@ -55,20 +51,25 @@ phina.namespace(function() {
           effectLayer1: {
             className: "phina.display.CanvasElement",
             children: {
-              playerBurnerL: {
-                className: "ps.AfterBurner",
-                onenterframe: function() {
-                  this.position.x = self.player.position.x - 4;
-                  this.position.y = self.player.position.y + 12;
+              playerBurner: {
+                className: "phina.display.CanvasElement",
+                children: {
+                  playerBurnerL: {
+                    className: "ps.AfterBurner",
+                    onenterframe: function() {
+                      this.position.x = self.player.position.x - 4;
+                      this.position.y = self.player.position.y + 12;
+                    }
+                  },
+                  playerBurnerR: {
+                    className: "ps.AfterBurner",
+                    onenterframe: function() {
+                      this.position.x = self.player.position.x + 4;
+                      this.position.y = self.player.position.y + 12;
+                    }
+                  }
                 }
-              },
-              playerBurnerR: {
-                className: "ps.AfterBurner",
-                onenterframe: function() {
-                  this.position.x = self.player.position.x + 4;
-                  this.position.y = self.player.position.y + 12;
-                }
-              },
+              }
             },
           },
 
@@ -91,6 +92,9 @@ phina.namespace(function() {
           }
         }
       });
+
+      this.player.parts.push(this.effectLayer1.playerBurner);
+      this.player.parts.push(this.playerMarker);
     }
 
   });
