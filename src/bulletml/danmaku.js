@@ -1,5 +1,7 @@
 phina.namespace(function() {
 
+  ps.danmaku = {};
+
   var action = bulletml.dsl.action;
   var actionRef = bulletml.dsl.actionRef;
   var bullet = bulletml.dsl.bullet;
@@ -73,9 +75,7 @@ phina.namespace(function() {
     dummy: true
   });
 
-  ps.danmaku = {};
-
-  // ザコ
+  // ザコヘリ用
   var basic = function(s, dir) {
     return new bulletml.Root({
       top: action([
@@ -101,31 +101,31 @@ phina.namespace(function() {
   ps.danmaku.basicFR2 = basic(1.2, -15);
   ps.danmaku.basicFL2 = basic(1.2, +15);
 
-  // ザコ3way
-  var basic3 = function(dir) {
+  // ザコヘリ3way
+  var basic3way = function(dir) {
     return new bulletml.Root({
       top: action([
         interval(10),
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir - 7)),
           repeat("$burst", [
-            fire(R2, spdSeq(0.05), direction(0, "sequence")),
+            fire(R2, spdSeq(0), direction(0, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
-            fire(DM, spdSeq(0), direction(-14, "sequence")),
+            fire(DM, spdSeq(0.05), direction(-14, "sequence")),
           ]),
           interval(50),
         ]),
       ]),
     });
   };
-  ps.danmaku.basic3 = basic3(0);
-  ps.danmaku.basic3R1 = basic3(-5);
-  ps.danmaku.basic3L1 = basic3(+5);
-  ps.danmaku.basic3R2 = basic3(-15);
-  ps.danmaku.basic3L2 = basic3(+15);
+  ps.danmaku.basic3way = basic3way(0);
+  ps.danmaku.basic3wayR1 = basic3way(-5);
+  ps.danmaku.basic3wayL1 = basic3way(+5);
+  ps.danmaku.basic3wayR2 = basic3way(-15);
+  ps.danmaku.basic3wayL2 = basic3way(+15);
 
-  // ザコ
+  // ザコ戦車用
   var forward = function(s, dir) {
     return new bulletml.Root({
       top: action([
@@ -154,67 +154,36 @@ phina.namespace(function() {
   ps.danmaku.forwardFR2 = forward(1.2, -15);
   ps.danmaku.forwardFL2 = forward(1.2, +15);
 
-  // Stage1 ------------------------------
-
-  // 黒川
-  ps.danmaku.kurokawa1 = new bulletml.Root({
-    top: action([
-      interval(20),
-      repeat(Infinity, [
-        repeat(3, [
-          fire(DM, spd(1.2)),
+  // ザコ戦車3way
+  var forward3way = function(s, dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
           repeat(3, [
-            fire(R0, spdSeq(0), direction(0, "sequence")),
-            wait(6),
+            fire(DM, spd(s), direction(dir + "-5", "relative")),
+            repeat("$burst", [
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(DM, spdSeq(0.15), direction(-15, "sequence")),
+            ]),
+            interval(10),
           ]),
-          interval(12),
+          interval(50),
         ]),
-        interval(50),
       ]),
-    ]),
-  });
-
-  // 秋元
-  ps.danmaku.akimoto1 = new bulletml.Root({
-    top0: action([
-      repeat(Infinity, [
-        interval(20),
-        fire(R2, spd(1.0), direction(-30)),
-        repeat(8, [
-          fire(R2, spdSeq(0), direction(60 / 8, "sequence")),
-        ]),
-        interval(80),
-      ]),
-    ]),
-    top1: action([
-      repeat(Infinity, [
-        interval(50),
-        fire(R1, spd(1.2), direction(-10)),
-        repeat(6, [
-          fire(R1, spdSeq(0), direction(20 / 6, "sequence")),
-        ]),
-        interval(50),
-      ]),
-    ]),
-  });
-
-  // 黄瀬
-  ps.danmaku.kise1 = new bulletml.Root({
-    top: action([
-      interval(20),
-      repeat(Infinity, [
-        fire(DM, spd(0.8)),
-        repeat(12, [
-          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
-        ]),
-        interval(50),
-      ]),
-    ]),
-  });
-
-  // Stage2 ------------------------------
-  // Stage3 ------------------------------
-  // Stage4 ------------------------------
-  // Stage5 ------------------------------
+    });
+  };
+  ps.danmaku.forward3way = forward3way(1, 0);
+  ps.danmaku.forward3wayR1 = forward3way(1, -5);
+  ps.danmaku.forward3wayL1 = forward3way(1, +5);
+  ps.danmaku.forward3wayR2 = forward3way(1, -15);
+  ps.danmaku.forward3wayL2 = forward3way(1, +15);
+  ps.danmaku.forward3wayF = forward3way(1.2, 0);
+  ps.danmaku.forward3wayFR1 = forward3way(1.2, -5);
+  ps.danmaku.forward3wayFL1 = forward3way(1.2, +5);
+  ps.danmaku.forward3wayFR2 = forward3way(1.2, -15);
+  ps.danmaku.forward3wayFL2 = forward3way(1.2, +15);
 
 });

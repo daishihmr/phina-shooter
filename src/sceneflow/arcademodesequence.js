@@ -16,7 +16,7 @@ phina.namespace(function() {
           Array.range(0, 5).map(function(stageId) {
             var stageName = "stage{0}".format(stageId);
             if (stageId < 4) {
-              next = "stage{0}preload".format(stageId + 1);
+              next = "stage{0}preload".format(stageId);
             } else {
               next = "ending";
             }

@@ -1,9 +1,9 @@
 phina.namespace(function() {
 
-  phina.define("ps.Stage1", {
+  phina.define("ps.Stage0", {
     superClass: "ps.Stage",
 
-    backgroundClassName: "ps.Background1",
+    backgroundClassName: "ps.Background0",
 
     init: function() {
       this.superInit();
