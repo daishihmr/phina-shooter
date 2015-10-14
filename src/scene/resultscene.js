@@ -12,6 +12,16 @@ phina.namespace(function() {
 
       this.fromJSON({
         gameData: params.gameData,
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "result"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
       });
     }
   });

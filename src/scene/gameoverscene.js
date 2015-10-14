@@ -9,6 +9,19 @@ phina.namespace(function() {
         height: SCREEN_HEIGHT,
         backgroundColor: "black",
       });
+
+      this.fromJSON({
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "GAME OVER"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
+      });
     }
   });
 
