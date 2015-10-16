@@ -1,6 +1,6 @@
 phina.namespace(function() {
 
-  ps.danmaku = {};
+  ps.danmaku = ps.danmaku || {};
 
   var action = bulletml.dsl.action;
   var actionRef = bulletml.dsl.actionRef;
@@ -35,18 +35,6 @@ phina.namespace(function() {
     return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
   };
 
-  var B0 = bullet({
-    type: 0
-  });
-  var B1 = bullet({
-    type: 1
-  });
-  var B2 = bullet({
-    type: 2
-  });
-  var B3 = bullet({
-    type: 3
-  });
   var R0 = bullet({
     type: 4
   });
@@ -82,7 +70,7 @@ phina.namespace(function() {
         interval(10),
         repeat(Infinity, [
           fire(DM, spd(s), direction(dir)),
-          repeat("$burst", [
+          repeat("$burst + 1", [
             fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
           interval(50),
@@ -108,7 +96,7 @@ phina.namespace(function() {
         interval(10),
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir - 7)),
-          repeat("$burst", [
+          repeat("$burst + 1", [
             fire(R2, spdSeq(0), direction(0, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
@@ -133,7 +121,7 @@ phina.namespace(function() {
         repeat(Infinity, [
           repeat(3, [
             fire(DM, spd(s), direction(dir, "relative")),
-            repeat("$burst", [
+            repeat("$burst + 1", [
               fire(R2, spdSeq(0.15), direction(0, "sequence")),
             ]),
             interval(10),
@@ -162,7 +150,7 @@ phina.namespace(function() {
         repeat(Infinity, [
           repeat(3, [
             fire(DM, spd(s), direction(dir + "-5", "relative")),
-            repeat("$burst", [
+            repeat("$burst + 1", [
               fire(R2, spdSeq(0), direction(+5, "sequence")),
               fire(R2, spdSeq(0), direction(+5, "sequence")),
               fire(R2, spdSeq(0), direction(+5, "sequence")),

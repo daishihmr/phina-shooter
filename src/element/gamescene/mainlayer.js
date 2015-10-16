@@ -51,7 +51,7 @@ phina.namespace(function() {
           effectLayer1: {
             className: "phina.display.CanvasElement",
             children: {
-              playerBurner: {
+              playerBurners: {
                 className: "phina.display.CanvasElement",
                 children: {
                   playerBurnerL: {
@@ -93,7 +93,8 @@ phina.namespace(function() {
         }
       });
 
-      this.player.parts.push(this.effectLayer1.playerBurner);
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerL);
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerR);
       this.player.parts.push(this.playerMarker);
     }
 

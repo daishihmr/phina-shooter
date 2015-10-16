@@ -144,6 +144,8 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  ps.danmaku = ps.danmaku || {};
+
   var action = bulletml.dsl.action;
   var actionRef = bulletml.dsl.actionRef;
   var bullet = bulletml.dsl.bullet;
@@ -177,18 +179,6 @@ phina.namespace(function() {
     return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
   };
 
-  var B0 = bullet({
-    type: 0
-  });
-  var B1 = bullet({
-    type: 1
-  });
-  var B2 = bullet({
-    type: 2
-  });
-  var B3 = bullet({
-    type: 3
-  });
   var R0 = bullet({
     type: 4
   });
@@ -217,16 +207,14 @@ phina.namespace(function() {
     dummy: true
   });
 
-  ps.danmaku = {};
-
-  // ザコ
+  // ザコヘリ用
   var basic = function(s, dir) {
     return new bulletml.Root({
       top: action([
         interval(10),
         repeat(Infinity, [
           fire(DM, spd(s), direction(dir)),
-          repeat("$burst", [
+          repeat("$burst + 1", [
             fire(R2, spdSeq(0.15), direction(0, "sequence")),
           ]),
           interval(50),
@@ -245,31 +233,31 @@ phina.namespace(function() {
   ps.danmaku.basicFR2 = basic(1.2, -15);
   ps.danmaku.basicFL2 = basic(1.2, +15);
 
-  // ザコ3way
-  var basic3 = function(dir) {
+  // ザコヘリ3way
+  var basic3way = function(dir) {
     return new bulletml.Root({
       top: action([
         interval(10),
         repeat(Infinity, [
           fire(DM, spd(1), direction(dir - 7)),
-          repeat("$burst", [
-            fire(R2, spdSeq(0.05), direction(0, "sequence")),
+          repeat("$burst + 1", [
+            fire(R2, spdSeq(0), direction(0, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
             fire(R2, spdSeq(0), direction(7, "sequence")),
-            fire(DM, spdSeq(0), direction(-14, "sequence")),
+            fire(DM, spdSeq(0.05), direction(-14, "sequence")),
           ]),
           interval(50),
         ]),
       ]),
     });
   };
-  ps.danmaku.basic3 = basic3(0);
-  ps.danmaku.basic3R1 = basic3(-5);
-  ps.danmaku.basic3L1 = basic3(+5);
-  ps.danmaku.basic3R2 = basic3(-15);
-  ps.danmaku.basic3L2 = basic3(+15);
+  ps.danmaku.basic3way = basic3way(0);
+  ps.danmaku.basic3wayR1 = basic3way(-5);
+  ps.danmaku.basic3wayL1 = basic3way(+5);
+  ps.danmaku.basic3wayR2 = basic3way(-15);
+  ps.danmaku.basic3wayL2 = basic3way(+15);
 
-  // ザコ
+  // ザコ戦車用
   var forward = function(s, dir) {
     return new bulletml.Root({
       top: action([
@@ -277,7 +265,7 @@ phina.namespace(function() {
         repeat(Infinity, [
           repeat(3, [
             fire(DM, spd(s), direction(dir, "relative")),
-            repeat("$burst", [
+            repeat("$burst + 1", [
               fire(R2, spdSeq(0.15), direction(0, "sequence")),
             ]),
             interval(10),
@@ -298,7 +286,104 @@ phina.namespace(function() {
   ps.danmaku.forwardFR2 = forward(1.2, -15);
   ps.danmaku.forwardFL2 = forward(1.2, +15);
 
-  // Stage1 ------------------------------
+  // ザコ戦車3way
+  var forward3way = function(s, dir) {
+    return new bulletml.Root({
+      top: action([
+        interval(10),
+        repeat(Infinity, [
+          repeat(3, [
+            fire(DM, spd(s), direction(dir + "-5", "relative")),
+            repeat("$burst + 1", [
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(R2, spdSeq(0), direction(+5, "sequence")),
+              fire(DM, spdSeq(0.15), direction(-15, "sequence")),
+            ]),
+            interval(10),
+          ]),
+          interval(50),
+        ]),
+      ]),
+    });
+  };
+  ps.danmaku.forward3way = forward3way(1, 0);
+  ps.danmaku.forward3wayR1 = forward3way(1, -5);
+  ps.danmaku.forward3wayL1 = forward3way(1, +5);
+  ps.danmaku.forward3wayR2 = forward3way(1, -15);
+  ps.danmaku.forward3wayL2 = forward3way(1, +15);
+  ps.danmaku.forward3wayF = forward3way(1.2, 0);
+  ps.danmaku.forward3wayFR1 = forward3way(1.2, -5);
+  ps.danmaku.forward3wayFL1 = forward3way(1.2, +5);
+  ps.danmaku.forward3wayFR2 = forward3way(1.2, -15);
+  ps.danmaku.forward3wayFL2 = forward3way(1.2, +15);
+
+});
+
+phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
+
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 8
+  });
+  var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
 
   // 黒川
   ps.danmaku.kurokawa1 = new bulletml.Root({
@@ -356,10 +441,315 @@ phina.namespace(function() {
     ]),
   });
 
-  // Stage2 ------------------------------
-  // Stage3 ------------------------------
-  // Stage4 ------------------------------
-  // Stage5 ------------------------------
+  // 雪城1
+  ps.danmaku.yukishiro1 = new bulletml.Root({
+    top: action([]),
+  });
+  // 雪城2
+  ps.danmaku.yukishiro2 = new bulletml.Root({
+    top: action([]),
+  });
+  // 雪城3
+  ps.danmaku.yukishiro3 = new bulletml.Root({
+    top: action([]),
+  });
+
+  // 美墨1-1
+  ps.danmaku.misumi11 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨1-2
+  ps.danmaku.misumi12 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨1-3
+  ps.danmaku.misumi13 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨2-1
+  ps.danmaku.misumi21 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨2-2
+  ps.danmaku.misumi22 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨2-3
+  ps.danmaku.misumi23 = new bulletml.Root({
+    top: action([]),
+  });
+  // 美墨3-1
+  ps.danmaku.misumi31 = new bulletml.Root({
+    top: action([]),
+  });
+
+});
+
+phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
+
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 8
+  });
+  var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
+
+});
+
+phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
+
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 8
+  });
+  var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
+
+});
+
+phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
+
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 8
+  });
+  var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
+
+});
+
+phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
+
+  var action = bulletml.dsl.action;
+  var actionRef = bulletml.dsl.actionRef;
+  var bullet = bulletml.dsl.bullet;
+  var bulletRef = bulletml.dsl.bulletRef;
+  var fire = bulletml.dsl.fire;
+  var fireRef = bulletml.dsl.fireRef;
+  var changeDirection = bulletml.dsl.changeDirection;
+  var changeSpeed = bulletml.dsl.changeSpeed;
+  var accel = bulletml.dsl.accel;
+  var wait = bulletml.dsl.wait;
+  var vanish = bulletml.dsl.vanish;
+  var repeat = bulletml.dsl.repeat;
+  var bindVar = bulletml.dsl.bindVar;
+  var notify = bulletml.dsl.notify;
+  var direction = bulletml.dsl.direction;
+  var speed = bulletml.dsl.speed;
+  var horizontal = bulletml.dsl.horizontal;
+  var vertical = bulletml.dsl.vertical;
+  var fireOption = bulletml.dsl.fireOption;
+  var offsetX = bulletml.dsl.offsetX;
+  var offsetY = bulletml.dsl.offsetY;
+  var autonomy = bulletml.dsl.autonomy;
+
+  var interval = function(v) {
+    return wait("{0} * (0.3 + (1.0 - $densityRank) * 0.7)".format(v));
+  };
+  var spd = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v));
+  };
+  var spdSeq = function(v) {
+    return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
+  };
+
+  var R0 = bullet({
+    type: 4
+  });
+  var R1 = bullet({
+    type: 5
+  });
+  var R2 = bullet({
+    type: 6
+  });
+  var R3 = bullet({
+    type: 7
+  });
+  var B4 = bullet({
+    type: 8
+  });
+  var B5 = bullet({
+    type: 9
+  });
+  var R4 = bullet({
+    type: 10
+  });
+  var R5 = bullet({
+    type: 11
+  });
+  var DM = bullet({
+    dummy: true
+  });
 
 });
 
@@ -1058,7 +1448,7 @@ phina.namespace(function() {
     spawn: function(runner, spec) {
       var bullet = this.pool.shift();
       if (!bullet) return;
-
+      
       bullet.x = runner.x;
       bullet.y = runner.y;
       bullet.runner = runner;
@@ -1145,7 +1535,7 @@ phina.namespace(function() {
           effectLayer1: {
             className: "phina.display.CanvasElement",
             children: {
-              playerBurner: {
+              playerBurners: {
                 className: "phina.display.CanvasElement",
                 children: {
                   playerBurnerL: {
@@ -1187,7 +1577,8 @@ phina.namespace(function() {
         }
       });
 
-      this.player.parts.push(this.effectLayer1.playerBurner);
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerL);
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerR);
       this.player.parts.push(this.playerMarker);
     }
 
@@ -1903,6 +2294,18 @@ phina.namespace(function() {
         height: SCREEN_HEIGHT,
         backgroundColor: "black",
       });
+      this.fromJSON({
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "ending"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
+      });
     }
   });
 
@@ -1918,6 +2321,19 @@ phina.namespace(function() {
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT,
         backgroundColor: "black",
+      });
+
+      this.fromJSON({
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "GAME OVER"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
       });
     }
   });
@@ -2183,6 +2599,18 @@ phina.namespace(function() {
         height: SCREEN_HEIGHT,
         backgroundColor: "black",
       });
+      this.fromJSON({
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "name entry"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
+      });
     }
   });
 
@@ -2202,6 +2630,16 @@ phina.namespace(function() {
 
       this.fromJSON({
         gameData: params.gameData,
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "result"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
       });
     }
   });
@@ -2285,6 +2723,18 @@ phina.namespace(function() {
         height: SCREEN_HEIGHT,
         backgroundColor: "black",
       });
+      this.fromJSON({
+        children: {
+          label: {
+            className: "ps.TitleLogoLabel",
+            arguments: {
+              text: "tutorial"
+            },
+            x: GAMEAREA_WIDTH * 0.5,
+            y: GAMEAREA_HEIGHT * 0.5,
+          }
+        }
+      });
     }
   });
 
@@ -2308,7 +2758,7 @@ phina.namespace(function() {
           Array.range(0, 5).map(function(stageId) {
             var stageName = "stage{0}".format(stageId);
             if (stageId < 4) {
-              next = "stage{0}preload".format(stageId + 1);
+              next = "stage{0}preload".format(stageId);
             } else {
               next = "ending";
             }
@@ -2447,7 +2897,7 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.Background1", {
+  phina.define("ps.Background0", {
     superClass: "ps.BackgroundLayer",
 
     init: function() {
@@ -2533,7 +2983,7 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.Background2", {
+  phina.define("ps.Background1", {
     superClass: "ps.BackgroundLayer",
 
     init: function() {
@@ -2654,7 +3104,7 @@ phina.namespace(function() {
       create: function(stageId) {
         switch (stageId) {
           case 0:
-            return ps.Stage1();
+            return ps.Stage0();
         }
       }
     }
@@ -2843,10 +3293,10 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
-  phina.define("ps.Stage1", {
+  phina.define("ps.Stage0", {
     superClass: "ps.Stage",
 
-    backgroundClassName: "ps.Background1",
+    backgroundClassName: "ps.Background0",
 
     init: function() {
       this.superInit();

@@ -1,4 +1,6 @@
 phina.namespace(function() {
+  
+  ps.danmaku = ps.danmaku || {};
 
   var action = bulletml.dsl.action;
   var actionRef = bulletml.dsl.actionRef;
@@ -33,18 +35,6 @@ phina.namespace(function() {
     return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
   };
 
-  var B0 = bullet({
-    type: 0
-  });
-  var B1 = bullet({
-    type: 1
-  });
-  var B2 = bullet({
-    type: 2
-  });
-  var B3 = bullet({
-    type: 3
-  });
   var R0 = bullet({
     type: 4
   });

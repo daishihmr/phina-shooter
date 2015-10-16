@@ -23,7 +23,7 @@ phina.namespace(function() {
     spawn: function(runner, spec) {
       var bullet = this.pool.shift();
       if (!bullet) return;
-
+      
       bullet.x = runner.x;
       bullet.y = runner.y;
       bullet.runner = runner;

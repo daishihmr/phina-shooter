@@ -31,7 +31,7 @@ phina.namespace(function() {
       create: function(stageId) {
         switch (stageId) {
           case 0:
-            return ps.Stage1();
+            return ps.Stage0();
         }
       }
     }
