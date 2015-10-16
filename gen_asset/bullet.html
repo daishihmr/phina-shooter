@@ -10,7 +10,7 @@
   <script>
   var sz = 24;
   var H = 16;
-  var V = 1;
+  var V = 2;
 
   tm.main(function() {
     tm.globalize();
@@ -72,15 +72,15 @@
   _(function(canvas) {
     (4).times(function(i) {
       [-1, 1].forEach(function(d) {
-        var v = Vector2().setAngle(180 + i * 12 * d, (7 - i) / 7 * 0.50);
+        var v = Vector2().setAngle(180 + i * 8 * d, (11 - i) / 7 * 0.40);
 
         var p = Vector2(sz - 4, sz * 0.5);
 
         Array.range(0, 30).forEach(function(j, _, range) {
-          var rad = 1 + Math.sin(j / range.length * Math.PI) * 1.0;
+          var rad = 1 + Math.sin(j / range.length * Math.PI) * 0.9;
           drawParticle(canvas, p.x, p.y, rad,
-            "hsla(230,80%,50%,0.5)",
-            "hsla(230,80%,30%,0.5)"
+            "hsla(125,80%,50%,0.5)",
+            "hsla(125,80%,30%,0.5)"
           );
           p.add(v);
         });
@@ -98,8 +98,8 @@
         Array.range(0, 30).forEach(function(j, _, range) {
           var rad = 1 + Math.sin(j / range.length * Math.PI) * 1.6;
           drawParticle(canvas, p.x, p.y, rad,
-            "hsla(230,80%,50%,0.5)",
-            "hsla(230,80%,30%,0.5)"
+            "hsla(125,80%,50%,0.5)",
+            "hsla(125,80%,30%,0.5)"
           );
           p.add(v);
         });
@@ -117,8 +117,8 @@
         Array.range(0, 30).forEach(function(j, _, range) {
           var rad = 0.5 + Math.sin(j / range.length * Math.PI) * 1.2;
           drawParticle(canvas, p.x, p.y, rad,
-            "hsla(230,80%,50%,0.5)",
-            "hsla(230,80%,30%,0.5)"
+            "hsla(125,80%,50%,0.5)",
+            "hsla(125,80%,30%,0.5)"
           );
           p.add(v);
         });
@@ -136,8 +136,8 @@
         Array.range(0, 30).forEach(function(j, _, range) {
           var rad = 1 + Math.sin(j / range.length * Math.PI) * 1.2;
           drawParticle(canvas, p.x, p.y, rad,
-            "hsla(230, 80%, 30%,0.3)",
-            "hsla(230, 80%, 30%,0.3)"
+            "hsla(125, 80%, 30%,0.3)",
+            "hsla(125, 80%, 30%,0.3)"
           );
           p.add(v);
         });
@@ -280,6 +280,73 @@
       );
     });
   });
+
+  _(function(canvas) {
+    var radius = 2 + 1;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.12,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
+  _(function(canvas) {
+    var radius = 2 + 2;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.10,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
+  _(function(canvas) {
+    var radius = 2 + 3;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.08,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
+  _(function(canvas) {
+    var radius = 2 + 4;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.06,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
+  _(function(canvas) {
+    var radius = 2 + 5;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.04,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
+  _(function(canvas) {
+    var radius = 2 + 6;
+    (80).times(function() {
+      var angle = Math.randf(0, Math.PI * 2);
+      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.02,
+        "hsla(10, 100%, 50%, 0.1)",
+        "hsla(10, 50%, 50%, 0.1)"
+      );
+    });
+  });
+
   </script>
 </body>
 

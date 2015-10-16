@@ -15,10 +15,10 @@ phina.namespace(function() {
       });
     },
 
-    fireVulcan: function(frameIndex, x, y, direction) {
+    fireVulcan: function(frameIndex, x, y, direction, power) {
       var shot = this.pool.shift();
       if (shot) {
-        shot.setup(frameIndex, x, y, direction).addChildTo(this);
+        shot.setup(frameIndex, x, y, direction, power).addChildTo(this);
       }
     },
 

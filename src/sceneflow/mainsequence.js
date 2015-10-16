@@ -13,7 +13,11 @@ phina.namespace(function() {
             arguments: {
               assetType: "common"
             },
-            nextLabel: "title",
+          },
+
+          {
+            label: "generate",
+            className: "ps.GenerateAssetScene",
           },
 
           {

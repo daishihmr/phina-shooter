@@ -16,7 +16,7 @@ phina.namespace(function() {
           Array.range(0, 5).map(function(stageId) {
             var stageName = "stage{0}".format(stageId);
             if (stageId < 4) {
-              next = "stage{0}preload".format(stageId + 1);
+              next = "stage{0}preload".format(stageId);
             } else {
               next = "ending";
             }
@@ -28,7 +28,14 @@ phina.namespace(function() {
                 arguments: {
                   assetType: stageName
                 },
-                nextLabel: stageName,
+              },
+
+              {
+                label: stageName + "generate",
+                className: "ps.GenerateAssetScene",
+                arguments: {
+                  assetType: stageName
+                },
               },
 
               {
@@ -38,7 +45,6 @@ phina.namespace(function() {
                   stageId: stageId,
                   gameData: gameData,
                 },
-                nextLabel: stageName + "result",
               },
 
               {
@@ -47,7 +53,6 @@ phina.namespace(function() {
                 arguments: {
                   gameData: gameData,
                 },
-                nextLabel: next,
               },
 
             ];
@@ -56,13 +61,11 @@ phina.namespace(function() {
           {
             label: "ending",
             className: "ps.EndingScene",
-            nextLabel: "gameover",
           },
 
           {
             label: "gameover",
             className: "ps.GameoverScene",
-            nextLabel: "nameEntry",
           },
 
           {

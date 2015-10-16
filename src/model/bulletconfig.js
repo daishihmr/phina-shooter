@@ -1,27 +1,30 @@
 phina.namespace(function() {
 
   phina.define("ps.BulletConfig", {
+    init: function() {},
+    _static: {
 
-    speedRate: 3,
-    target: null,
-    bulletLayer: null,
+      speedRate: 3,
+      target: null,
+      bulletLayer: null,
 
-    init: function(target, bulletLayer) {
-      this.target = target;
-      this.bulletLayer = bulletLayer;
-      
-      this.put("densityRank", 0.0);
-      this.put("speedRank", 0.0);
-      this.put("burst", 0);
-    },
+      setup: function(target, bulletLayer) {
+        this.target = target;
+        this.bulletLayer = bulletLayer;
 
-    createNewBullet: function(runner, spec) {
-      this.bulletLayer.spawn(runner, spec);
-    },
-    
-    put: function(name, value) {
-      bulletml.Walker.globalScope["$" + name] = value;
-    },
+        this.put("densityRank", 0.00);
+        this.put("speedRank", 0.00);
+        this.put("burst", 0);
+      },
+
+      createNewBullet: function(runner, spec) {
+        this.bulletLayer.spawn(runner, spec);
+      },
+
+      put: function(name, value) {
+        bulletml.Walker.globalScope["$" + name] = value;
+      },
+    }
   });
 
 });

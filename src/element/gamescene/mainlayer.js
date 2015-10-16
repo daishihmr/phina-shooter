@@ -20,67 +20,61 @@ phina.namespace(function() {
           },
 
           scoreItemLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
+          },
+
+          deadEnemyLayer: {
+            className: "phina.display.CanvasElement",
           },
 
           shotLayer: {
             className: "ps.ShotLayer",
-            draw: function(canvas) {
-              canvas.context.globalCompositeOperation = "lighter";
-            },
           },
 
           effectLayer0: {
             className: "phina.display.CanvasElement",
           },
 
+          enemyLayer: {
+            className: "phina.display.CanvasElement",
+          },
+
           player: {
             className: "ps.Player",
-            x: GAMEAREA_WIDTH * 0.5,
-            y: GAMEAREA_HEIGHT * 0.9,
+            visible: false,
           },
 
           itemLayer: {
-            className: "phina.app.Element",
-          },
-
-          enemyLayer: {
-            className: "phina.app.Element",
+            className: "phina.display.CanvasElement",
           },
 
           effectLayer1: {
             className: "phina.display.CanvasElement",
             children: {
-              playerBurnerL: {
-                className: "ps.AfterBurner",
-                onenterframe: function() {
-                  this.position.x = self.player.position.x - 4;
-                  this.position.y = self.player.position.y + 12;
+              playerBurners: {
+                className: "phina.display.CanvasElement",
+                children: {
+                  playerBurnerL: {
+                    className: "ps.AfterBurner",
+                    onenterframe: function() {
+                      this.position.x = self.player.position.x - 4;
+                      this.position.y = self.player.position.y + 12;
+                    }
+                  },
+                  playerBurnerR: {
+                    className: "ps.AfterBurner",
+                    onenterframe: function() {
+                      this.position.x = self.player.position.x + 4;
+                      this.position.y = self.player.position.y + 12;
+                    }
+                  }
                 }
-              },
-              playerBurnerR: {
-                className: "ps.AfterBurner",
-                onenterframe: function() {
-                  this.position.x = self.player.position.x + 4;
-                  this.position.y = self.player.position.y + 12;
-                }
-              },
+              }
             },
           },
 
           bulletLayer: {
             className: "ps.BulletLayer",
-          },
-
-          dummy: {
-            className: "ps.OutlinedSprite",
-            arguments: ["bomb"],
-            x: 20,
-            y: 70,
-            onenterframe: function() {
-              this.x += 0.2;
-              this.y += 0.2;
-            }
           },
 
           playerMarker: {
@@ -98,6 +92,10 @@ phina.namespace(function() {
           }
         }
       });
+
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerL);
+      this.player.parts.push(this.effectLayer1.playerBurners.playerBurnerR);
+      this.player.parts.push(this.playerMarker);
     }
 
   });

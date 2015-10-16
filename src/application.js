@@ -19,11 +19,13 @@ phina.namespace(function() {
     },
 
     update: function() {
-      this.mouse.update();
-      this.touch.update();
-      this.touchList.update();
+      // this.mouse.update();
+      // this.touch.update();
+      // this.touchList.update();
       this.keyboard.update();
       this.gamepads.update();
+      
+      ps.SoundManager.update(this);
     },
 
   });

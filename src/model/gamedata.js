@@ -36,16 +36,6 @@ phina.namespace(function() {
       });
     },
 
-    miss: function() {
-      this.zanki -= 1;
-      this.psyche = 0;
-    },
-
-    useBomb: function() {
-      this.bomb -= 1;
-      this.psyche *= 0.7;
-    },
-
     addPsyche: function(v) {
       this.psyche += v;
     },
@@ -75,7 +65,19 @@ phina.namespace(function() {
 
     bind: function(propertyName, view) {
       this._binder[propertyName] = view;
-    }
+    },
+    
+    onbomb: function() {
+      this.bomb -= 1;
+    },
+
+    onkill: function(e) {
+      
+    },
+    
+    onmiss: function() {
+      this.zanki -= 1;
+    },
 
   });
 
