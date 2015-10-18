@@ -13,6 +13,10 @@ phina.namespace(function() {
         baseline: "middle",
       }));
     },
+    
+    update: function(app) {
+      this.alpha = 1.0;
+    },
 
   });
 });
