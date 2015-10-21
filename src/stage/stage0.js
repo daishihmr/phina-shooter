@@ -150,6 +150,48 @@ phina.namespace(function() {
           formation: "basic0",
         })
         //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
+        .wait(75)
+        .launchEnemyUnit("ps.Kujo1", {
+          x: x(5),
+          y: y(-7),
+          formation: "basic0",
+        })
+        //
       ;
     }
 
