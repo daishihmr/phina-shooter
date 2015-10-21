@@ -432,9 +432,13 @@ phina.namespace(function() {
     top: action([
       interval(20),
       repeat(Infinity, [
-        fire(DM, spd(0.8)),
-        repeat(12, [
-          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+        fire(DM, spd(0.6)),
+        repeat(5, [
+          repeat(9, [
+            fire(R4, spdSeq(0.02), direction(360 / (9 - 1), "sequence")),
+          ]),
+          wait(4),
+          fire(DM, direction(7, "sequence"), spd(0.6)),
         ]),
         interval(50),
       ]),
@@ -879,6 +883,8 @@ phina.namespace(function() {
         hp: 2,
       }));
       this.setSrcRect(0, 0, 24, 24);
+      
+      this.move = phina.geom.Vector2(0, 1);
 
       var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
         .addChildTo(this)
@@ -899,6 +905,11 @@ phina.namespace(function() {
       var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
+      if (this.y < player.y) {
+        var delta = phina.geom.Vector2(player.x - this.x, player.y - this.y).normalize().mul(0.3);
+        this.move.add(delta).normalize().mul(3);
+      }
+      this.position.add(this.move);
     }
   });
 
@@ -920,6 +931,10 @@ phina.namespace(function() {
           self.startAttack();
         });
     },
+    
+    onenterframe: function(e) {
+      this.y += 0.25;
+    }
   });
 
   phina.define("ps.Natsuki1", {
@@ -952,6 +967,88 @@ phina.namespace(function() {
       var player = app.currentScene.player;
       var t = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI * 2;
       if (this.runner) this.runner.direction = ~~((t + U225) / U45) * U45;
+    }
+  });
+  
+  phina.define("ps.Kurokawa1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 64, 64, params.$safe({
+        boundingType: "circle",
+        radius: 30,
+        danmakuName: "kurokawa1",
+        hp: 30,
+      }));
+      this.setSrcRect(64, 0, 64, 64);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
+      this.y += 0.5;
+    }
+  });
+
+  phina.define("ps.Akimoto1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 128, 64, params.$safe({
+        boundingType: "rect",
+        boundingWidth: 90,
+        boundingHeight: 30,
+        danmakuName: "akimoto1",
+        hp: 60,
+      }));
+      this.setSrcRect(0, 64, 128, 64);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
+      this.y += 0.4;
+    }
+  });
+
+  phina.define("ps.Yukishiro1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 192, 96, params.$safe({
+        boundingType: "rect",
+        boundingWidth: 190,
+        boundingHeight: 60,
+        danmakuName: "yukishiro1",
+        hp: 300,
+      }));
+      this.setSrcRect(128, 0, 192, 96);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
     }
   });
 
@@ -1002,7 +1099,7 @@ phina.namespace(function() {
       var x = _x - this.position.x;
       var y = _y - this.position.y;
 
-      if (((x) * (x) + (y) * (y)) < (this.radius * this.radius)) {
+      if ((x * x + y * y) < (this.radius * this.radius)) {
         return true;
       }
       return false;
@@ -1069,25 +1166,91 @@ phina.namespace(function() {
           wait: 20,
         }, ],
 
+        "basic1": [{
+          x: GAMEAREA_WIDTH * -0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 30,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.15,
+          y: GAMEAREA_HEIGHT * -0.1,
+          wait: 20,
+        }, ],
+
+        "basic2": [{
+          x: GAMEAREA_WIDTH * -0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.1,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 50,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * -0.1,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.05,
+          y: GAMEAREA_HEIGHT * -0.1,
+          wait: 20,
+        }, ],
+
+        "line4": [{
+          x: 40 * -0,
+          y: 40 * +0,
+          wait: 0,
+        }, {
+          x: 40 * -1,
+          y: 40 * +0,
+          wait: 0,
+        }, {
+          x: 40 * -2,
+          y: 40 * +0,
+          wait: 0,
+        }, {
+          x: 40 * -3,
+          y: 40 * +0,
+          wait: 0,
+        }, {
+          x: 40 * -4,
+          y: 40 * +0,
+          wait: 0,
+        }, ],
+
         "line6": [{
-          x: 40 * 0,
-          y: 40 * 0,
+          x: 40 * +0,
+          y: 40 * +0,
           wait: 0,
         }, {
-          x: 40 * 1,
-          y: 40 * 0,
+          x: 40 * +1,
+          y: 40 * +0,
           wait: 0,
         }, {
-          x: 40 * 2,
-          y: 40 * 0,
+          x: 40 * +2,
+          y: 40 * +0,
           wait: 0,
         }, {
-          x: 40 * 3,
-          y: 40 * 0,
+          x: 40 * +3,
+          y: 40 * +0,
           wait: 0,
         }, {
-          x: 40 * 4,
-          y: 40 * 0,
+          x: 40 * +4,
+          y: 40 * +0,
           wait: 0,
         }, ],
 
@@ -1109,6 +1272,50 @@ phina.namespace(function() {
           wait: 0,
         }, {
           x: 40 * -4,
+          y: 40 * -4,
+          wait: 0,
+        }, ],
+
+        "line8": [{
+          x: 0,
+          y: 40 * -0,
+          wait: 0,
+        }, {
+          x: 0,
+          y: 40 * -1,
+          wait: 0,
+        }, {
+          x: 0,
+          y: 40 * -2,
+          wait: 0,
+        }, {
+          x: 0,
+          y: 40 * -3,
+          wait: 0,
+        }, {
+          x: 0,
+          y: 40 * -4,
+          wait: 0,
+        }, ],
+
+        "line9": [{
+          x: 40 * +0,
+          y: 40 * -0,
+          wait: 0,
+        }, {
+          x: 40 * +1,
+          y: 40 * -1,
+          wait: 0,
+        }, {
+          x: 40 * +2,
+          y: 40 * -2,
+          wait: 0,
+        }, {
+          x: 40 * +3,
+          y: 40 * -3,
+          wait: 0,
+        }, {
+          x: 40 * +4,
           y: 40 * -4,
           wait: 0,
         }, ],
@@ -1497,16 +1704,16 @@ phina.namespace(function() {
             className: "phina.display.CanvasElement",
           },
 
-          shotLayer: {
-            className: "ps.ShotLayer",
-          },
-
           effectLayer0: {
             className: "phina.display.CanvasElement",
           },
 
           enemyLayer: {
             className: "phina.display.CanvasElement",
+          },
+
+          shotLayer: {
+            className: "ps.ShotLayer",
           },
 
           player: {
@@ -3417,177 +3624,9 @@ phina.namespace(function() {
         .startBgm()
         //
         .wait(250)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .launchEnemyUnit("ps.Natsuki1", {
-          x: x(-1),
-          y: y(2),
-          direction: 45,
-          formation: "line7",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(200)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        .wait(50)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-5),
-          formation: "basic0",
-        })
-        //
-        .launchEnemyUnit("ps.Natsuki1", {
-          x: x(11),
-          y: y(3),
-          direction: 180,
-          formation: "line6",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(80)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(2),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
-        })
-        //
-        .wait(75)
-        .launchEnemyUnit("ps.Kujo1", {
-          x: x(5),
-          y: y(-7),
-          formation: "basic0",
+        .launchEnemy("ps.Yukishiro1", {
+          x: x(+5),
+          y: y(-1),
         })
         //
       ;
@@ -3985,7 +4024,7 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.2,
+      _bgmVolume: 0.005,
       soundVolume: 1.0,
 
       beforeBgm: null,

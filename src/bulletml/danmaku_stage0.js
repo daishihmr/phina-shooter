@@ -110,9 +110,13 @@ phina.namespace(function() {
     top: action([
       interval(20),
       repeat(Infinity, [
-        fire(DM, spd(0.8)),
-        repeat(12, [
-          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+        fire(DM, spd(0.6)),
+        repeat(5, [
+          repeat(9, [
+            fire(R4, spdSeq(0.02), direction(360 / (9 - 1), "sequence")),
+          ]),
+          wait(4),
+          fire(DM, direction(7, "sequence"), spd(0.6)),
         ]),
         interval(50),
       ]),

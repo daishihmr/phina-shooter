@@ -3,7 +3,7 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.2,
+      _bgmVolume: 0.005,
       soundVolume: 1.0,
 
       beforeBgm: null,

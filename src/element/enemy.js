@@ -41,7 +41,7 @@ phina.namespace(function() {
       var x = _x - this.position.x;
       var y = _y - this.position.y;
 
-      if (((x) * (x) + (y) * (y)) < (this.radius * this.radius)) {
+      if ((x * x + y * y) < (this.radius * this.radius)) {
         return true;
       }
       return false;

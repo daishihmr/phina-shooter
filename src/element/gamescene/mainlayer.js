@@ -27,16 +27,16 @@ phina.namespace(function() {
             className: "phina.display.CanvasElement",
           },
 
-          shotLayer: {
-            className: "ps.ShotLayer",
-          },
-
           effectLayer0: {
             className: "phina.display.CanvasElement",
           },
 
           enemyLayer: {
             className: "phina.display.CanvasElement",
+          },
+
+          shotLayer: {
+            className: "ps.ShotLayer",
           },
 
           player: {

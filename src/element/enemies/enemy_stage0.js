@@ -50,6 +50,8 @@ phina.namespace(function() {
         hp: 2,
       }));
       this.setSrcRect(0, 0, 24, 24);
+      
+      this.move = phina.geom.Vector2(0, 1);
 
       var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
         .addChildTo(this)
@@ -70,6 +72,11 @@ phina.namespace(function() {
       var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
+      if (this.y < player.y) {
+        var delta = phina.geom.Vector2(player.x - this.x, player.y - this.y).normalize().mul(0.3);
+        this.move.add(delta).normalize().mul(3);
+      }
+      this.position.add(this.move);
     }
   });
 
@@ -91,6 +98,10 @@ phina.namespace(function() {
           self.startAttack();
         });
     },
+    
+    onenterframe: function(e) {
+      this.y += 0.25;
+    }
   });
 
   phina.define("ps.Natsuki1", {
@@ -123,6 +134,88 @@ phina.namespace(function() {
       var player = app.currentScene.player;
       var t = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI * 2;
       if (this.runner) this.runner.direction = ~~((t + U225) / U45) * U45;
+    }
+  });
+  
+  phina.define("ps.Kurokawa1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 64, 64, params.$safe({
+        boundingType: "circle",
+        radius: 30,
+        danmakuName: "kurokawa1",
+        hp: 30,
+      }));
+      this.setSrcRect(64, 0, 64, 64);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
+      this.y += 0.5;
+    }
+  });
+
+  phina.define("ps.Akimoto1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 128, 64, params.$safe({
+        boundingType: "rect",
+        boundingWidth: 90,
+        boundingHeight: 30,
+        danmakuName: "akimoto1",
+        hp: 60,
+      }));
+      this.setSrcRect(0, 64, 128, 64);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
+      this.y += 0.4;
+    }
+  });
+
+  phina.define("ps.Yukishiro1", {
+    superClass: "ps.Enemy",
+    init: function(params) {
+      this.superInit("enemy_stage0", 192, 96, params.$safe({
+        boundingType: "rect",
+        boundingWidth: 190,
+        boundingHeight: 60,
+        danmakuName: "yukishiro1",
+        hp: 300,
+      }));
+      this.setSrcRect(128, 0, 192, 96);
+
+      var self = this;
+      this.ftweener
+        .wait(params.wait)
+        .call(function() {
+          self.startAttack();
+        })
+        .by({
+          y: GAMEAREA_HEIGHT * 0.3
+        }, 40, "easeOutQuad");
+    },
+    
+    onenterframe: function(e) {
     }
   });
 
