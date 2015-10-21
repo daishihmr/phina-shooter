@@ -16,6 +16,14 @@ phina.namespace(function() {
       };
     },
 
+    setSrcRect: function(x, y, w, h) {
+      this.srcRect.x = x;
+      this.srcRect.y = y;
+      this.srcRect.width = w;
+      this.srcRect.height = h;
+      return this;
+    },
+
     _static: {
       staticAlpha: 1.0
     }

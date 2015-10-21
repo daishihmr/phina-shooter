@@ -15,6 +15,8 @@ phina.namespace(function() {
         case "stage0":
           ps.TextureEdit.outline("enemy_stage0", "red");
 
+          ps.TextureEdit.dark("enemy_stage0");
+
           break;
 
         default:

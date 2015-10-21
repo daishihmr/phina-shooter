@@ -83,6 +83,10 @@ phina.namespace(function() {
     launchBoss: function(bossClassName) {
       return this.addTask(ps.LaunchBossTask(bossClassName));
     },
+    
+    call: function(func) {
+      return this.addTask(ps.CallFuncTask(func));
+    },
   });
 
   phina.define("ps.StageTask", {
@@ -214,6 +218,21 @@ phina.namespace(function() {
     },
 
     execute: function(app, gameScene, stage) {}
+  });
+
+  phina.define("ps.CallFuncTask", {
+    superClass: "ps.StageTask",
+
+    func: null,
+
+    init: function(func) {
+      this.superInit();
+      this.func = func;
+    },
+
+    execute: function(app, gameScene, stage) {
+      this.func();
+    }
   });
 
 });

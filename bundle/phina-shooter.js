@@ -839,16 +839,13 @@ phina.namespace(function() {
         hp: 2,
       }));
       this.setSrcRect(32, 0, 24, 24);
-      
+
       var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
         .addChildTo(this)
         .on("enterframe", function() {
           this.rotation += 20;
-        });
-      propeler.srcRect.x = 0;
-      propeler.srcRect.y = 128;
-      propeler.srcRect.width = 32;
-      propeler.srcRect.height = 32;
+        })
+        .setSrcRect(0, 128, 32, 32);
 
       var self = this;
       this.ftweener
@@ -887,11 +884,8 @@ phina.namespace(function() {
         .addChildTo(this)
         .on("enterframe", function() {
           this.rotation += 20;
-        });
-      propeler.srcRect.x = 0;
-      propeler.srcRect.y = 128;
-      propeler.srcRect.width = 32;
-      propeler.srcRect.height = 32;
+        })
+        .setSrcRect(0, 128, 32, 32);
 
       var self = this;
       this.ftweener
@@ -990,14 +984,6 @@ phina.namespace(function() {
         this.runner.y = this.position.y;
         this.runner.update();
       });
-    },
-
-    setSrcRect: function(x, y, w, h) {
-      this.srcRect.x = x;
-      this.srcRect.y = y;
-      this.srcRect.width = w;
-      this.srcRect.height = h;
-      return this;
     },
 
     hitTestRect: function(_x, _y) {
@@ -1853,6 +1839,14 @@ phina.namespace(function() {
       };
     },
 
+    setSrcRect: function(x, y, w, h) {
+      this.srcRect.x = x;
+      this.srcRect.y = y;
+      this.srcRect.width = w;
+      this.srcRect.height = h;
+      return this;
+    },
+
     _static: {
       staticAlpha: 1.0
     }
@@ -2521,6 +2515,8 @@ phina.namespace(function() {
         case "stage0":
           ps.TextureEdit.outline("enemy_stage0", "red");
 
+          ps.TextureEdit.dark("enemy_stage0");
+
           break;
 
         default:
@@ -3160,6 +3156,10 @@ phina.namespace(function() {
     launchBoss: function(bossClassName) {
       return this.addTask(ps.LaunchBossTask(bossClassName));
     },
+    
+    call: function(func) {
+      return this.addTask(ps.CallFuncTask(func));
+    },
   });
 
   phina.define("ps.StageTask", {
@@ -3291,6 +3291,21 @@ phina.namespace(function() {
     },
 
     execute: function(app, gameScene, stage) {}
+  });
+
+  phina.define("ps.CallFuncTask", {
+    superClass: "ps.StageTask",
+
+    func: null,
+
+    init: function(func) {
+      this.superInit();
+      this.func = func;
+    },
+
+    execute: function(app, gameScene, stage) {
+      this.func();
+    }
   });
 
 });
@@ -3967,6 +3982,40 @@ phina.namespace(function() {
         }
 
         phina.asset.AssetManager.set("image", textureName + "Outline", dst);
+      },
+
+      dark: function(textureName) {
+        var texture = phina.asset.AssetManager.get("image", textureName);
+        if (texture == null) {
+          return;
+        }
+        var w = texture.domElement.width;
+        var h = texture.domElement.height;
+
+        var src = phina.graphics.Canvas().setSize(w, h);
+        src.context.drawImage(texture.domElement, 0, 0);
+
+        var srcData = src.context.getImageData(0, 0, w, h);
+        var data = srcData.data;
+
+        var dst = phina.graphics.Canvas().setSize(w, h);
+        for (var y = 0; y < h; y++) {
+          for (var x = 0; x < w; x++) {
+
+            var index = (y * w + x) * 4;
+            var r = data[index + 0];
+            var g = data[index + 1];
+            var b = data[index + 2];
+            var a = data[index + 3];
+
+            if (a > 0) {
+              dst.fillStyle = "rgba({0},{1},{2},{3})".format(~~(r * 0.6), ~~(g * 0.4), ~~(b * 0.4), a / 255);
+              dst.fillRect(x, y, 1, 1);
+            }
+          }
+        }
+
+        phina.asset.AssetManager.set("image", textureName + "Dark", dst);
       }
     }
   });

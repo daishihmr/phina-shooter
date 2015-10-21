@@ -10,16 +10,13 @@ phina.namespace(function() {
         hp: 2,
       }));
       this.setSrcRect(32, 0, 24, 24);
-      
+
       var propeler = ps.OutlinedSprite("enemy_stage0", 32, 32)
         .addChildTo(this)
         .on("enterframe", function() {
           this.rotation += 20;
-        });
-      propeler.srcRect.x = 0;
-      propeler.srcRect.y = 128;
-      propeler.srcRect.width = 32;
-      propeler.srcRect.height = 32;
+        })
+        .setSrcRect(0, 128, 32, 32);
 
       var self = this;
       this.ftweener
@@ -58,11 +55,8 @@ phina.namespace(function() {
         .addChildTo(this)
         .on("enterframe", function() {
           this.rotation += 20;
-        });
-      propeler.srcRect.x = 0;
-      propeler.srcRect.y = 128;
-      propeler.srcRect.width = 32;
-      propeler.srcRect.height = 32;
+        })
+        .setSrcRect(0, 128, 32, 32);
 
       var self = this;
       this.ftweener

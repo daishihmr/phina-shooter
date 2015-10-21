@@ -25,14 +25,6 @@ phina.namespace(function() {
       });
     },
 
-    setSrcRect: function(x, y, w, h) {
-      this.srcRect.x = x;
-      this.srcRect.y = y;
-      this.srcRect.width = w;
-      this.srcRect.height = h;
-      return this;
-    },
-
     hitTestRect: function(_x, _y) {
       var x = _x - this.position.x;
       var y = _y - this.position.y;
