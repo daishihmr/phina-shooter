@@ -16,12 +16,16 @@ phina.namespace(function() {
       this.$extend(params);
     },
 
-    startAttack: function() {
+    startAttack: function(danmakuName) {
+      if (danmakuName) this.danmakuName = danmakuName;
       this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
       this.on("enterframe", function() {
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
         this.runner.update();
+        this.runner.onNotify = function(eventType, event) {
+          this.flare("bullet" + eventType, event);
+        }.bind(this);
       });
     },
 

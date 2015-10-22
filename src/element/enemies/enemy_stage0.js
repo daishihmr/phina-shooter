@@ -210,12 +210,33 @@ phina.namespace(function() {
         .call(function() {
           self.startAttack();
         })
-        .by({
-          y: GAMEAREA_HEIGHT * 0.3
-        }, 40, "easeOutQuad");
+        .to({
+          y: GAMEAREA_HEIGHT * 0.20
+        }, 60, "easeOutQuad")
+        .call(function() {
+          self.ftweener
+            .clear()
+            .to({
+              x: GAMEAREA_WIDTH * 0.6,
+              y: GAMEAREA_HEIGHT * 0.24,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.5,
+              y: GAMEAREA_HEIGHT * 0.28,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.4,
+              y: GAMEAREA_HEIGHT * 0.24,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.5,
+              y: GAMEAREA_HEIGHT * 0.20,
+            }, 150, "easeInOutQuad")
+            .setLoop(true);
+        });
     },
-    
-    onenterframe: function(e) {
+    onbulletend: function(e) {
+      this.startAttack(e.next);
     }
   });
 

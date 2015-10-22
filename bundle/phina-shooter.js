@@ -447,7 +447,14 @@ phina.namespace(function() {
 
   // 雪城1
   ps.danmaku.yukishiro1 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      wait(120),
+      repeat(5, [
+        fire(R0),
+        wait(30),
+      ]),
+      notify("end", { next: "yukishiro2" }),
+    ]),
   });
   // 雪城2
   ps.danmaku.yukishiro2 = new bulletml.Root({
@@ -1043,12 +1050,33 @@ phina.namespace(function() {
         .call(function() {
           self.startAttack();
         })
-        .by({
-          y: GAMEAREA_HEIGHT * 0.3
-        }, 40, "easeOutQuad");
+        .to({
+          y: GAMEAREA_HEIGHT * 0.20
+        }, 60, "easeOutQuad")
+        .call(function() {
+          self.ftweener
+            .clear()
+            .to({
+              x: GAMEAREA_WIDTH * 0.6,
+              y: GAMEAREA_HEIGHT * 0.24,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.5,
+              y: GAMEAREA_HEIGHT * 0.28,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.4,
+              y: GAMEAREA_HEIGHT * 0.24,
+            }, 150, "easeInOutQuad")
+            .to({
+              x: GAMEAREA_WIDTH * 0.5,
+              y: GAMEAREA_HEIGHT * 0.20,
+            }, 150, "easeInOutQuad")
+            .setLoop(true);
+        });
     },
-    
-    onenterframe: function(e) {
+    onbulletend: function(e) {
+      this.startAttack(e.next);
     }
   });
 
@@ -1074,12 +1102,16 @@ phina.namespace(function() {
       this.$extend(params);
     },
 
-    startAttack: function() {
+    startAttack: function(danmakuName) {
+      if (danmakuName) this.danmakuName = danmakuName;
       this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
       this.on("enterframe", function() {
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
         this.runner.update();
+        this.runner.onNotify = function(eventType, event) {
+          this.flare("bullet" + eventType, event);
+        }.bind(this);
       });
     },
 
@@ -4024,7 +4056,7 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.005,
+      _bgmVolume: 0.0,
       soundVolume: 1.0,
 
       beforeBgm: null,

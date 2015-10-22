@@ -125,7 +125,14 @@ phina.namespace(function() {
 
   // 雪城1
   ps.danmaku.yukishiro1 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      wait(120),
+      repeat(5, [
+        fire(R0),
+        wait(30),
+      ]),
+      notify("end", { next: "yukishiro2" }),
+    ]),
   });
   // 雪城2
   ps.danmaku.yukishiro2 = new bulletml.Root({
