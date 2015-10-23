@@ -14,12 +14,9 @@ phina.namespace(function() {
     init: function(texture, width, height, params) {
       this.superInit(texture, width, height);
       this.$extend(params);
-    },
-
-    startAttack: function(danmakuName) {
-      if (danmakuName) this.danmakuName = danmakuName;
-      this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
       this.on("enterframe", function() {
+        if (this.runner === null) return;
+
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
         this.runner.update();
@@ -27,6 +24,11 @@ phina.namespace(function() {
           this.flare("bullet" + eventType, event);
         }.bind(this);
       });
+    },
+
+    startAttack: function(danmakuName) {
+      if (danmakuName) this.danmakuName = danmakuName;
+      this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
     },
 
     hitTestRect: function(_x, _y) {
@@ -73,9 +75,9 @@ phina.namespace(function() {
     damage: function(power) {
       if (!this.entered) return false;
       this.hp -= power;
-      
+
       this.flare("killed");
-      
+
       return this.hp < 0;
     },
 

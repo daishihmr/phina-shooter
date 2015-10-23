@@ -5,6 +5,9 @@ phina.namespace(function() {
 
     stageId: null,
     gameData: null,
+    
+    stage: null,
+    player: null,
 
     init: function(params) {
       this.superInit({
