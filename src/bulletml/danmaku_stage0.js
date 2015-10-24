@@ -146,15 +146,15 @@ phina.namespace(function() {
     top: action([
       wait(120),
       fire(DM, spd(0.6)),
-      bindVar("dd", 1),
       repeat(3, [
+        bindVar("dd", "$loop.index"),
         fire(R4, spdSeq(0.08), direction(-60)),
         repeat(8, [
           repeat(8, [
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
-          wait(3),
-          fire(R4, spdSeq(0), direction("-120 + $dd", "sequence")),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 + $dd * 2", "sequence")),
         ]),
         wait(30),
         fire(R4, spdSeq(0.08), direction(-60)),
@@ -162,11 +162,10 @@ phina.namespace(function() {
           repeat(8, [
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
-          wait(3),
-          fire(R4, spdSeq(0), direction("-120 - $dd", "sequence")),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 - $dd * 2 + 1", "sequence")),
         ]),
         wait(30),
-        bindVar("dd", "$dd + 2"),
       ]),
       notify("end", {
         next: "yukishiro2"
@@ -200,9 +199,9 @@ phina.namespace(function() {
       interval(60),
       repeat(6, [
         bindVar("p", "$loop.index"),
-        repeat(6, [
-          fire(DM(actionRef("b", 180 - 20, "-($loop.index + $p * 6)")), speed(10), direction(-90, "absolute")),
-          fire(DM(actionRef("b", 180 + 20, "+($loop.index + $p * 6)")), speed(10), direction(+90, "absolute")),
+        repeat(10, [
+          fire(DM(actionRef("b", 180 - 10, "-($loop.index + $p * 6)")), speed(10), direction(-90, "absolute")),
+          fire(DM(actionRef("b", 180 + 10, "+($loop.index + $p * 6)")), speed(10), direction(+90, "absolute")),
           interval(8),
         ]),
         interval(25),
@@ -213,8 +212,9 @@ phina.namespace(function() {
     ]),
     b: action([
       wait(2),
-      fire(R4, spd(0.7), direction("$1 + Math.sin($2 * 0.2) * 40 - 20", "absolute")),
-      fire(R4, spdSeq(0), direction(40, "sequence")),
+      fire(R4, spd(0.7), direction("$1 + Math.sin($2 * 0.35) * 30 - 10", "absolute")),
+      fire(R5, spdSeq(0), direction(10, "sequence")),
+      fire(R4, spdSeq(0), direction(10, "sequence")),
     ]),
   });
 

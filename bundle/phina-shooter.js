@@ -468,15 +468,15 @@ phina.namespace(function() {
     top: action([
       wait(120),
       fire(DM, spd(0.6)),
-      bindVar("dd", 1),
       repeat(3, [
+        bindVar("dd", "$loop.index"),
         fire(R4, spdSeq(0.08), direction(-60)),
         repeat(8, [
           repeat(8, [
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
-          wait(3),
-          fire(R4, spdSeq(0), direction("-120 + $dd", "sequence")),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 + $dd * 2", "sequence")),
         ]),
         wait(30),
         fire(R4, spdSeq(0.08), direction(-60)),
@@ -484,11 +484,10 @@ phina.namespace(function() {
           repeat(8, [
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
-          wait(3),
-          fire(R4, spdSeq(0), direction("-120 - $dd", "sequence")),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 - $dd * 2 + 1", "sequence")),
         ]),
         wait(30),
-        bindVar("dd", "$dd + 2"),
       ]),
       notify("end", {
         next: "yukishiro2"
@@ -522,9 +521,9 @@ phina.namespace(function() {
       interval(60),
       repeat(6, [
         bindVar("p", "$loop.index"),
-        repeat(6, [
-          fire(DM(actionRef("b", 180 - 20, "-($loop.index + $p * 6)")), speed(10), direction(-90, "absolute")),
-          fire(DM(actionRef("b", 180 + 20, "+($loop.index + $p * 6)")), speed(10), direction(+90, "absolute")),
+        repeat(10, [
+          fire(DM(actionRef("b", 180 - 10, "-($loop.index + $p * 6)")), speed(10), direction(-90, "absolute")),
+          fire(DM(actionRef("b", 180 + 10, "+($loop.index + $p * 6)")), speed(10), direction(+90, "absolute")),
           interval(8),
         ]),
         interval(25),
@@ -535,8 +534,9 @@ phina.namespace(function() {
     ]),
     b: action([
       wait(2),
-      fire(R4, spd(0.7), direction("$1 + Math.sin($2 * 0.2) * 40 - 20", "absolute")),
-      fire(R4, spdSeq(0), direction(40, "sequence")),
+      fire(R4, spd(0.7), direction("$1 + Math.sin($2 * 0.35) * 30 - 10", "absolute")),
+      fire(R5, spdSeq(0), direction(10, "sequence")),
+      fire(R4, spdSeq(0), direction(10, "sequence")),
     ]),
   });
 
@@ -857,6 +857,7 @@ phina.namespace(function() {
     superClass: "ps.OutlinedSprite",
 
     runner: null,
+    active: false,
 
     init: function() {
       this.superInit("bullet", 24, 24);
@@ -891,11 +892,41 @@ phina.namespace(function() {
         this.rotation = Math.atan2(this.y - by, this.x - bx) * 180 / Math.PI;
 
         this.age += 1;
+        
+        if (!this.active) {
+          this.frameIndex += 1;
+          if (this.frameIndex <= 0 || 44 < this.frameIndex) {
+            this.remove();
+          }
+        }
       }
+    },
+    
+    spawn: function(runner, spec) {
+      this.x = runner.x;
+      this.y = runner.y;
+      this.runner = runner;
+      this.frameIndex = spec.type || 0;
+      this.visible = !spec.dummy;
+      this.active = true;
+      this.outline.visible = true;
+      return this;
+    },
+    
+    erase: function() {
+      if (!this.visible) {
+        this.remove();
+      }
+      
+      this.active = false;
+      this.frameIndex = 12;
+      this.outline.visible = false;
+      this.runner.fireable = false;
+      return this;
     },
 
     hitTest: function(_x, _y) {
-      if (!this.visible || !this.parent) return false;
+      if (!this.visible || !this.active || !this.parent) return false;
 
       var x = _x - this.x;
       var y = _y - this.y;
@@ -1115,7 +1146,8 @@ phina.namespace(function() {
         boundingWidth: 190,
         boundingHeight: 60,
         danmakuName: "yukishiro1",
-        hp: 300,
+        // hp: 300,
+        hp: 3,
       }));
       this.setSrcRect(128, 0, 192, 96);
 
@@ -1152,6 +1184,10 @@ phina.namespace(function() {
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
+    },
+    onkilled: function() {
+      var gameScene = this.parent.parent;
+      gameScene.bulletLayer.eraseAll();
     }
   });
 
@@ -1282,12 +1318,14 @@ phina.namespace(function() {
     },
 
     damage: function(power) {
+      if (this.hp <= 0) return false;
+      
       if (!this.entered) return false;
       this.hp -= power;
 
-      this.flare("killed");
+      if (this.hp <= 0) this.flare("killed");
 
-      return this.hp < 0;
+      return this.hp <= 0;
     },
 
   });
@@ -1799,12 +1837,18 @@ phina.namespace(function() {
       var bullet = this.pool.shift();
       if (!bullet) return;
       
-      bullet.x = runner.x;
-      bullet.y = runner.y;
-      bullet.runner = runner;
-      bullet.frameIndex = spec.type || 0;
-      bullet.visible = !spec.dummy;
+      bullet.spawn(runner, spec);
       bullet.addChildTo(this);
+    },
+    
+    eraseAll: function() {
+      console.log ("eraseAll");
+      var bs = this.children;
+      var b;
+      for (var i = 0, len = bs.length; i < len; i++) {
+        b = bs[i];
+        b.erase();
+      }
     },
 
     update: function() {

@@ -200,7 +200,8 @@ phina.namespace(function() {
         boundingWidth: 190,
         boundingHeight: 60,
         danmakuName: "yukishiro1",
-        hp: 300,
+        // hp: 300,
+        hp: 3,
       }));
       this.setSrcRect(128, 0, 192, 96);
 
@@ -237,6 +238,10 @@ phina.namespace(function() {
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
+    },
+    onkilled: function() {
+      var gameScene = this.parent.parent;
+      gameScene.bulletLayer.eraseAll();
     }
   });
 

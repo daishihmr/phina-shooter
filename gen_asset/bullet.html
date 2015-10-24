@@ -6,15 +6,11 @@
 </head>
 
 <body>
-  <div class='runstant'>
-    <iframe src='http://lite.runstant.com/lazy?v=1&link=http://goo.gl/nMCePF' width='600px' height='600px'></iframe>
-  </div>
-
   <script src="https://cdn.rawgit.com/phi-jp/tmlib.js/develop/build/tmlib.js"></script>
   <script>
   var sz = 24;
   var H = 16;
-  var V = 2;
+  var V = 4;
 
   tm.main(function() {
     tm.globalize();
@@ -284,73 +280,19 @@
       );
     });
   });
-
-  _(function(canvas) {
-    var radius = 2 + 1;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.12,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
+  
+  (32).times(function(i) {
+    _(function(canvas) {
+      var radius = 2 + 1.0 + i * 0.25;
+      (80).times(function() {
+        var angle = Math.randf(0, Math.PI * 2);
+        drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * (0.050 - i * 0.001),
+          "hsla(10, 100%, 50%, 0.1)",
+          "hsla(10, 50%, 50%, 0.1)"
+        );
+      });
     });
   });
-
-  _(function(canvas) {
-    var radius = 2 + 2;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.10,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
-    });
-  });
-
-  _(function(canvas) {
-    var radius = 2 + 3;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.08,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
-    });
-  });
-
-  _(function(canvas) {
-    var radius = 2 + 4;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.06,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
-    });
-  });
-
-  _(function(canvas) {
-    var radius = 2 + 5;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.04,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
-    });
-  });
-
-  _(function(canvas) {
-    var radius = 2 + 6;
-    (80).times(function() {
-      var angle = Math.randf(0, Math.PI * 2);
-      drawParticle(canvas, sz * 0.5 + Math.cos(angle) * radius, sz * 0.5 + Math.sin(angle) * radius, sz * 0.02,
-        "hsla(10, 100%, 50%, 0.1)",
-        "hsla(10, 50%, 50%, 0.1)"
-      );
-    });
-  });
-
   </script>
 </body>
 

@@ -73,12 +73,14 @@ phina.namespace(function() {
     },
 
     damage: function(power) {
+      if (this.hp <= 0) return false;
+      
       if (!this.entered) return false;
       this.hp -= power;
 
-      this.flare("killed");
+      if (this.hp <= 0) this.flare("killed");
 
-      return this.hp < 0;
+      return this.hp <= 0;
     },
 
   });

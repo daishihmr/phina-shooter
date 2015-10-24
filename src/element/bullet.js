@@ -4,6 +4,7 @@ phina.namespace(function() {
     superClass: "ps.OutlinedSprite",
 
     runner: null,
+    active: false,
 
     init: function() {
       this.superInit("bullet", 24, 24);
@@ -38,11 +39,41 @@ phina.namespace(function() {
         this.rotation = Math.atan2(this.y - by, this.x - bx) * 180 / Math.PI;
 
         this.age += 1;
+        
+        if (!this.active) {
+          this.frameIndex += 1;
+          if (this.frameIndex <= 0 || 44 < this.frameIndex) {
+            this.remove();
+          }
+        }
       }
+    },
+    
+    spawn: function(runner, spec) {
+      this.x = runner.x;
+      this.y = runner.y;
+      this.runner = runner;
+      this.frameIndex = spec.type || 0;
+      this.visible = !spec.dummy;
+      this.active = true;
+      this.outline.visible = true;
+      return this;
+    },
+    
+    erase: function() {
+      if (!this.visible) {
+        this.remove();
+      }
+      
+      this.active = false;
+      this.frameIndex = 12;
+      this.outline.visible = false;
+      this.runner.fireable = false;
+      return this;
     },
 
     hitTest: function(_x, _y) {
-      if (!this.visible || !this.parent) return false;
+      if (!this.visible || !this.active || !this.parent) return false;
 
       var x = _x - this.x;
       var y = _y - this.y;
