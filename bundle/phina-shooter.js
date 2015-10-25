@@ -1843,7 +1843,7 @@ phina.namespace(function() {
     
     eraseAll: function() {
       console.log ("eraseAll");
-      var bs = this.children;
+      var bs = this.children.slice();
       var b;
       for (var i = 0, len = bs.length; i < len; i++) {
         b = bs[i];
