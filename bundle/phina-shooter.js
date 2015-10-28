@@ -542,31 +542,59 @@ phina.namespace(function() {
 
   // 美墨1-1
   ps.danmaku.misumi11 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi12",
+      }),
+    ]),
   });
   // 美墨1-2
   ps.danmaku.misumi12 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi13",
+      }),
+    ]),
   });
   // 美墨1-3
   ps.danmaku.misumi13 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi11",
+      }),
+    ]),
   });
   // 美墨2-1
   ps.danmaku.misumi21 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi22",
+      }),
+    ]),
   });
   // 美墨2-2
   ps.danmaku.misumi22 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi23",
+      }),
+    ]),
   });
   // 美墨2-3
   ps.danmaku.misumi23 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi21",
+      }),
+    ]),
   });
   // 美墨3-1
   ps.danmaku.misumi31 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi31",
+      }),
+    ]),
   });
 
 });
@@ -1162,8 +1190,8 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
-          self.startAttack();
           self.activate();
+          self.startAttack();
         })
         .to({
           y: GAMEAREA_HEIGHT * 0.20
@@ -1198,12 +1226,14 @@ phina.namespace(function() {
   phina.define("ps.Misumi1", {
     superClass: "ps.Enemy",
     init: function(params) {
+      var MAX_HP = 600;
       this.superInit("enemy_stage0", 192, 96, params.$safe({
         boundingType: "rect",
         boundingWidth: 190,
         boundingHeight: 60,
-        danmakuName: "yukishiro1",
-        hp: 600,
+        danmakuName: "misumi11",
+        hp: MAX_HP,
+        eraseBullet: true,
       }));
       this.setSrcRect(128, 96, 192, 96);
 
@@ -1211,6 +1241,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .to({
@@ -1237,10 +1268,22 @@ phina.namespace(function() {
             }, 150, "easeInOutQuad")
             .setLoop(true);
         });
+
+      this.on("damaged", function(e) {
+        if (e.after <= MAX_HP * 0.6 && MAX_HP * 0.6 < e.before) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+          this.startAttack("misumi21");
+        } else if (e.after <= MAX_HP * 0.2 && MAX_HP * 0.2 < e.before) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+          this.startAttack("misumi31");
+        }
+      });
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
-    }
+    },
   });
 
   var U45 = Math.PI * 2 / 8;
@@ -1257,7 +1300,7 @@ phina.namespace(function() {
 
     danmakuName: null,
     runner: null,
-    
+
     eraseBullet: false,
 
     _active: false,
@@ -1278,7 +1321,7 @@ phina.namespace(function() {
         }.bind(this);
       });
     },
-    
+
     activate: function() {
       this._active = true;
       this.outline.visible = true;
@@ -1338,15 +1381,24 @@ phina.namespace(function() {
 
     damage: function(power) {
       if (this.hp <= 0) return false;
-      
+
       if (!this.entered) return false;
+
+      var before = this.hp;
       this.hp -= power;
 
-      if (this.hp <= 0) this.flare("killed");
+      if (this.hp <= 0) {
+        this.flare("killed");
+      } else {
+        this.flare("damaged", {
+          before: before,
+          after: this.hp,
+        });
+      }
 
       return this.hp <= 0;
     },
-    
+
     onkilled: function() {
       if (this.eraseBullet) {
         var gameScene = this.parent.parent;
@@ -1670,6 +1722,8 @@ phina.namespace(function() {
 
   phina.define("ps.BackgroundLayer", {
     superClass: "phina.display.Layer",
+
+    _cameraOffsetX: 0,
 
     renderChildBySelf: true,
     skip: false,
@@ -2040,14 +2094,23 @@ phina.namespace(function() {
         children: {
           backgroundLayer: {
             className: params.stage.backgroundClassName,
+            // onenterframe: function() {
+            //   this.cameraOffsetX = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           scoreItemLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           deadEnemyLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           effectLayer0: {
@@ -2056,6 +2119,9 @@ phina.namespace(function() {
 
           enemyLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           shotLayer: {
@@ -2098,6 +2164,9 @@ phina.namespace(function() {
 
           bulletLayer: {
             className: "ps.BulletLayer",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           playerMarker: {
@@ -2509,6 +2578,7 @@ phina.namespace(function() {
       this.visible = true;
       this.roll = 0;
       this.frameIndex = 4;
+      this.trigger = 0;
       this.parts.forEach(function(part) {
         part.visible = true;
       });
@@ -2973,6 +3043,9 @@ phina.namespace(function() {
     _hitTestShotVsEnemy: function() {
       var enemies = this.mainLayer.enemyLayer.children;
       var shots = this.mainLayer.shotLayer.children;
+      
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
 
       var es = enemies.slice();
       var ss = shots.slice();
@@ -2982,7 +3055,7 @@ phina.namespace(function() {
         for (var ei = 0, elen = es.length; ei < elen; ei++) {
           var e = es[ei];
           if (!e._active) continue;
-          if (e.hitTest(s.x, s.y)) {
+          if (e.hitTest(s.x + offsetX, s.y)) {
             if (e.damage(s.power)) {
               this.kill(e);
             }
@@ -3003,10 +3076,13 @@ phina.namespace(function() {
 
       if (player.muteki) return;
 
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
+
       var bs = bullets.slice();
       for (var bi = 0, blen = bs.length; bi < blen; bi++) {
         var b = bs[bi];
-        if (b.hitTest(player.x, player.y)) {
+        if (b.hitTest(player.x - offsetX, player.y)) {
           this.flare("miss");
           console.log("miss by bullet");
           return;
@@ -3018,12 +3094,15 @@ phina.namespace(function() {
       var player = this.player;
 
       if (player.muteki) return;
+      
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
 
       var es = enemies.slice();
       for (var ei = 0, elen = es.length; ei < elen; ei++) {
         var e = es[ei];
         if (!e._active) continue;
-        if (e.hitTest(player.x, player.y)) {
+        if (e.hitTest(player.x + offsetX, player.y)) {
           this.flare("miss");
           console.log("miss by enemy");
           return;
@@ -3535,7 +3614,20 @@ phina.namespace(function() {
           });
         });
       });
-    }
+    },
+    
+    _accessor: {
+      cameraOffsetX: {
+        get: function() {
+          return this._cameraOffsetX;
+        },
+        set: function(v) {
+          this._cameraOffsetX = v;
+          this.camera.x = 2 + this._cameraOffsetX * -0.1;
+          this.camera.targetX = this._cameraOffsetX * -0.1;
+        },
+      },
+    },
   });
 
 });

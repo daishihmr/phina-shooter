@@ -17,14 +17,23 @@ phina.namespace(function() {
         children: {
           backgroundLayer: {
             className: params.stage.backgroundClassName,
+            // onenterframe: function() {
+            //   this.cameraOffsetX = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           scoreItemLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           deadEnemyLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           effectLayer0: {
@@ -33,6 +42,9 @@ phina.namespace(function() {
 
           enemyLayer: {
             className: "phina.display.CanvasElement",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           shotLayer: {
@@ -75,6 +87,9 @@ phina.namespace(function() {
 
           bulletLayer: {
             className: "ps.BulletLayer",
+            // onenterframe: function() {
+            //   this.x = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
+            // },
           },
 
           playerMarker: {

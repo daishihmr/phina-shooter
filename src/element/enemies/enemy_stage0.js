@@ -216,8 +216,8 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
-          self.startAttack();
           self.activate();
+          self.startAttack();
         })
         .to({
           y: GAMEAREA_HEIGHT * 0.20
@@ -252,12 +252,14 @@ phina.namespace(function() {
   phina.define("ps.Misumi1", {
     superClass: "ps.Enemy",
     init: function(params) {
+      var MAX_HP = 600;
       this.superInit("enemy_stage0", 192, 96, params.$safe({
         boundingType: "rect",
         boundingWidth: 190,
         boundingHeight: 60,
-        danmakuName: "yukishiro1",
-        hp: 600,
+        danmakuName: "misumi11",
+        hp: MAX_HP,
+        eraseBullet: true,
       }));
       this.setSrcRect(128, 96, 192, 96);
 
@@ -265,6 +267,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .to({
@@ -291,10 +294,22 @@ phina.namespace(function() {
             }, 150, "easeInOutQuad")
             .setLoop(true);
         });
+
+      this.on("damaged", function(e) {
+        if (e.after <= MAX_HP * 0.6 && MAX_HP * 0.6 < e.before) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+          this.startAttack("misumi21");
+        } else if (e.after <= MAX_HP * 0.2 && MAX_HP * 0.2 < e.before) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+          this.startAttack("misumi31");
+        }
+      });
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
-    }
+    },
   });
 
   var U45 = Math.PI * 2 / 8;

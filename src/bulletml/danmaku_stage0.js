@@ -220,31 +220,59 @@ phina.namespace(function() {
 
   // 美墨1-1
   ps.danmaku.misumi11 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi12",
+      }),
+    ]),
   });
   // 美墨1-2
   ps.danmaku.misumi12 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi13",
+      }),
+    ]),
   });
   // 美墨1-3
   ps.danmaku.misumi13 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi11",
+      }),
+    ]),
   });
   // 美墨2-1
   ps.danmaku.misumi21 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi22",
+      }),
+    ]),
   });
   // 美墨2-2
   ps.danmaku.misumi22 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi23",
+      }),
+    ]),
   });
   // 美墨2-3
   ps.danmaku.misumi23 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi21",
+      }),
+    ]),
   });
   // 美墨3-1
   ps.danmaku.misumi31 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi31",
+      }),
+    ]),
   });
 
 });

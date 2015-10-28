@@ -8,7 +8,7 @@ phina.namespace(function() {
 
     danmakuName: null,
     runner: null,
-    
+
     eraseBullet: false,
 
     _active: false,
@@ -29,7 +29,7 @@ phina.namespace(function() {
         }.bind(this);
       });
     },
-    
+
     activate: function() {
       this._active = true;
       this.outline.visible = true;
@@ -89,15 +89,24 @@ phina.namespace(function() {
 
     damage: function(power) {
       if (this.hp <= 0) return false;
-      
+
       if (!this.entered) return false;
+
+      var before = this.hp;
       this.hp -= power;
 
-      if (this.hp <= 0) this.flare("killed");
+      if (this.hp <= 0) {
+        this.flare("killed");
+      } else {
+        this.flare("damaged", {
+          before: before,
+          after: this.hp,
+        });
+      }
 
       return this.hp <= 0;
     },
-    
+
     onkilled: function() {
       if (this.eraseBullet) {
         var gameScene = this.parent.parent;

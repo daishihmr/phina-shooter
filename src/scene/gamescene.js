@@ -75,6 +75,9 @@ phina.namespace(function() {
     _hitTestShotVsEnemy: function() {
       var enemies = this.mainLayer.enemyLayer.children;
       var shots = this.mainLayer.shotLayer.children;
+      
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
 
       var es = enemies.slice();
       var ss = shots.slice();
@@ -84,7 +87,7 @@ phina.namespace(function() {
         for (var ei = 0, elen = es.length; ei < elen; ei++) {
           var e = es[ei];
           if (!e._active) continue;
-          if (e.hitTest(s.x, s.y)) {
+          if (e.hitTest(s.x + offsetX, s.y)) {
             if (e.damage(s.power)) {
               this.kill(e);
             }
@@ -105,10 +108,13 @@ phina.namespace(function() {
 
       if (player.muteki) return;
 
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
+
       var bs = bullets.slice();
       for (var bi = 0, blen = bs.length; bi < blen; bi++) {
         var b = bs[bi];
-        if (b.hitTest(player.x, player.y)) {
+        if (b.hitTest(player.x - offsetX, player.y)) {
           this.flare("miss");
           console.log("miss by bullet");
           return;
@@ -120,12 +126,15 @@ phina.namespace(function() {
       var player = this.player;
 
       if (player.muteki) return;
+      
+      // var offsetX = (GAMEAREA_WIDTH * 0.5 - this.player.x) * 0.2;
+      var offsetX = 0;
 
       var es = enemies.slice();
       for (var ei = 0, elen = es.length; ei < elen; ei++) {
         var e = es[ei];
         if (!e._active) continue;
-        if (e.hitTest(player.x, player.y)) {
+        if (e.hitTest(player.x + offsetX, player.y)) {
           this.flare("miss");
           console.log("miss by enemy");
           return;

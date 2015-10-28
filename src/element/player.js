@@ -100,6 +100,7 @@ phina.namespace(function() {
       this.visible = true;
       this.roll = 0;
       this.frameIndex = 4;
+      this.trigger = 0;
       this.parts.forEach(function(part) {
         part.visible = true;
       });

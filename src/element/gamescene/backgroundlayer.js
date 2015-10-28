@@ -3,6 +3,8 @@ phina.namespace(function() {
   phina.define("ps.BackgroundLayer", {
     superClass: "phina.display.Layer",
 
+    _cameraOffsetX: 0,
+
     renderChildBySelf: true,
     skip: false,
 
