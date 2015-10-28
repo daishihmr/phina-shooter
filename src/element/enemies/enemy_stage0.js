@@ -22,6 +22,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -64,6 +65,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -95,6 +97,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -121,6 +124,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -152,6 +156,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -180,6 +185,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -202,6 +208,7 @@ phina.namespace(function() {
         danmakuName: "yukishiro1",
         // hp: 300,
         hp: 3,
+        eraseBullet: true,
       }));
       this.setSrcRect(128, 0, 192, 96);
 
@@ -210,6 +217,7 @@ phina.namespace(function() {
         .wait(params.wait)
         .call(function() {
           self.startAttack();
+          self.activate();
         })
         .to({
           y: GAMEAREA_HEIGHT * 0.20
@@ -239,10 +247,6 @@ phina.namespace(function() {
     onbulletend: function(e) {
       this.startAttack(e.next);
     },
-    onkilled: function() {
-      var gameScene = this.parent.parent;
-      gameScene.bulletLayer.eraseAll();
-    }
   });
 
   phina.define("ps.Misumi1", {

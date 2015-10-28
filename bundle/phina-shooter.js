@@ -476,7 +476,7 @@ phina.namespace(function() {
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
           wait(5),
-          fire(R4, spdSeq(0), direction("-120 + $dd * 2", "sequence")),
+          fire(R4, spdSeq(0), direction("-120 + $dd * 1.4", "sequence")),
         ]),
         wait(30),
         fire(R4, spdSeq(0.08), direction(-60)),
@@ -485,7 +485,7 @@ phina.namespace(function() {
             fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
           ]),
           wait(5),
-          fire(R4, spdSeq(0), direction("-120 - $dd * 2 + 1", "sequence")),
+          fire(R4, spdSeq(0), direction("-120 - ($dd + 1) * 1.4", "sequence")),
         ]),
         wait(30),
       ]),
@@ -968,6 +968,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -1010,6 +1011,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -1041,6 +1043,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -1067,6 +1070,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         });
     },
@@ -1098,6 +1102,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -1126,6 +1131,7 @@ phina.namespace(function() {
       this.ftweener
         .wait(params.wait)
         .call(function() {
+          self.activate();
           self.startAttack();
         })
         .by({
@@ -1148,6 +1154,7 @@ phina.namespace(function() {
         danmakuName: "yukishiro1",
         // hp: 300,
         hp: 3,
+        eraseBullet: true,
       }));
       this.setSrcRect(128, 0, 192, 96);
 
@@ -1156,6 +1163,7 @@ phina.namespace(function() {
         .wait(params.wait)
         .call(function() {
           self.startAttack();
+          self.activate();
         })
         .to({
           y: GAMEAREA_HEIGHT * 0.20
@@ -1185,10 +1193,6 @@ phina.namespace(function() {
     onbulletend: function(e) {
       this.startAttack(e.next);
     },
-    onkilled: function() {
-      var gameScene = this.parent.parent;
-      gameScene.bulletLayer.eraseAll();
-    }
   });
 
   phina.define("ps.Misumi1", {
@@ -1253,7 +1257,10 @@ phina.namespace(function() {
 
     danmakuName: null,
     runner: null,
+    
+    eraseBullet: false,
 
+    _active: false,
     entered: false,
 
     init: function(texture, width, height, params) {
@@ -1261,6 +1268,7 @@ phina.namespace(function() {
       this.$extend(params);
       this.on("enterframe", function() {
         if (this.runner === null) return;
+        if (!this._active) return;
 
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
@@ -1269,6 +1277,17 @@ phina.namespace(function() {
           this.flare("bullet" + eventType, event);
         }.bind(this);
       });
+    },
+    
+    activate: function() {
+      this._active = true;
+      this.outline.visible = true;
+      return this;
+    },
+    unactivate: function() {
+      this._active = false;
+      this.outline.visible = false;
+      return this;
     },
 
     startAttack: function(danmakuName) {
@@ -1327,6 +1346,16 @@ phina.namespace(function() {
 
       return this.hp <= 0;
     },
+    
+    onkilled: function() {
+      if (this.eraseBullet) {
+        var gameScene = this.parent.parent;
+        gameScene.bulletLayer.eraseAll();
+      }
+      this.unactivate();
+      this.runner = null;
+      this.remove();
+    },
 
   });
 
@@ -1338,6 +1367,8 @@ phina.namespace(function() {
     init: function() {},
     _static: {
       formation: {
+
+        // basic
 
         "basic0": [{
           x: GAMEAREA_WIDTH * -0.1,
@@ -1404,6 +1435,120 @@ phina.namespace(function() {
           y: GAMEAREA_HEIGHT * -0.1,
           wait: 20,
         }, ],
+
+        // wide
+
+        "wide0": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide1": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 30,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, ],
+
+        "wide2": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 30,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide3": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 60,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide4": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 60,
+        }, ],
+
+        // line
 
         "line4": [{
           x: 40 * -0,
@@ -2277,6 +2422,7 @@ phina.namespace(function() {
     shotLayer: null,
 
     trigger: 0,
+    shotPower: 0,
     fireFrame: 0,
 
     parts: null,
@@ -2333,6 +2479,7 @@ phina.namespace(function() {
       position.y = Math.clamp(position.y, 4, GAMEAREA_HEIGHT - 4);
 
       if (keyboard.getKeyDown("shot") || gamepad.getKeyDown("shot")) {
+        this.shotPower = this.trigger - 14;
         this.trigger = 14;
       } else {
         this.trigger -= 1;
@@ -2345,10 +2492,10 @@ phina.namespace(function() {
       if (0 < this.trigger && frame % 4 === 0) {
         var xv = Math.sin(this.fireFrame * 0.6) * 8;
         var dv = Math.sin(this.fireFrame * 1.0) * 8;
-        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90, 1.0);
-        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90, 1.0);
-        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv, 0.5);
-        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv, 0.5);
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90, 1.0 + Math.max(0, this.shotPower / 14));
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90, 1.0 + Math.max(0, this.shotPower / 14));
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv, 0.5 + Math.max(0, this.shotPower / 14 / 2));
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv, 0.5 + Math.max(0, this.shotPower / 14 / 2));
         this.fireFrame += 1;
       }
     },
@@ -2596,6 +2743,7 @@ phina.namespace(function() {
     bomb: 3,
     psyche: Math.randint(0, 100000000000),
     highScore: Math.randint(0, 100000000000),
+    rank: 0,
 
     /**
      * "normal" or "every"
@@ -2632,12 +2780,14 @@ phina.namespace(function() {
       var after = this.score + v;
 
       if (this.extendMode === "normal") {
-        this.extendScore.forEach(function(es) {
+        for (var i = 0, len = this.extendScore.length; i < len; i++) {
+          var es = this.extendScore[i];
           if (before < es && es <= after) {
             self.zanki += 1;
             self.flare("extend");
+            break;
           }
-        });
+        }
       } else if (this.extendMode === "every") {
         var es = this.extendScore[0];
         if (Math.floor(before / es) < Math.floor(after / es)) {
@@ -2652,15 +2802,15 @@ phina.namespace(function() {
     bind: function(propertyName, view) {
       this._binder[propertyName] = view;
     },
-    
+
     onbomb: function() {
       this.bomb -= 1;
     },
 
     onkill: function(e) {
-      
+
     },
-    
+
     onmiss: function() {
       this.zanki -= 1;
     },
@@ -2831,11 +2981,10 @@ phina.namespace(function() {
         var s = ss[si];
         for (var ei = 0, elen = es.length; ei < elen; ei++) {
           var e = es[ei];
+          if (!e._active) continue;
           if (e.hitTest(s.x, s.y)) {
             if (e.damage(s.power)) {
-              this.flare("kill", {
-                enemy: e
-              });
+              this.kill(e);
             }
             s.remove();
             break;
@@ -2873,6 +3022,7 @@ phina.namespace(function() {
       var es = enemies.slice();
       for (var ei = 0, elen = es.length; ei < elen; ei++) {
         var e = es[ei];
+        if (!e._active) continue;
         if (e.hitTest(player.x, player.y)) {
           this.flare("miss");
           console.log("miss by enemy");
@@ -2885,9 +3035,7 @@ phina.namespace(function() {
       this.mainLayer.enemyLayer.addChild(enemy);
     },
 
-    onkill: function(e) {
-      var enemy = e.enemy;
-      enemy.remove();
+    kill: function(enemy) {
       this.gameData.flare("kill", {
         enemy: enemy
       });
@@ -3577,7 +3725,7 @@ phina.namespace(function() {
     sequencer: null,
     random: null,
 
-    block: false,
+    lock: false,
 
     init: function() {
       this.superInit();
@@ -3588,12 +3736,7 @@ phina.namespace(function() {
     update: function(app) {
       var frame = app.ticker.frame;
       while (this.sequencer.hasNext() && this.waitFor <= frame) {
-        var task = this.sequencer.next();
-        if (task) {
-          if (!((task instanceof ps.LaunchEnemyTask || task instanceof ps.LaunchEnemyUnitTask) && this.block)) {
-            task.execute(app, app.currentScene, this);
-          }
-        }
+        this.sequencer.next().execute(app, app.currentScene, this);
       }
     },
 
@@ -3602,19 +3745,22 @@ phina.namespace(function() {
         switch (stageId) {
           case 0:
             return ps.Stage0();
+            // TODO
         }
       }
     }
   });
 
   phina.define("ps.StageSequancer", {
+    
+    cur: 0,
 
     init: function() {
       this.seq = [];
     },
 
     hasNext: function() {
-      return this.seq.length > 0;
+      return this.cur < this.seq.length;
     },
 
     addTask: function(task) {
@@ -3623,11 +3769,30 @@ phina.namespace(function() {
     },
 
     next: function() {
-      return this.seq.shift();
+      var task = this.seq[this.cur];
+      this.cur += 1;
+      return task;
     },
 
     wait: function(frame) {
       return this.addTask(ps.WaitTask(frame));
+    },
+    
+    repeatStart: function(time) {
+      var self = this;
+      return this.addTask(ps.CallFuncTask(function() {
+        self.backCur = self.cur;
+        self.time = time;
+      }));
+    },
+    repeatEnd: function() {
+      var self = this;
+      return this.addTask(ps.CallFuncTask(function() {
+        self.time -= 1;
+        if (0 < self.time) {
+          self.cur = self.backCur;
+        }
+      }));
     },
 
     startBgm: function(bgmData) {
@@ -3653,10 +3818,16 @@ phina.namespace(function() {
     launchBoss: function(bossClassName) {
       return this.addTask(ps.LaunchBossTask(bossClassName));
     },
-    
+
     call: function(func) {
       return this.addTask(ps.CallFuncTask(func));
     },
+
+    unlock: function() {
+      return this.addTask(ps.CallFuncTask(function(app, scene, stage) {
+        stage.lock = false;
+      }));
+    }
   });
 
   phina.define("ps.StageTask", {
@@ -3728,18 +3899,28 @@ phina.namespace(function() {
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        blockFlag: false,
+        lock: false,
         wait: 0,
       });
     },
 
     execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
       var EnemyClazz = phina.using(this.enemyClassName);
       var params = this.params;
       var enemy = EnemyClazz(params);
       gameScene.launchEnemy(enemy);
 
-      stage.block = this.params.blockFlag;
+      stage.lock = this.params.lock;
+      if (this.params.lock) {
+        enemy.on("killed", function() {
+          stage.lock = false;
+        });
+        enemy.on("removed", function() {
+          stage.lock = false;
+        });
+      }
     }
   });
 
@@ -3755,13 +3936,15 @@ phina.namespace(function() {
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        blockFlag: false,
+        lock: false,
         formation: "basic0",
         wait: 0,
       });
     },
 
     execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
       var EnemyClazz = phina.using(this.enemyClassName);
       var params = this.params;
       var enemy = null;
@@ -3801,7 +3984,7 @@ phina.namespace(function() {
     },
 
     execute: function(app, gameScene, stage) {
-      this.func();
+      this.func(app, gameScene, stage);
     }
   });
 
@@ -3824,15 +4007,28 @@ phina.namespace(function() {
         return GAMEAREA_HEIGHT * v * 0.1;
       };
 
-      this.sequencer
-        .startBgm()
-        //
-        .wait(250)
+      this.sequencer.startBgm()
+
+      .wait(250)
         .launchEnemy("ps.Yukishiro1", {
           x: x(+5),
           y: y(-1),
+          lock: true,
         })
-        //
+
+      .wait(200)
+
+      .repeatStart(60)
+
+      .wait(80)
+        .launchEnemyUnit("ps.Kiryu1", {
+          x: x(5),
+          y: y(-0.5),
+          formation: "wide1",
+        })
+
+      .repeatEnd()
+
       ;
     }
 

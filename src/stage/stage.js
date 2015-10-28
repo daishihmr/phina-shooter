@@ -7,7 +7,7 @@ phina.namespace(function() {
     sequencer: null,
     random: null,
 
-    block: false,
+    lock: false,
 
     init: function() {
       this.superInit();
@@ -18,12 +18,7 @@ phina.namespace(function() {
     update: function(app) {
       var frame = app.ticker.frame;
       while (this.sequencer.hasNext() && this.waitFor <= frame) {
-        var task = this.sequencer.next();
-        if (task) {
-          if (!((task instanceof ps.LaunchEnemyTask || task instanceof ps.LaunchEnemyUnitTask) && this.block)) {
-            task.execute(app, app.currentScene, this);
-          }
-        }
+        this.sequencer.next().execute(app, app.currentScene, this);
       }
     },
 
@@ -32,19 +27,22 @@ phina.namespace(function() {
         switch (stageId) {
           case 0:
             return ps.Stage0();
+            // TODO
         }
       }
     }
   });
 
   phina.define("ps.StageSequancer", {
+    
+    cur: 0,
 
     init: function() {
       this.seq = [];
     },
 
     hasNext: function() {
-      return this.seq.length > 0;
+      return this.cur < this.seq.length;
     },
 
     addTask: function(task) {
@@ -53,11 +51,30 @@ phina.namespace(function() {
     },
 
     next: function() {
-      return this.seq.shift();
+      var task = this.seq[this.cur];
+      this.cur += 1;
+      return task;
     },
 
     wait: function(frame) {
       return this.addTask(ps.WaitTask(frame));
+    },
+    
+    repeatStart: function(time) {
+      var self = this;
+      return this.addTask(ps.CallFuncTask(function() {
+        self.backCur = self.cur;
+        self.time = time;
+      }));
+    },
+    repeatEnd: function() {
+      var self = this;
+      return this.addTask(ps.CallFuncTask(function() {
+        self.time -= 1;
+        if (0 < self.time) {
+          self.cur = self.backCur;
+        }
+      }));
     },
 
     startBgm: function(bgmData) {
@@ -83,10 +100,16 @@ phina.namespace(function() {
     launchBoss: function(bossClassName) {
       return this.addTask(ps.LaunchBossTask(bossClassName));
     },
-    
+
     call: function(func) {
       return this.addTask(ps.CallFuncTask(func));
     },
+
+    unlock: function() {
+      return this.addTask(ps.CallFuncTask(function(app, scene, stage) {
+        stage.lock = false;
+      }));
+    }
   });
 
   phina.define("ps.StageTask", {
@@ -158,18 +181,28 @@ phina.namespace(function() {
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        blockFlag: false,
+        lock: false,
         wait: 0,
       });
     },
 
     execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
       var EnemyClazz = phina.using(this.enemyClassName);
       var params = this.params;
       var enemy = EnemyClazz(params);
       gameScene.launchEnemy(enemy);
 
-      stage.block = this.params.blockFlag;
+      stage.lock = this.params.lock;
+      if (this.params.lock) {
+        enemy.on("killed", function() {
+          stage.lock = false;
+        });
+        enemy.on("removed", function() {
+          stage.lock = false;
+        });
+      }
     }
   });
 
@@ -185,13 +218,15 @@ phina.namespace(function() {
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        blockFlag: false,
+        lock: false,
         formation: "basic0",
         wait: 0,
       });
     },
 
     execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
       var EnemyClazz = phina.using(this.enemyClassName);
       var params = this.params;
       var enemy = null;
@@ -231,7 +266,7 @@ phina.namespace(function() {
     },
 
     execute: function(app, gameScene, stage) {
-      this.func();
+      this.func(app, gameScene, stage);
     }
   });
 

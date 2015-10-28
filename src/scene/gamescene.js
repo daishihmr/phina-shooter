@@ -83,11 +83,10 @@ phina.namespace(function() {
         var s = ss[si];
         for (var ei = 0, elen = es.length; ei < elen; ei++) {
           var e = es[ei];
+          if (!e._active) continue;
           if (e.hitTest(s.x, s.y)) {
             if (e.damage(s.power)) {
-              this.flare("kill", {
-                enemy: e
-              });
+              this.kill(e);
             }
             s.remove();
             break;
@@ -125,6 +124,7 @@ phina.namespace(function() {
       var es = enemies.slice();
       for (var ei = 0, elen = es.length; ei < elen; ei++) {
         var e = es[ei];
+        if (!e._active) continue;
         if (e.hitTest(player.x, player.y)) {
           this.flare("miss");
           console.log("miss by enemy");
@@ -137,9 +137,7 @@ phina.namespace(function() {
       this.mainLayer.enemyLayer.addChild(enemy);
     },
 
-    onkill: function(e) {
-      var enemy = e.enemy;
-      enemy.remove();
+    kill: function(enemy) {
       this.gameData.flare("kill", {
         enemy: enemy
       });

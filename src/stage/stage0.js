@@ -15,15 +15,28 @@ phina.namespace(function() {
         return GAMEAREA_HEIGHT * v * 0.1;
       };
 
-      this.sequencer
-        .startBgm()
-        //
-        .wait(250)
+      this.sequencer.startBgm()
+
+      .wait(250)
         .launchEnemy("ps.Yukishiro1", {
           x: x(+5),
           y: y(-1),
+          lock: true,
         })
-        //
+
+      .wait(200)
+
+      .repeatStart(60)
+
+      .wait(80)
+        .launchEnemyUnit("ps.Kiryu1", {
+          x: x(5),
+          y: y(-0.5),
+          formation: "wide1",
+        })
+
+      .repeatEnd()
+
       ;
     }
 

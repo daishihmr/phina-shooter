@@ -5,6 +5,8 @@ phina.namespace(function() {
     _static: {
       formation: {
 
+        // basic
+
         "basic0": [{
           x: GAMEAREA_WIDTH * -0.1,
           y: GAMEAREA_HEIGHT * 0.0,
@@ -70,6 +72,120 @@ phina.namespace(function() {
           y: GAMEAREA_HEIGHT * -0.1,
           wait: 20,
         }, ],
+
+        // wide
+
+        "wide0": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide1": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 30,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, ],
+
+        "wide2": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 30,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 10,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide3": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 60,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, ],
+
+        "wide4": [{
+          x: GAMEAREA_WIDTH * -0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * -0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 0,
+        }, {
+          x: GAMEAREA_WIDTH * 0.0,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 40,
+        }, {
+          x: GAMEAREA_WIDTH * 0.2,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 20,
+        }, {
+          x: GAMEAREA_WIDTH * 0.4,
+          y: GAMEAREA_HEIGHT * 0.0,
+          wait: 60,
+        }, ],
+
+        // line
 
         "line4": [{
           x: 40 * -0,

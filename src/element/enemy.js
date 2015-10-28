@@ -8,7 +8,10 @@ phina.namespace(function() {
 
     danmakuName: null,
     runner: null,
+    
+    eraseBullet: false,
 
+    _active: false,
     entered: false,
 
     init: function(texture, width, height, params) {
@@ -16,6 +19,7 @@ phina.namespace(function() {
       this.$extend(params);
       this.on("enterframe", function() {
         if (this.runner === null) return;
+        if (!this._active) return;
 
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
@@ -24,6 +28,17 @@ phina.namespace(function() {
           this.flare("bullet" + eventType, event);
         }.bind(this);
       });
+    },
+    
+    activate: function() {
+      this._active = true;
+      this.outline.visible = true;
+      return this;
+    },
+    unactivate: function() {
+      this._active = false;
+      this.outline.visible = false;
+      return this;
     },
 
     startAttack: function(danmakuName) {
@@ -81,6 +96,16 @@ phina.namespace(function() {
       if (this.hp <= 0) this.flare("killed");
 
       return this.hp <= 0;
+    },
+    
+    onkilled: function() {
+      if (this.eraseBullet) {
+        var gameScene = this.parent.parent;
+        gameScene.bulletLayer.eraseAll();
+      }
+      this.unactivate();
+      this.runner = null;
+      this.remove();
     },
 
   });
