@@ -9,28 +9,41 @@ phina.namespace(function() {
     danmakuName: null,
     runner: null,
 
+    eraseBullet: false,
+
+    _active: false,
     entered: false,
 
     init: function(texture, width, height, params) {
       this.superInit(texture, width, height);
       this.$extend(params);
-    },
-
-    startAttack: function() {
-      this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
       this.on("enterframe", function() {
+        if (this.runner === null) return;
+        if (!this._active) return;
+
         this.runner.x = this.position.x;
         this.runner.y = this.position.y;
         this.runner.update();
+        this.runner.onNotify = function(eventType, event) {
+          this.flare("bullet" + eventType, event);
+        }.bind(this);
       });
     },
 
-    setSrcRect: function(x, y, w, h) {
-      this.srcRect.x = x;
-      this.srcRect.y = y;
-      this.srcRect.width = w;
-      this.srcRect.height = h;
+    activate: function() {
+      this._active = true;
+      this.outline.visible = true;
       return this;
+    },
+    unactivate: function() {
+      this._active = false;
+      this.outline.visible = false;
+      return this;
+    },
+
+    startAttack: function(danmakuName) {
+      if (danmakuName) this.danmakuName = danmakuName;
+      this.runner = ps.danmaku[this.danmakuName].createRunner(ps.BulletConfig);
     },
 
     hitTestRect: function(_x, _y) {
@@ -49,7 +62,7 @@ phina.namespace(function() {
       var x = _x - this.position.x;
       var y = _y - this.position.y;
 
-      if (((x) * (x) + (y) * (y)) < (this.radius * this.radius)) {
+      if ((x * x + y * y) < (this.radius * this.radius)) {
         return true;
       }
       return false;
@@ -75,12 +88,33 @@ phina.namespace(function() {
     },
 
     damage: function(power) {
+      if (this.hp <= 0) return false;
+
       if (!this.entered) return false;
+
+      var before = this.hp;
       this.hp -= power;
-      
-      this.flare("killed");
-      
-      return this.hp < 0;
+
+      if (this.hp <= 0) {
+        this.flare("killed");
+      } else {
+        this.flare("damaged", {
+          before: before,
+          after: this.hp,
+        });
+      }
+
+      return this.hp <= 0;
+    },
+
+    onkilled: function() {
+      if (this.eraseBullet) {
+        var gameScene = this.parent.parent;
+        gameScene.bulletLayer.eraseAll();
+      }
+      this.unactivate();
+      this.runner = null;
+      this.remove();
     },
 
   });

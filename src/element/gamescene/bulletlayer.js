@@ -24,12 +24,18 @@ phina.namespace(function() {
       var bullet = this.pool.shift();
       if (!bullet) return;
       
-      bullet.x = runner.x;
-      bullet.y = runner.y;
-      bullet.runner = runner;
-      bullet.frameIndex = spec.type || 0;
-      bullet.visible = !spec.dummy;
+      bullet.spawn(runner, spec);
       bullet.addChildTo(this);
+    },
+    
+    eraseAll: function() {
+      console.log ("eraseAll");
+      var bs = this.children.slice();
+      var b;
+      for (var i = 0, len = bs.length; i < len; i++) {
+        b = bs[i];
+        b.erase();
+      }
     },
 
     update: function() {

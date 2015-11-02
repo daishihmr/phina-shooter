@@ -13,6 +13,7 @@ phina.namespace(function() {
     shotLayer: null,
 
     trigger: 0,
+    shotPower: 0,
     fireFrame: 0,
 
     parts: null,
@@ -69,6 +70,7 @@ phina.namespace(function() {
       position.y = Math.clamp(position.y, 4, GAMEAREA_HEIGHT - 4);
 
       if (keyboard.getKeyDown("shot") || gamepad.getKeyDown("shot")) {
+        this.shotPower = this.trigger - 14;
         this.trigger = 14;
       } else {
         this.trigger -= 1;
@@ -81,10 +83,10 @@ phina.namespace(function() {
       if (0 < this.trigger && frame % 4 === 0) {
         var xv = Math.sin(this.fireFrame * 0.6) * 8;
         var dv = Math.sin(this.fireFrame * 1.0) * 8;
-        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90, 1.0);
-        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90, 1.0);
-        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv, 0.5);
-        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv, 0.5);
+        this.shotLayer.fireVulcan(0, position.x - xv, position.y - 20, -90, 1.0 + Math.max(0, this.shotPower / 14));
+        this.shotLayer.fireVulcan(0, position.x + xv, position.y - 20, -90, 1.0 + Math.max(0, this.shotPower / 14));
+        this.shotLayer.fireVulcan(2, position.x - 14, position.y - 2, -90 - 12 + dv, 0.5 + Math.max(0, this.shotPower / 14 / 2));
+        this.shotLayer.fireVulcan(2, position.x + 14, position.y - 2, -90 + 12 - dv, 0.5 + Math.max(0, this.shotPower / 14 / 2));
         this.fireFrame += 1;
       }
     },
@@ -98,6 +100,7 @@ phina.namespace(function() {
       this.visible = true;
       this.roll = 0;
       this.frameIndex = 4;
+      this.trigger = 0;
       this.parts.forEach(function(part) {
         part.visible = true;
       });

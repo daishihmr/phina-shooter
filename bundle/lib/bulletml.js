@@ -2045,10 +2045,12 @@ bulletml.runner.DEFAULT_CONFIG = {
 
 /**
  * @constructor
+ * @param {boolean} fireable
  */
 bulletml.runner.Runner = function() {
     this.x = 0;
     this.y = 0;
+    this.fireable = true;
 };
 bulletml.runner.Runner.prototype = {
     constructor: bulletml.runner.Runner,
@@ -2249,6 +2251,7 @@ bulletml.runner.SubRunner.prototype.update = function() {
  * @param {bulletml.Fire} cmd
  */
 bulletml.runner.SubRunner.prototype.fire = function(cmd) {
+    if (!this.fireable) return;
 
     var bulletRunner;
     if (cmd.bullet.actions.length === 0) {

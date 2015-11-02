@@ -1,5 +1,5 @@
 phina.namespace(function() {
-  
+
   ps.danmaku = ps.danmaku || {};
 
   var action = bulletml.dsl.action;
@@ -35,33 +35,51 @@ phina.namespace(function() {
     return speed("{0} * (1.0 + $speedRank * 2.0)".format(v), "sequence");
   };
 
-  var R0 = bullet({
-    type: 4
-  });
-  var R1 = bullet({
-    type: 5
-  });
-  var R2 = bullet({
-    type: 6
-  });
-  var R3 = bullet({
-    type: 7
-  });
-  var B4 = bullet({
-    type: 8
-  });
-  var B5 = bullet({
-    type: 9
-  });
-  var R4 = bullet({
-    type: 10
-  });
-  var R5 = bullet({
-    type: 11
-  });
-  var DM = bullet({
-    dummy: true
-  });
+  var R0 = function(action) {
+    return bullet(action, {
+      type: 4
+    });
+  };
+  var R1 = function(action) {
+    return bullet(action, {
+      type: 5
+    });
+  };
+  var R2 = function(action) {
+    return bullet(action, {
+      type: 6
+    });
+  };
+  var R3 = function(action) {
+    return bullet(action, {
+      type: 7
+    });
+  };
+  var B4 = function(action) {
+    return bullet(action, {
+      type: 8
+    });
+  };
+  var B5 = function(action) {
+    return bullet(action, {
+      type: 9
+    });
+  };
+  var R4 = function(action) {
+    return bullet(action, {
+      type: 10
+    });
+  };
+  var R5 = function(action) {
+    return bullet(action, {
+      type: 11
+    });
+  };
+  var DM = function(action) {
+    return bullet(action, {
+      dummy: true
+    });
+  };
 
   // 黒川
   ps.danmaku.kurokawa1 = new bulletml.Root({
@@ -110,9 +128,13 @@ phina.namespace(function() {
     top: action([
       interval(20),
       repeat(Infinity, [
-        fire(DM, spd(0.8)),
-        repeat(12, [
-          fire(R4, spdSeq(0), direction(360 / (12 - 1), "sequence")),
+        fire(DM, spd(0.6)),
+        repeat(5, [
+          repeat(9, [
+            fire(R4, spdSeq(0.02), direction(360 / (9 - 1), "sequence")),
+          ]),
+          wait(4),
+          fire(DM, direction(7, "sequence"), spd(0.6)),
         ]),
         interval(50),
       ]),
@@ -121,44 +143,136 @@ phina.namespace(function() {
 
   // 雪城1
   ps.danmaku.yukishiro1 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      wait(120),
+      fire(DM, spd(0.6)),
+      repeat(3, [
+        bindVar("dd", "$loop.index"),
+        fire(R4, spdSeq(0.08), direction(-60)),
+        repeat(8, [
+          repeat(8, [
+            fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
+          ]),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 + $dd * 1.4", "sequence")),
+        ]),
+        wait(30),
+        fire(R4, spdSeq(0.08), direction(-60)),
+        repeat(8, [
+          repeat(8, [
+            fire(R4, spdSeq(0), direction(120 / 8, "sequence")),
+          ]),
+          wait(5),
+          fire(R4, spdSeq(0), direction("-120 - ($dd + 1) * 1.4", "sequence")),
+        ]),
+        wait(30),
+      ]),
+      notify("end", {
+        next: "yukishiro2"
+      }),
+    ]),
   });
   // 雪城2
   ps.danmaku.yukishiro2 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      interval(60),
+      repeat(10, [
+        fire(DM(actionRef("b")), speed(10), direction(-90, "absolute")),
+        fire(DM(actionRef("b")), speed(10), direction(+90, "absolute")),
+        interval(30),
+      ]),
+      notify("end", {
+        next: "yukishiro3"
+      }),
+    ]),
+    b: action([
+      wait(2),
+      fire(R2, spd(0.9), direction(-60)),
+      repeat(10, [
+        fire(R2, spdSeq(0), direction(120 / 10, "sequence")),
+      ]),
+    ]),
   });
   // 雪城3
   ps.danmaku.yukishiro3 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      interval(60),
+      repeat(6, [
+        bindVar("p", "$loop.index"),
+        repeat(10, [
+          fire(DM(actionRef("b", 180 - 10, "-($loop.index + $p * 6)")), speed(10), direction(-90, "absolute")),
+          fire(DM(actionRef("b", 180 + 10, "+($loop.index + $p * 6)")), speed(10), direction(+90, "absolute")),
+          interval(8),
+        ]),
+        interval(25),
+      ]),
+      notify("end", {
+        next: "yukishiro1"
+      }),
+    ]),
+    b: action([
+      wait(2),
+      fire(R4, spd(0.7), direction("$1 + Math.sin($2 * 0.35) * 30 - 10", "absolute")),
+      fire(R5, spdSeq(0), direction(10, "sequence")),
+      fire(R4, spdSeq(0), direction(10, "sequence")),
+    ]),
   });
 
   // 美墨1-1
   ps.danmaku.misumi11 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi12",
+      }),
+    ]),
   });
   // 美墨1-2
   ps.danmaku.misumi12 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi13",
+      }),
+    ]),
   });
   // 美墨1-3
   ps.danmaku.misumi13 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi11",
+      }),
+    ]),
   });
   // 美墨2-1
   ps.danmaku.misumi21 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi22",
+      }),
+    ]),
   });
   // 美墨2-2
   ps.danmaku.misumi22 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi23",
+      }),
+    ]),
   });
   // 美墨2-3
   ps.danmaku.misumi23 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi21",
+      }),
+    ]),
   });
   // 美墨3-1
   ps.danmaku.misumi31 = new bulletml.Root({
-    top: action([]),
+    top: action([
+      notify("end", {
+        next: "misumi31",
+      }),
+    ]),
   });
 
 });

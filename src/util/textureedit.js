@@ -45,6 +45,40 @@ phina.namespace(function() {
         }
 
         phina.asset.AssetManager.set("image", textureName + "Outline", dst);
+      },
+
+      dark: function(textureName) {
+        var texture = phina.asset.AssetManager.get("image", textureName);
+        if (texture == null) {
+          return;
+        }
+        var w = texture.domElement.width;
+        var h = texture.domElement.height;
+
+        var src = phina.graphics.Canvas().setSize(w, h);
+        src.context.drawImage(texture.domElement, 0, 0);
+
+        var srcData = src.context.getImageData(0, 0, w, h);
+        var data = srcData.data;
+
+        var dst = phina.graphics.Canvas().setSize(w, h);
+        for (var y = 0; y < h; y++) {
+          for (var x = 0; x < w; x++) {
+
+            var index = (y * w + x) * 4;
+            var r = data[index + 0];
+            var g = data[index + 1];
+            var b = data[index + 2];
+            var a = data[index + 3];
+
+            if (a > 0) {
+              dst.fillStyle = "rgba({0},{1},{2},{3})".format(~~(r * 0.6), ~~(g * 0.4), ~~(b * 0.4), a / 255);
+              dst.fillRect(x, y, 1, 1);
+            }
+          }
+        }
+
+        phina.asset.AssetManager.set("image", textureName + "Dark", dst);
       }
     }
   });

@@ -1,6 +1,6 @@
 phina.namespace(function() {
 
-  phina.define("ps.Background0", {
+  phina.define("ps.Background2", {
     superClass: "ps.BackgroundLayer",
 
     init: function() {
@@ -79,20 +79,7 @@ phina.namespace(function() {
           });
         });
       });
-    },
-    
-    _accessor: {
-      cameraOffsetX: {
-        get: function() {
-          return this._cameraOffsetX;
-        },
-        set: function(v) {
-          this._cameraOffsetX = v;
-          this.camera.x = 2 + this._cameraOffsetX * -0.1;
-          this.camera.targetX = this._cameraOffsetX * -0.1;
-        },
-      },
-    },
+    }
   });
 
 });

@@ -10,6 +10,7 @@ phina.namespace(function() {
     bomb: 3,
     psyche: Math.randint(0, 100000000000),
     highScore: Math.randint(0, 100000000000),
+    rank: 0,
 
     /**
      * "normal" or "every"
@@ -46,12 +47,14 @@ phina.namespace(function() {
       var after = this.score + v;
 
       if (this.extendMode === "normal") {
-        this.extendScore.forEach(function(es) {
+        for (var i = 0, len = this.extendScore.length; i < len; i++) {
+          var es = this.extendScore[i];
           if (before < es && es <= after) {
             self.zanki += 1;
             self.flare("extend");
+            break;
           }
-        });
+        }
       } else if (this.extendMode === "every") {
         var es = this.extendScore[0];
         if (Math.floor(before / es) < Math.floor(after / es)) {
@@ -66,15 +69,15 @@ phina.namespace(function() {
     bind: function(propertyName, view) {
       this._binder[propertyName] = view;
     },
-    
+
     onbomb: function() {
       this.bomb -= 1;
     },
 
     onkill: function(e) {
-      
+
     },
-    
+
     onmiss: function() {
       this.zanki -= 1;
     },
