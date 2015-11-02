@@ -1,9 +1,54 @@
 phina.namespace(function() {
 
   phina.define("ps.EnemyUnit", {
-    init: function() {},
+    superClass: "phina.app.Object2D",
+
+    init: function(params) {
+      this.superInit();
+
+      this.enemyClass = phina.using(params.enemyClassName);
+      this.formation = ps.EnemyUnit.formations[params.formation];
+
+      this.one("enterframe", function() {
+        var self = this;
+        this.formation.forEach(function(f) {
+          self
+            .enemyClass(params.$extend({
+              x: params.x + f.x,
+              y: params.y + f.y,
+              wait: params.wait + f.wait,
+            }))
+            .on("killed", function() {
+              self.flare("killedOne");
+            })
+            .on("removed", function() {
+              self.flare("removedOne");
+            });
+        });
+      });
+
+      var killedCount = 0;
+      this.on("killedOne", function() {
+        killedCount += 1;
+        if (killedCount === this.formation.length) {
+          this.flare("annihilated");
+        }
+      });
+      var removedCount = 0;
+      this.on("removedOne", function() {
+        removedCount += 1;
+        if (removedCount === this.formation.length && killedCount < this.formation.length) {
+          this.flare("annihilated");
+        }
+      });
+
+      this.on("annihilated", function() {
+        this.remove();
+      });
+    },
+
     _static: {
-      formation: {
+      formations: {
 
         // basic
 

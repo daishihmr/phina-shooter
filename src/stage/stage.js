@@ -89,12 +89,16 @@ phina.namespace(function() {
       return this.addTask(ps.WarningTask());
     },
 
-    launchEnemy: function(enemyClassName, params) {
-      return this.addTask(ps.LaunchEnemyTask(enemyClassName, params));
+    launchEnemy: function(enemyClassName, params, lock) {
+      return this.addTask(ps.LaunchEnemyTask(enemyClassName, params, lock));
     },
 
     launchEnemyUnit: function(enemyClassName, params) {
       return this.addTask(ps.LaunchEnemyUnitTask(enemyClassName, params));
+    },
+    
+    launchEnemyLoop: function(enemyClassName, params) {
+      return this.addTask(ps.LaunchEnemyLoopTask(enemyClassName, params));
     },
 
     launchBoss: function(bossClassName) {
@@ -174,16 +178,17 @@ phina.namespace(function() {
 
     enemyClassName: null,
     params: null,
+    lock: false,
 
-    init: function(enemyClassName, params) {
+    init: function(enemyClassName, params, lock) {
       this.superInit();
       this.enemyClassName = enemyClassName;
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        lock: false,
         wait: 0,
       });
+      this.lock = lock;
     },
 
     execute: function(app, gameScene, stage) {
@@ -194,9 +199,12 @@ phina.namespace(function() {
       var enemy = EnemyClazz(params);
       gameScene.launchEnemy(enemy);
 
-      stage.lock = this.params.lock;
-      if (this.params.lock) {
+      stage.lock = this.lock;
+      if (this.lock) {
         enemy.on("killed", function() {
+          stage.lock = false;
+        });
+        enemy.on("annihilated", function() {
           stage.lock = false;
         });
         enemy.on("removed", function() {
@@ -209,16 +217,14 @@ phina.namespace(function() {
   phina.define("ps.LaunchEnemyUnitTask", {
     superClass: "ps.StageTask",
 
-    enemyClassName: null,
     params: null,
 
     init: function(enemyClassName, params) {
       this.superInit();
-      this.enemyClassName = enemyClassName;
       this.params = params.$safe({
+        enemyClassName: enemyClassName,
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        lock: false,
         formation: "basic0",
         wait: 0,
       });
@@ -226,18 +232,32 @@ phina.namespace(function() {
 
     execute: function(app, gameScene, stage) {
       if (stage.lock) return;
+      
+      var enemyUnit = ps.EnemyUnit(this.params);
+      gameScene.launchEnemy(enemyUnit);
+    }
+  });
 
-      var EnemyClazz = phina.using(this.enemyClassName);
-      var params = this.params;
-      var enemy = null;
-      ps.EnemyUnit.formation[params.formation].forEach(function(f) {
-        enemy = EnemyClazz({}.$extend(params, {
-          x: params.x + f.x,
-          y: params.y + f.y,
-          wait: f.wait,
-        }));
-        gameScene.launchEnemy(enemy);
+  phina.define("ps.LaunchEnemyLoopTask", {
+    superClass: "ps.StageTask",
+
+    params: null,
+
+    init: function(enemyClassName, params) {
+      this.superInit();
+      this.params = params.$safe({
+        enemyClassName: enemyClassName,
+        x: GAMEAREA_WIDTH * 0.5,
+        y: GAMEAREA_HEIGHT * -0.1,
+        maxCount: 5,
       });
+    },
+
+    execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
+      var enemyLooper = ps.EnemyLooper(this.params);
+      gameScene.launchEnemy(enemyLooper);
     }
   });
 

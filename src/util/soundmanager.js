@@ -3,8 +3,8 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.0,
-      soundVolume: 1.0,
+      _bgmVolume: 0.1,
+      soundVolume: 0.1,
 
       beforeBgm: null,
       currentBgm: null,
@@ -36,7 +36,7 @@ phina.namespace(function() {
           if (this.beforeBgm) this.beforeBgm.stop();
           this.beforeBgm = this.currentBgm;
         }
-        this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).clone().play();
+        this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).play();
         this.currentBgm.volume = this._bgmVolume;
         this.currentBgm.loop = bgmData.loop;
         this.currentBgm.loopStart = bgmData.loopStart;
@@ -61,7 +61,7 @@ phina.namespace(function() {
 
       playSound: function(name) {
         if (this._lastPlayFrame[name] !== this.currentFrame) {
-          var sound = phina.asset.AssetManager.get("sound", name).clone();
+          var sound = phina.asset.AssetManager.get("sound", name);
           sound.volume = this.soundVolume;
           sound.play();
           this._lastPlayFrame[name] = this.currentFrame;

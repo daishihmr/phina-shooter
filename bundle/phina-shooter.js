@@ -1415,10 +1415,97 @@ phina.namespace(function() {
 
 phina.namespace(function() {
 
+  phina.define("ps.EnemyLooper", {
+    superClass: "phina.app.Object2D",
+
+    init: function(params) {
+      this.superInit();
+      this.params = params;
+      this.enemyClass = phina.using(params.enemyClassName);
+      this.setPosition(params.x, params.y);
+      this.maxCount = params.maxCount;
+
+      this.count = 0;
+    },
+
+    spawn: function() {
+      this.count += 1;
+      if (this.maxCount < this.count) {
+        this.remove();
+        return;
+      }
+
+      var self = this;
+      this.one("enterframe", function() {
+        var enemy = self.enemyClass(self.params)
+          .setPosition(self.x, self.y)
+          .addChildTo(self.parent)
+          .on("killed", function() {
+            self.spawn();
+            self.remove();
+          })
+          .on("annihilated", function() {
+            self.spawn();
+            self.remove();
+          });
+      });
+    },
+
+  });
+
+});
+
+phina.namespace(function() {
+
   phina.define("ps.EnemyUnit", {
-    init: function() {},
+    superClass: "phina.app.Object2D",
+
+    init: function(params) {
+      this.superInit();
+
+      this.enemyClass = phina.using(params.enemyClassName);
+      this.formation = ps.EnemyUnit.formations[params.formation];
+
+      this.one("enterframe", function() {
+        var self = this;
+        this.formation.forEach(function(f) {
+          self
+            .enemyClass(params.$extend({
+              x: params.x + f.x,
+              y: params.y + f.y,
+              wait: params.wait + f.wait,
+            }))
+            .on("killed", function() {
+              self.flare("killedOne");
+            })
+            .on("removed", function() {
+              self.flare("removedOne");
+            });
+        });
+      });
+
+      var killedCount = 0;
+      this.on("killedOne", function() {
+        killedCount += 1;
+        if (killedCount === this.formation.length) {
+          this.flare("annihilated");
+        }
+      });
+      var removedCount = 0;
+      this.on("removedOne", function() {
+        removedCount += 1;
+        if (removedCount === this.formation.length && killedCount < this.formation.length) {
+          this.flare("annihilated");
+        }
+      });
+
+      this.on("annihilated", function() {
+        this.remove();
+      });
+    },
+
     _static: {
-      formation: {
+      formations: {
 
         // basic
 
@@ -3899,12 +3986,16 @@ phina.namespace(function() {
       return this.addTask(ps.WarningTask());
     },
 
-    launchEnemy: function(enemyClassName, params) {
-      return this.addTask(ps.LaunchEnemyTask(enemyClassName, params));
+    launchEnemy: function(enemyClassName, params, lock) {
+      return this.addTask(ps.LaunchEnemyTask(enemyClassName, params, lock));
     },
 
     launchEnemyUnit: function(enemyClassName, params) {
       return this.addTask(ps.LaunchEnemyUnitTask(enemyClassName, params));
+    },
+    
+    launchEnemyLoop: function(enemyClassName, params) {
+      return this.addTask(ps.LaunchEnemyLoopTask(enemyClassName, params));
     },
 
     launchBoss: function(bossClassName) {
@@ -3984,16 +4075,17 @@ phina.namespace(function() {
 
     enemyClassName: null,
     params: null,
+    lock: false,
 
-    init: function(enemyClassName, params) {
+    init: function(enemyClassName, params, lock) {
       this.superInit();
       this.enemyClassName = enemyClassName;
       this.params = params.$safe({
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        lock: false,
         wait: 0,
       });
+      this.lock = lock;
     },
 
     execute: function(app, gameScene, stage) {
@@ -4004,9 +4096,12 @@ phina.namespace(function() {
       var enemy = EnemyClazz(params);
       gameScene.launchEnemy(enemy);
 
-      stage.lock = this.params.lock;
-      if (this.params.lock) {
+      stage.lock = this.lock;
+      if (this.lock) {
         enemy.on("killed", function() {
+          stage.lock = false;
+        });
+        enemy.on("annihilated", function() {
           stage.lock = false;
         });
         enemy.on("removed", function() {
@@ -4019,16 +4114,14 @@ phina.namespace(function() {
   phina.define("ps.LaunchEnemyUnitTask", {
     superClass: "ps.StageTask",
 
-    enemyClassName: null,
     params: null,
 
     init: function(enemyClassName, params) {
       this.superInit();
-      this.enemyClassName = enemyClassName;
       this.params = params.$safe({
+        enemyClassName: enemyClassName,
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
-        lock: false,
         formation: "basic0",
         wait: 0,
       });
@@ -4036,18 +4129,32 @@ phina.namespace(function() {
 
     execute: function(app, gameScene, stage) {
       if (stage.lock) return;
+      
+      var enemyUnit = ps.EnemyUnit(this.params);
+      gameScene.launchEnemy(enemyUnit);
+    }
+  });
 
-      var EnemyClazz = phina.using(this.enemyClassName);
-      var params = this.params;
-      var enemy = null;
-      ps.EnemyUnit.formation[params.formation].forEach(function(f) {
-        enemy = EnemyClazz({}.$extend(params, {
-          x: params.x + f.x,
-          y: params.y + f.y,
-          wait: f.wait,
-        }));
-        gameScene.launchEnemy(enemy);
+  phina.define("ps.LaunchEnemyLoopTask", {
+    superClass: "ps.StageTask",
+
+    params: null,
+
+    init: function(enemyClassName, params) {
+      this.superInit();
+      this.params = params.$safe({
+        enemyClassName: enemyClassName,
+        x: GAMEAREA_WIDTH * 0.5,
+        y: GAMEAREA_HEIGHT * -0.1,
+        maxCount: 5,
       });
+    },
+
+    execute: function(app, gameScene, stage) {
+      if (stage.lock) return;
+
+      var enemyLooper = ps.EnemyLooper(this.params);
+      gameScene.launchEnemy(enemyLooper);
     }
   });
 
@@ -4105,18 +4212,16 @@ phina.namespace(function() {
         .launchEnemy("ps.Yukishiro1", {
           x: x(+5),
           y: y(-1),
-          lock: true,
-        })
+        }, true)
 
       .wait(200)
 
       .repeatStart(60)
 
       .wait(80)
-        .launchEnemyUnit("ps.Kiryu1", {
+        .launchEnemyLoop("ps.Kiryu1", {
           x: x(5),
           y: y(-0.5),
-          formation: "wide1",
         })
 
       .repeatEnd()
@@ -4516,8 +4621,8 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.0,
-      soundVolume: 1.0,
+      _bgmVolume: 0.1,
+      soundVolume: 0.1,
 
       beforeBgm: null,
       currentBgm: null,
@@ -4549,7 +4654,7 @@ phina.namespace(function() {
           if (this.beforeBgm) this.beforeBgm.stop();
           this.beforeBgm = this.currentBgm;
         }
-        this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).clone().play();
+        this.currentBgm = phina.asset.AssetManager.get("sound", bgmData.name).play();
         this.currentBgm.volume = this._bgmVolume;
         this.currentBgm.loop = bgmData.loop;
         this.currentBgm.loopStart = bgmData.loopStart;
@@ -4574,7 +4679,7 @@ phina.namespace(function() {
 
       playSound: function(name) {
         if (this._lastPlayFrame[name] !== this.currentFrame) {
-          var sound = phina.asset.AssetManager.get("sound", name).clone();
+          var sound = phina.asset.AssetManager.get("sound", name);
           sound.volume = this.soundVolume;
           sound.play();
           this._lastPlayFrame[name] = this.currentFrame;

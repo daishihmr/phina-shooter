@@ -21,18 +21,16 @@ phina.namespace(function() {
         .launchEnemy("ps.Yukishiro1", {
           x: x(+5),
           y: y(-1),
-          lock: true,
-        })
+        }, true)
 
       .wait(200)
 
       .repeatStart(60)
 
       .wait(80)
-        .launchEnemyUnit("ps.Kiryu1", {
+        .launchEnemyLoop("ps.Kiryu1", {
           x: x(5),
           y: y(-0.5),
-          formation: "wide1",
         })
 
       .repeatEnd()
