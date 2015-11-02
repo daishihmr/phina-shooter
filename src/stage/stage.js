@@ -250,6 +250,8 @@ phina.namespace(function() {
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
         maxCount: 5,
+        limitAge: 300,
+        wait: 0,
       });
     },
 

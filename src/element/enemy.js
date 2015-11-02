@@ -28,6 +28,15 @@ phina.namespace(function() {
           this.flare("bullet" + eventType, event);
         }.bind(this);
       });
+
+      this.on("killed", function() {
+        if (this.eraseBullet) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+        }
+        this.unactivate();
+        this.runner = null;
+      });
     },
 
     activate: function() {
@@ -89,7 +98,6 @@ phina.namespace(function() {
 
     damage: function(power) {
       if (this.hp <= 0) return false;
-
       if (!this.entered) return false;
 
       var before = this.hp;
@@ -105,16 +113,6 @@ phina.namespace(function() {
       }
 
       return this.hp <= 0;
-    },
-
-    onkilled: function() {
-      if (this.eraseBullet) {
-        var gameScene = this.parent.parent;
-        gameScene.bulletLayer.eraseAll();
-      }
-      this.unactivate();
-      this.runner = null;
-      this.remove();
     },
 
   });

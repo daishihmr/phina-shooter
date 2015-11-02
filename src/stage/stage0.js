@@ -17,23 +17,25 @@ phina.namespace(function() {
 
       this.sequencer.startBgm()
 
-      .wait(250)
-        .launchEnemy("ps.Yukishiro1", {
-          x: x(+5),
-          y: y(-1),
-        }, true)
+      // .wait(250)
+      //   .launchEnemy("ps.Yukishiro1", {
+      //     x: x(+5),
+      //     y: y(-1),
+      //   }, true)
+
+      // .wait(200)
+
+      // .repeatStart(60)
 
       .wait(200)
-
-      .repeatStart(60)
-
-      .wait(80)
         .launchEnemyLoop("ps.Kiryu1", {
           x: x(5),
-          y: y(-0.5),
+          y: -32,
+          maxCount: 100,
+          limitAge: 1000,
         })
 
-      .repeatEnd()
+      // .repeatEnd()
 
       ;
     }

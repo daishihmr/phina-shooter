@@ -24,6 +24,8 @@ phina.namespace(function() {
         .call(function() {
           self.activate();
           self.startAttack();
+
+          console.log("activate");
         })
         .by({
           y: GAMEAREA_HEIGHT * 1.0
@@ -38,7 +40,11 @@ phina.namespace(function() {
       var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kiryu1", {
@@ -79,7 +85,11 @@ phina.namespace(function() {
         this.move.add(delta).normalize().mul(3);
       }
       this.position.add(this.move);
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kise1", {
@@ -104,7 +114,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.25;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Natsuki1", {
@@ -138,7 +152,11 @@ phina.namespace(function() {
       var player = app.currentScene.player;
       var t = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI * 2;
       if (this.runner) this.runner.direction = ~~((t + U225) / U45) * U45;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kurokawa1", {
@@ -166,7 +184,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.5;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Akimoto1", {
@@ -195,7 +217,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.4;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Yukishiro1", {
@@ -246,6 +272,10 @@ phina.namespace(function() {
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
+    },
+
+    onkilled: function() {
+      this.remove();
     },
   });
 
@@ -309,6 +339,10 @@ phina.namespace(function() {
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
+    },
+
+    onkilled: function() {
+      this.remove();
     },
   });
 

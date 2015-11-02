@@ -998,6 +998,8 @@ phina.namespace(function() {
         .call(function() {
           self.activate();
           self.startAttack();
+
+          console.log("activate");
         })
         .by({
           y: GAMEAREA_HEIGHT * 1.0
@@ -1012,7 +1014,11 @@ phina.namespace(function() {
       var app = e.app;
       var player = app.currentScene.player;
       this.rotation = Math.atan2(player.y - this.y, player.x - this.x) * Math.RAD_TO_DEG;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kiryu1", {
@@ -1053,7 +1059,11 @@ phina.namespace(function() {
         this.move.add(delta).normalize().mul(3);
       }
       this.position.add(this.move);
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kise1", {
@@ -1078,7 +1088,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.25;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Natsuki1", {
@@ -1112,7 +1126,11 @@ phina.namespace(function() {
       var player = app.currentScene.player;
       var t = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI * 2;
       if (this.runner) this.runner.direction = ~~((t + U225) / U45) * U45;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Kurokawa1", {
@@ -1140,7 +1158,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.5;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Akimoto1", {
@@ -1169,7 +1191,11 @@ phina.namespace(function() {
 
     onenterframe: function(e) {
       this.y += 0.4;
-    }
+    },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   phina.define("ps.Yukishiro1", {
@@ -1220,6 +1246,10 @@ phina.namespace(function() {
     },
     onbulletend: function(e) {
       this.startAttack(e.next);
+    },
+
+    onkilled: function() {
+      this.remove();
     },
   });
 
@@ -1284,6 +1314,10 @@ phina.namespace(function() {
     onbulletend: function(e) {
       this.startAttack(e.next);
     },
+
+    onkilled: function() {
+      this.remove();
+    },
   });
 
   var U45 = Math.PI * 2 / 8;
@@ -1319,6 +1353,15 @@ phina.namespace(function() {
         this.runner.onNotify = function(eventType, event) {
           this.flare("bullet" + eventType, event);
         }.bind(this);
+      });
+
+      this.on("killed", function() {
+        if (this.eraseBullet) {
+          var gameScene = this.parent.parent;
+          gameScene.bulletLayer.eraseAll();
+        }
+        this.unactivate();
+        this.runner = null;
       });
     },
 
@@ -1381,7 +1424,6 @@ phina.namespace(function() {
 
     damage: function(power) {
       if (this.hp <= 0) return false;
-
       if (!this.entered) return false;
 
       var before = this.hp;
@@ -1399,16 +1441,6 @@ phina.namespace(function() {
       return this.hp <= 0;
     },
 
-    onkilled: function() {
-      if (this.eraseBullet) {
-        var gameScene = this.parent.parent;
-        gameScene.bulletLayer.eraseAll();
-      }
-      this.unactivate();
-      this.runner = null;
-      this.remove();
-    },
-
   });
 
 });
@@ -1424,13 +1456,23 @@ phina.namespace(function() {
       this.enemyClass = phina.using(params.enemyClassName);
       this.setPosition(params.x, params.y);
       this.maxCount = params.maxCount;
+      this.limitAge = params.limitAge;
 
       this.count = 0;
+
+      this.one("added", function() {
+        this.spawn();
+        this.age = 0;
+      });
+    },
+
+    update: function() {
+      this.age += 1;
     },
 
     spawn: function() {
       this.count += 1;
-      if (this.maxCount < this.count) {
+      if (this.limitAge <= this.age || this.maxCount < this.count) {
         this.remove();
         return;
       }
@@ -1439,15 +1481,19 @@ phina.namespace(function() {
       this.one("enterframe", function() {
         var enemy = self.enemyClass(self.params)
           .setPosition(self.x, self.y)
-          .addChildTo(self.parent)
-          .on("killed", function() {
-            self.spawn();
-            self.remove();
-          })
-          .on("annihilated", function() {
-            self.spawn();
-            self.remove();
-          });
+          .addChildTo(self.parent);
+
+        var next = function() {
+          self.spawn();
+          this.off("removed", next);
+          this.off("killed", next);
+          this.off("annihilated", next);
+        };
+
+        enemy
+          .on("removed", next)
+          .on("killed", next)
+          .on("annihilated", next);
       });
     },
 
@@ -4147,6 +4193,8 @@ phina.namespace(function() {
         x: GAMEAREA_WIDTH * 0.5,
         y: GAMEAREA_HEIGHT * -0.1,
         maxCount: 5,
+        limitAge: 300,
+        wait: 0,
       });
     },
 
@@ -4208,23 +4256,25 @@ phina.namespace(function() {
 
       this.sequencer.startBgm()
 
-      .wait(250)
-        .launchEnemy("ps.Yukishiro1", {
-          x: x(+5),
-          y: y(-1),
-        }, true)
+      // .wait(250)
+      //   .launchEnemy("ps.Yukishiro1", {
+      //     x: x(+5),
+      //     y: y(-1),
+      //   }, true)
+
+      // .wait(200)
+
+      // .repeatStart(60)
 
       .wait(200)
-
-      .repeatStart(60)
-
-      .wait(80)
         .launchEnemyLoop("ps.Kiryu1", {
           x: x(5),
-          y: y(-0.5),
+          y: -32,
+          maxCount: 100,
+          limitAge: 1000,
         })
 
-      .repeatEnd()
+      // .repeatEnd()
 
       ;
     }
@@ -4621,8 +4671,8 @@ phina.namespace(function() {
   phina.define("ps.SoundManager", {
     init: function() {},
     _static: {
-      _bgmVolume: 0.1,
-      soundVolume: 0.1,
+      _bgmVolume: 0.0,
+      soundVolume: 1.0,
 
       beforeBgm: null,
       currentBgm: null,
