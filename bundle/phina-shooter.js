@@ -998,8 +998,6 @@ phina.namespace(function() {
         .call(function() {
           self.activate();
           self.startAttack();
-
-          console.log("activate");
         })
         .by({
           y: GAMEAREA_HEIGHT * 1.0

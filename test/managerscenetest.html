@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8" />
+<script src="../phina.js/build/phina.js"></script>
+<script>
+phina.globalize();
+
+phina.main(function() {
+  var app = CanvasApp({
+    query: "#app"
+  });
+  app.run();
+  
+  app.replaceScene(SceneSequence());
+});
+
+phina.define('SceneSequence', {
+  superClass: 'ManagerScene',
+  
+  init: function() {
+    this.superInit({
+      scenes: [
+
+        {
+          label: "シーンA",
+          className: "SceneA",
+          arguments: { message: "1-1" }
+        },
+
+        {
+          className: "SubSequence"
+        },
+
+        {
+          label: "シーンB",
+          className: "SceneB",
+          arguments: { message: "1-2" }
+        },
+
+      ]
+    });
+  }
+});
+
+phina.define('SubSequence', {
+  superClass: 'ManagerScene',
+  
+  init: function() {
+    this.superInit({
+      scenes: [
+
+        {
+          className: "SceneB",
+          arguments: { message: "2-1" }
+        },
+
+        {
+          className: "SceneA",
+          arguments: { message: "2-2" }
+        }
+
+      ]
+    });
+  },
+  onfinish: function() {
+    this.exit();
+  }
+});
+
+phina.define('SceneA', {
+  superClass: 'CanvasScene',
+  
+  init: function(params) {
+    this.superInit();
+    Label("This is SceneA")
+      .setPosition(this.gridX.center(), this.gridY.span(5))
+      .addChildTo(this);
+    Label(params.message)
+      .setPosition(this.gridX.center(), this.gridY.span(7))
+      .addChildTo(this);
+  },
+  
+  update: function(app) {
+    if (app.pointer.getPointingEnd()) {
+      this.exit();
+    }
+  }
+});
+
+phina.define('SceneB', {
+  superClass: 'CanvasScene',
+  
+  init: function(params) {
+    this.superInit();
+    Label("This is SceneB")
+      .setPosition(this.gridX.center(), this.gridY.span(5))
+      .addChildTo(this);
+    Label(params.message)
+      .setPosition(this.gridX.center(), this.gridY.span(7))
+      .addChildTo(this);
+  },
+  
+  update: function(app) {
+    if (app.pointer.getPointingEnd()) {
+      this.exit();
+    }
+  }
+});
+</script>
+</head>
+<body>
+<canvas id="app"></canvas>
+</body>
+</html>
