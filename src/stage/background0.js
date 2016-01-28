@@ -6,7 +6,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit({
         backgroundColor: ps.Color.pri[1],
-        fill: ps.Color.pria[7].format(0.2),
+        fill: null,
         stroke: ps.Color.pri[4],
       });
 
@@ -32,12 +32,12 @@ phina.namespace(function() {
       var vertices2 = [
         [0, 0, 0],
       ];
-      Array.range(-10, 10).forEach(function(z) {
-        Array.range(-10, 10).forEach(function(x) {
+      Array.range(-5, 5).forEach(function(z) {
+        Array.range(-5, 5).forEach(function(x) {
           ps.bg.Polygon({
               vertices: vertices2,
             })
-            .setTranslation(x * 2.6, 0, z * 2.6)
+            .setTranslation(x * 5.2, 0, z * 5.2)
             .addChildTo(self)
             .on("enterframe", function() {
               this.x += dx;
@@ -53,19 +53,19 @@ phina.namespace(function() {
 
       // 建造物
       var vertices = [
-        [-0.7, 0, -0.7],
-        [-0.7, 0, +0.7],
-        [+0.7, 0, +0.7],
-        [+0.7, 0, -0.7],
+        [-1.0, 0, -1.0],
+        [-1.0, 0, +1.0],
+        [+1.0, 0, +1.0],
+        [+1.0, 0, -1.0],
       ];
       var random = phina.util.Random(12345);
-      Array.range(-5, 5).forEach(function(z) {
-        Array.range(-5, 5).forEach(function(x) {
-          Array.range(0, random.randint(6, 11)).forEach(function(y) {
+      Array.range(-4, 4).forEach(function(z) {
+        Array.range(-4, 4).forEach(function(x) {
+          Array.range(0, random.randint(3, 5)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.21, z * 4.0)
+              .setTranslation(x * 6.0, y * 0.6, z * 8.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;

@@ -11,6 +11,8 @@ phina.namespace(function() {
     },
 
     generate: function(assetType) {
+      var c;
+
       switch (assetType) {
         case "stage0":
           ps.TextureEdit.outline("enemy_stage0", "red");
@@ -23,8 +25,8 @@ phina.namespace(function() {
           ps.TextureEdit.outline("bullet", "rgba(255,180,0,0.5)", 2);
           ps.TextureEdit.outline("player", "rgba(0,100,255,0.5)", 2);
           ps.TextureEdit.outline("bomb", "lightgreen", 2);
-
-          var c = phina.graphics.Canvas().setSize(32, 32);
+          
+          c = phina.graphics.Canvas().setSize(32, 32);
           c.clearColor("rgba(255, 255, 255, 0.5)");
           phina.asset.AssetManager.set("image", "particleW", c);
 

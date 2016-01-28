@@ -17,7 +17,7 @@ phina.namespace(function() {
     }
   });
 
-  phina.app.Element.prototype.method("timer", function(time, callback) {
+  phina.app.Element.prototype.$method("timer", function(time, callback) {
     ps.Timer(time)
       .addChildTo(this)
       .on("time", callback);

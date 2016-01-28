@@ -18,17 +18,20 @@ phina.namespace(function() {
       this.sequencer.startBgm()
 
       // .wait(250)
-      //   .launchEnemy("ps.Yukishiro1", {
+      //   .launchEnemy({
+      //     enemyClassName: "ps.Yukishiro1",
       //     x: x(+5),
       //     y: y(-1),
-      //   }, true)
+      //     lock: true,
+      //   })
 
       // .wait(200)
 
       // .repeatStart(60)
 
       .wait(200)
-        .launchEnemyLoop("ps.Kiryu1", {
+        .launchEnemyLoop({
+          enemyClassName: "ps.Kiryu1",
           x: x(5),
           y: -32,
           maxCount: 100,

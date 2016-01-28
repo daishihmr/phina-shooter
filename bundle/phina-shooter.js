@@ -1875,7 +1875,7 @@ phina.namespace(function() {
     },
 
     update: function(app) {
-      this.skip = app.ticker.frame % 3 !== 0;
+      this.skip = app.ticker.frame % 2 !== 0;
     },
 
     render: function() {
@@ -1887,13 +1887,14 @@ phina.namespace(function() {
 
       canvas.clearColor(this.backgroundColor);
 
+      // if (self.fill) {
+      //   canvas.fillStyle = self.fill;
+      //   canvas.fill();
+      // }
       if (self.stroke) {
         canvas.strokeStyle = self.stroke;
         canvas.context.lineWidth = self.lineWidth;
-      }
-      if (self.fill) {
-        canvas.fillStyle = self.fill;
-        canvas.fill();
+        // canvas.stroke();
       }
 
       for (var i = 0, len = this.children.length; i < len; i++) {
@@ -1912,7 +1913,7 @@ phina.namespace(function() {
             }
           }
 
-          var alpha = Math.clamp(1.0 - src[0][2] * 0.032, 0.0, 1.0);
+          var alpha = Math.clamp(1.0 - src[0][2] * src[0][2] * 0.001, 0.0, 1.0);
           if (alpha < 0.01) continue;
           canvas.context.globalAlpha = alpha;
 
@@ -1920,14 +1921,14 @@ phina.namespace(function() {
             canvas.beginPath();
             canvas.lines.apply(canvas, positions);
             canvas.closePath();
-            if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
+            if (self.stroke) canvas.stroke();
           } else if (positions.length === 2) {
             canvas.beginPath();
             canvas.rect(positions[0], positions[1], 1, 1);
             canvas.closePath();
-            if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
+            if (self.stroke) canvas.stroke();
           }
         }
       }
@@ -2228,6 +2229,7 @@ phina.namespace(function() {
             // onenterframe: function() {
             //   this.cameraOffsetX = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
             // },
+            // visible: false,
           },
 
           scoreItemLayer: {
@@ -3280,6 +3282,8 @@ phina.namespace(function() {
     },
 
     generate: function(assetType) {
+      var c;
+
       switch (assetType) {
         case "stage0":
           ps.TextureEdit.outline("enemy_stage0", "red");
@@ -3292,8 +3296,8 @@ phina.namespace(function() {
           ps.TextureEdit.outline("bullet", "rgba(255,180,0,0.5)", 2);
           ps.TextureEdit.outline("player", "rgba(0,100,255,0.5)", 2);
           ps.TextureEdit.outline("bomb", "lightgreen", 2);
-
-          var c = phina.graphics.Canvas().setSize(32, 32);
+          
+          c = phina.graphics.Canvas().setSize(32, 32);
           c.clearColor("rgba(255, 255, 255, 0.5)");
           phina.asset.AssetManager.set("image", "particleW", c);
 
@@ -3672,7 +3676,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit({
         backgroundColor: ps.Color.pri[1],
-        fill: ps.Color.pria[7].format(0.2),
+        fill: null,
         stroke: ps.Color.pri[4],
       });
 
@@ -3698,12 +3702,12 @@ phina.namespace(function() {
       var vertices2 = [
         [0, 0, 0],
       ];
-      Array.range(-10, 10).forEach(function(z) {
-        Array.range(-10, 10).forEach(function(x) {
+      Array.range(-5, 5).forEach(function(z) {
+        Array.range(-5, 5).forEach(function(x) {
           ps.bg.Polygon({
               vertices: vertices2,
             })
-            .setTranslation(x * 2.6, 0, z * 2.6)
+            .setTranslation(x * 5.2, 0, z * 5.2)
             .addChildTo(self)
             .on("enterframe", function() {
               this.x += dx;
@@ -3719,19 +3723,19 @@ phina.namespace(function() {
 
       // 建造物
       var vertices = [
-        [-0.7, 0, -0.7],
-        [-0.7, 0, +0.7],
-        [+0.7, 0, +0.7],
-        [+0.7, 0, -0.7],
+        [-1.0, 0, -1.0],
+        [-1.0, 0, +1.0],
+        [+1.0, 0, +1.0],
+        [+1.0, 0, -1.0],
       ];
       var random = phina.util.Random(12345);
-      Array.range(-5, 5).forEach(function(z) {
-        Array.range(-5, 5).forEach(function(x) {
-          Array.range(0, random.randint(6, 11)).forEach(function(y) {
+      Array.range(-4, 4).forEach(function(z) {
+        Array.range(-4, 4).forEach(function(x) {
+          Array.range(0, random.randint(3, 5)).forEach(function(y) {
             ps.bg.Polygon({
                 vertices: vertices,
               })
-              .setTranslation(x * 3.0, y * 0.21, z * 4.0)
+              .setTranslation(x * 6.0, y * 0.6, z * 8.0)
               .addChildTo(self)
               .on("enterframe", function() {
                 this.x += dx;
@@ -4853,7 +4857,7 @@ phina.namespace(function() {
     }
   });
 
-  phina.app.Element.prototype.method("timer", function(time, callback) {
+  phina.app.Element.prototype.$method("timer", function(time, callback) {
     ps.Timer(time)
       .addChildTo(this)
       .on("time", callback);

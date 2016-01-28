@@ -24,7 +24,7 @@ phina.namespace(function() {
     },
 
     update: function(app) {
-      this.skip = app.ticker.frame % 3 !== 0;
+      this.skip = app.ticker.frame % 2 !== 0;
     },
 
     render: function() {
@@ -36,13 +36,14 @@ phina.namespace(function() {
 
       canvas.clearColor(this.backgroundColor);
 
+      // if (self.fill) {
+      //   canvas.fillStyle = self.fill;
+      //   canvas.fill();
+      // }
       if (self.stroke) {
         canvas.strokeStyle = self.stroke;
         canvas.context.lineWidth = self.lineWidth;
-      }
-      if (self.fill) {
-        canvas.fillStyle = self.fill;
-        canvas.fill();
+        // canvas.stroke();
       }
 
       for (var i = 0, len = this.children.length; i < len; i++) {
@@ -61,7 +62,7 @@ phina.namespace(function() {
             }
           }
 
-          var alpha = Math.clamp(1.0 - src[0][2] * 0.032, 0.0, 1.0);
+          var alpha = Math.clamp(1.0 - src[0][2] * src[0][2] * 0.001, 0.0, 1.0);
           if (alpha < 0.01) continue;
           canvas.context.globalAlpha = alpha;
 
@@ -69,14 +70,14 @@ phina.namespace(function() {
             canvas.beginPath();
             canvas.lines.apply(canvas, positions);
             canvas.closePath();
-            if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
+            if (self.stroke) canvas.stroke();
           } else if (positions.length === 2) {
             canvas.beginPath();
             canvas.rect(positions[0], positions[1], 1, 1);
             canvas.closePath();
-            if (self.stroke) canvas.stroke();
             if (self.fill) canvas.fill();
+            if (self.stroke) canvas.stroke();
           }
         }
       }

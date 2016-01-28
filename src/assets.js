@@ -14,6 +14,8 @@ phina.namespace(function() {
 
                 zanki: "asset/zankiIcon.png",
                 bombIcon: "asset/bombIcon.png",
+                
+                particleWhite: "asset/particleWhite.png",
               },
 
               font: {

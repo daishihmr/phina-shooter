@@ -1,5 +1,8 @@
 phina.namespace(function() {
 
+  /**
+   * 同じ敵の繰り返し出現
+   */
   phina.define("ps.EnemyLooper", {
     superClass: "phina.app.Object2D",
 

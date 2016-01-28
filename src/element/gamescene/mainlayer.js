@@ -20,6 +20,7 @@ phina.namespace(function() {
             // onenterframe: function() {
             //   this.cameraOffsetX = (GAMEAREA_WIDTH * 0.5 - self.player.x) * 0.2;
             // },
+            // visible: false,
           },
 
           scoreItemLayer: {

@@ -1,19 +1,21 @@
 phina.namespace(function() {
 
+  /**
+   * 敵編隊
+   */
   phina.define("ps.EnemyUnit", {
     superClass: "phina.app.Object2D",
 
     init: function(params) {
       this.superInit();
 
-      this.enemyClass = phina.using(params.enemyClassName);
-      this.formation = ps.EnemyUnit.formations[params.formation];
+      var self = this;
+      var EnemyClass = phina.using(params.enemyClassName);
+      var formation = ps.EnemyUnit.formations[params.formation];
 
       this.one("enterframe", function() {
-        var self = this;
-        this.formation.forEach(function(f) {
-          self
-            .enemyClass(params.$extend({
+        formation.forEach(function(f) {
+          EnemyClass(params.$extend({
               x: params.x + f.x,
               y: params.y + f.y,
               wait: params.wait + f.wait,
@@ -30,14 +32,14 @@ phina.namespace(function() {
       var killedCount = 0;
       this.on("killedOne", function() {
         killedCount += 1;
-        if (killedCount === this.formation.length) {
+        if (killedCount === formation.length) {
           this.flare("annihilated");
         }
       });
       var removedCount = 0;
       this.on("removedOne", function() {
         removedCount += 1;
-        if (removedCount === this.formation.length && killedCount < this.formation.length) {
+        if (removedCount === formation.length && killedCount < formation.length) {
           this.flare("annihilated");
         }
       });
@@ -48,6 +50,12 @@ phina.namespace(function() {
     },
 
     _static: {
+      /**
+       * 敵編隊のフォーメーション
+       * x {number} 位置x。編隊位置からの相対座標
+       * y {number} 位置y。編隊位置からの相対座標
+       * wait {number} 編隊出現から動き出すまでのフレーム
+       */
       formations: {
 
         // basic
